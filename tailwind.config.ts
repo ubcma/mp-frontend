@@ -8,15 +8,7 @@ const config: Config = {
     "./src/**/*.{ts,tsx}"
   ],
   theme: {
-    extend: {
-      colors: {
-        primary: "#4f46e5",
-        secondary: "#818cf8",
-      },
-      borderRadius: {
-        "2xl": "1rem",
-      },
-    },
+    
   },
 };
 

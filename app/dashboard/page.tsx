@@ -1,7 +1,7 @@
 export default function Dashboard() {
   return (
     <div>
-        Hello!
+        Welcome to the dashboard!
     </div>
   )
 }
