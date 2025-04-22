@@ -1,13 +1,13 @@
-"use client";
-import Link from "next/link";
+'use client';
+import Link from 'next/link';
 import {
   LayoutDashboard,
   Network,
   PlusCircle,
   Calendar,
   Users,
-} from "lucide-react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+} from 'lucide-react';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
   Sidebar,
   SidebarContent,
@@ -20,11 +20,13 @@ import {
   SidebarMenuItem,
   SidebarRail,
   useSidebar,
-} from "@/components/ui/sidebar";
-import { usePathname } from "next/navigation";
-import { getInitials } from "@/helpers/getInitials";
-import { useUserQuery } from "@/lib/queries/user";
-import { LogoutButton } from "./LogoutButton";
+} from '@/components/ui/sidebar';
+import { usePathname } from 'next/navigation';
+import { getInitials } from '@/helpers/getInitials';
+import { useUserQuery } from '@/lib/queries/user';
+import { LogoutButton } from './LogoutButton';
+import { UserProfileData } from '@/types';
+import { Skeleton } from './ui/skeleton';
 
 export function AppSidebar() {
   const {
@@ -43,36 +45,36 @@ export function AppSidebar() {
 
   const memberMenu = [
     {
-      href: "/events",
+      href: '/events',
       icon: Calendar,
-      label: "Events",
+      label: 'Events',
       disabled: false,
     },
     {
-      href: "/member-network",
+      href: '/member-network',
       icon: Network,
-      label: "Member Network",
+      label: 'Member Network',
       disabled: false,
     },
   ];
 
   const adminMenu = [
     {
-      href: "/manage-members",
+      href: '/manage-members',
       icon: Users,
-      label: "Manage Members",
+      label: 'Manage Members',
       disabled: false,
     },
     {
-      href: "/dashboard",
+      href: '/dashboard',
       icon: LayoutDashboard,
-      label: "Dashboard",
+      label: 'Dashboard',
       disabled: false,
     },
     {
-      href: "/create-event",
+      href: '/create-event',
       icon: PlusCircle,
-      label: "Create New Event",
+      label: 'Create New Event',
       disabled: true,
     },
   ];
@@ -83,42 +85,56 @@ export function AppSidebar() {
         <Link href="/events" className="flex items-center">
           <img
             src={`${
-              state === "collapsed"
-                ? "/logos/logo_red.svg"
-                : "/logos/portal_logo_red.svg"
+              state === 'collapsed'
+                ? '/logos/logo_red.svg'
+                : '/logos/portal_logo_red.svg'
             }`}
             alt="UBCMA Logo"
-            className={`${state === "collapsed" ? "h-8" : "h-[64px]"}`}
+            className={`${state === 'collapsed' ? 'h-8' : 'h-[64px]'}`}
           />
         </Link>
       </SidebarHeader>
       <SidebarContent>
         {/* User Profile */}
         <SidebarGroup>
-          <Link
-            href="/profile"
-            className={`flex items-center gap-4 transition-all duration-300 ease-in-out hover:opacity-70 ${
-              state === "collapsed" ? "p-0" : "p-2"
-            }`}
-          >
-            <Avatar
-              className={`rounded-md ${
-                state === "collapsed" ? "h-8 w-8" : "h-12 w-12"
+          {isLoading ? (
+            <div className="flex items-center space-x-4 p-2 brightness-[0.95]">
+              <Skeleton className="h-10 w-10 rounded-md" />
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-[150px] rounded-md" />
+                <Skeleton className="h-3 w-[100px] rounded-md" />
+              </div>
+            </div>
+          ) : (
+            <Link
+              href="/profile"
+              className={`flex items-center gap-3 transition-all duration-300 ease-in-out hover:opacity-70 ${
+                state === 'collapsed' ? 'p-0' : 'p-2'
               }`}
             >
-              {user?.profile_image ? (
-                <AvatarImage src={user?.profile_image} alt="Profile Image" className="object-cover w-full h-full rounded-md"/>
-              ) : (
-                <AvatarFallback>{getInitials(user?.name)}</AvatarFallback>
-              )}
-            </Avatar>
-            <div>
-              <h3 className="font-medium">{user?.name}</h3>
-              <p className="text-sm text-muted-foreground text-nowrap">
-                Year {user?.year_level} // {user?.specialization}
-              </p>
-            </div>
-          </Link>
+              <Avatar
+                className={`rounded-md ${
+                  state === 'collapsed' ? 'h-8 w-8' : 'h-10 w-10'
+                }`}
+              >
+                {user?.avatarUrl ? (
+                  <AvatarImage
+                    src={user.avatarUrl}
+                    alt="Profile Image"
+                    className="object-cover w-full h-full rounded-md"
+                  />
+                ) : (
+                  <AvatarFallback>{getInitials(user?.name)}</AvatarFallback>
+                )}
+              </Avatar>
+              <div>
+                <h3 className="font-medium">{user?.name}</h3>
+                <p className="text-xs text-muted-foreground text-nowrap">
+                  Year {user?.yearLevel} // {user?.specialization}
+                </p>
+              </div>
+            </Link>
+          )}
         </SidebarGroup>
 
         {/* Explore Section */}
@@ -132,8 +148,8 @@ export function AppSidebar() {
                     <Link
                       href={item.href}
                       aria-disabled={item.disabled}
-                      {...(item.href.startsWith("http")
-                        ? { target: "_blank", rel: "noopener noreferrer" }
+                      {...(item.href.startsWith('http')
+                        ? { target: '_blank', rel: 'noopener noreferrer' }
                         : {})}
                     >
                       <item.icon className="h-4 w-4" />
@@ -152,7 +168,7 @@ export function AppSidebar() {
             <SidebarMenu>
               <SidebarMenuItem>
                 <SidebarMenuButton asChild>
-                  <LogoutButton/>
+                  <LogoutButton />
                 </SidebarMenuButton>
               </SidebarMenuItem>
             </SidebarMenu>

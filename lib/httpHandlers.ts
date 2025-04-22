@@ -3,8 +3,6 @@ import { NextResponse } from 'next/server';
 async function genericGetRequest<T>(url: string, token?: string): Promise<T> {
   try {
 
-    console.log('Token:', token);
-
     const res = await fetch(url, {
       method: 'GET',
       headers: {

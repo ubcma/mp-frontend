@@ -5,7 +5,7 @@ export function useUserQuery() {
   return useQuery({
     queryKey: ['user'],
     queryFn: async () => {
-      const res = await fetch('/api/me');
+      const res: Response = await fetch('/api/me');
 
       if (!res.ok) {
         const errorData = await res.json();

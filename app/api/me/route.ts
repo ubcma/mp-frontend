@@ -11,10 +11,8 @@ async function getUserFromSessionToken(token: string | undefined) {
 export async function GET() {
   const cookieStore = await cookies();
   const token = cookieStore.get('token')?.value;
-  console.log('Token:', token);
 
   const user = await getUserFromSessionToken(token);
-  console.log('User:', user);
 
   if (!user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
