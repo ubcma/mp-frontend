@@ -6,6 +6,8 @@ import {
   PlusCircle,
   Calendar,
   Users,
+  Home,
+  LogOut,
 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
@@ -24,9 +26,8 @@ import {
 import { usePathname } from 'next/navigation';
 import { getInitials } from '@/helpers/getInitials';
 import { useUserQuery } from '@/lib/queries/user';
-import { LogoutButton } from './LogoutButton';
-import { UserProfileData } from '@/types';
 import { Skeleton } from './ui/skeleton';
+import { useSignoutMutation } from '@/lib/mutations/auth';
 
 export function AppSidebar() {
   const {
@@ -43,17 +44,19 @@ export function AppSidebar() {
 
   const { data: user, isLoading, isError } = useUserQuery();
 
+  const logoutMutation = useSignoutMutation();
+
   const memberMenu = [
+    {
+      href: '/home',
+      icon: Home,
+      label: 'Home',
+      disabled: false,
+    },
     {
       href: '/events',
       icon: Calendar,
       label: 'Events',
-      disabled: false,
-    },
-    {
-      href: '/member-network',
-      icon: Network,
-      label: 'Member Network',
       disabled: false,
     },
   ];
@@ -66,9 +69,9 @@ export function AppSidebar() {
       disabled: false,
     },
     {
-      href: '/dashboard',
+      href: '/admin-dashboard',
       icon: LayoutDashboard,
-      label: 'Dashboard',
+      label: 'Admin Dashboard',
       disabled: false,
     },
     {
@@ -168,7 +171,20 @@ export function AppSidebar() {
             <SidebarMenu>
               <SidebarMenuItem>
                 <SidebarMenuButton asChild>
-                  <LogoutButton />
+                  <button
+                    onClick={() => logoutMutation.mutate()}
+                    disabled={logoutMutation.isPending}
+                    className='cursor-pointer'
+                  >
+                    {logoutMutation.isPending ? (
+                      'Logging out...'
+                    ) : (
+                      <>
+                        <LogOut className="w-4 h-4"/>
+                        <span>Logout</span>
+                      </>
+                    )}
+                  </button>
                 </SidebarMenuButton>
               </SidebarMenuItem>
             </SidebarMenu>

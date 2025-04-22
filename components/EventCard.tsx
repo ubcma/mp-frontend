@@ -19,7 +19,7 @@ export function EventCard({
     <Card className="flex flex-col h-full overflow-hidden">
       <CardContent className="p-0 flex-1 flex flex-col">
         <div className="relative">
-          <div className="absolute left-4 top-4 rounded bg-customRed px-2 py-1 text-xs font-semibold text-white">
+          <div className="absolute left-4 top-4 rounded bg-ma-red px-2 py-1 text-xs font-semibold text-white">
             {new Date(event.date).toLocaleDateString("en-US", {
               month: "short",
               day: "numeric",
@@ -43,7 +43,7 @@ export function EventCard({
       </CardContent>
       <CardFooter className="p-6 pt-0 bg-black">
         {status === "Upcoming" ? (
-            <Button onClick={()=> router.push(`/events/${event.eventID}`)} className="w-full bg-customRed hover:bg-rose-600">
+            <Button onClick={()=> router.push(`/events/${event.eventID}`)} className="w-full bg-ma-red hover:bg-rose-600">
               Register for this event
             </Button>
         ) : status === "Ongoing" ? (
@@ -51,7 +51,7 @@ export function EventCard({
             Event in progress
           </Button>
         ) : (
-          <Button className="w-full bg-rose-400" disabled>
+          <Button className="w-full bg-ma-red/60" disabled>
             Event has passed
           </Button>
         )}

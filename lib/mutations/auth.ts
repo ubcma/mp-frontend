@@ -14,36 +14,25 @@ type SignInPayload = {
   password: string;
 };
 
-export function useLogoutMutation() {
+export function useSignoutMutation() {
   const router = useRouter();
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async () => {
-      const signoutRes = await fetch('/api/auth/signout', {
+      const signoutRes = await fetch('/api/auth/sign-out', {
         method: 'POST',
+        credentials: 'include',
       });
-
-      if (!signoutRes.ok) {
-        const errorData = await signoutRes.json();
-        throw new Error(errorData.error || 'Signout failed');
-      }
-
-      await fetch('/api/auth/logout', {
-        method: 'POST',
-      });
-
-      return true;
     },
     onSuccess: () => {
-      console.log('Logged out successfully!');
-
       queryClient.clear();
-
       router.push('/sign-in');
+      toast('Logged out successfully!');
     },
     onError: (error) => {
-      console.error('Logout failed:', error);
+      console.error('Signout failed:', error);
+      toast.error('Logout failed!');
     },
   });
 }
@@ -62,7 +51,9 @@ export function useSignInMutation() {
 
       if (!res.ok) {
         const errorData = await res.json();
-        throw new Error(errorData.error || 'Login failed');
+        const error = new Error(errorData.message || 'Login failed') as any;
+        error.code = errorData.code;
+        throw error;
       }
 
       const result = await res.json();
@@ -77,10 +68,7 @@ export function useSignInMutation() {
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['user'] });
-      router.push('/dashboard');
-    },
-    onError: (error) => {
-      console.error('Login failed:', error);
+      router.push('/home');
     },
   });
 }
@@ -103,7 +91,7 @@ export function useSignUpMutation() {
         throw new Error(errorData.error || 'Signup failed');
       }
 
-      const result = await res.json(); 
+      const result = await res.json();
 
       await fetch('/api/auth/set-session', {
         method: 'POST',
@@ -115,7 +103,7 @@ export function useSignUpMutation() {
     },
     onSuccess: async (data) => {
        await queryClient.invalidateQueries({ queryKey: ['user'] });
-       router.push('/dashboard');
+       router.push('/home');
     },
     onError: (error) => {
       toast('Signup error:' + error);

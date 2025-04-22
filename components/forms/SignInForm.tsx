@@ -1,15 +1,16 @@
 'use client';
 
-import * as React from 'react';
+import { useState } from 'react';
 import { useForm } from '@tanstack/react-form';
 import type { AnyFieldApi } from '@tanstack/react-form';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import { CreditCardIcon, LogIn } from 'lucide-react';
+import { LogIn } from 'lucide-react';
 import Link from 'next/link';
 import { useSignInMutation } from '@/lib/mutations/auth';
-import { redirect } from 'next/navigation';
+import Spinner from '../Spinner';
+import { toast } from 'sonner';
 
 function FieldInfo({ field }: { field: AnyFieldApi }) {
   return (
@@ -63,12 +64,32 @@ export default function SignInForm() {
       password: '',
     },
     onSubmit: async ({ value }) => {
-      loginMutation.mutate(
-        {
-          email: value.email,
-          password: value.password,
-        },
-      );
+      try {
+        await new Promise<void>((resolve, reject) => {
+          loginMutation.mutate(
+            { email: value.email, password: value.password },
+            {
+              onSuccess: () => {
+                resolve();
+              },
+              onError: (error) => {
+                toast.error(error.message,
+                  {
+                    style: {
+                      background: '#FFE6E8',
+                      color: '#EF3050',
+                      border: '1px solid #EF3050',
+                    },
+                  }
+                );
+                reject(error);
+              },
+            }
+          );
+        });
+      } catch (error) {
+        console.error('Login error:', error);
+      }
     },
   });
 
@@ -121,10 +142,19 @@ export default function SignInForm() {
               className="cursor-pointer font-regular bg-ma-red"
               variant="ma"
               type="submit"
-              disabled={!canSubmit}
+              disabled={isSubmitting}
             >
-              <LogIn />
-              <div>Sign In</div>
+              {isSubmitting ? (
+                <>
+                  <Spinner />
+                  <div>Loading</div>
+                </>
+              ) : (
+                <>
+                  <LogIn />
+                  <div>Sign In</div>
+                </>
+              )}
             </Button>
           )}
         />

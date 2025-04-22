@@ -2,30 +2,22 @@ import { NextResponse } from 'next/server';
 
 async function genericGetRequest<T>(url: string, token?: string): Promise<T> {
   try {
-
     const res = await fetch(url, {
       method: 'GET',
       headers: {
-        'Content-Type': 'application/json',
         ...(token ? { Cookie: `token=${token}` } : {}),
       },
       credentials: 'include',
     });
 
-    const contentType = res.headers.get('Content-Type') || '';
-
     if (!res.ok) {
-      if (contentType.includes('application/json')) {
-        const errorData = await res.json();
-        throw new Error(errorData.error || 'Failed to fetch');
-      } else {
-        const text = await res.text();
-        throw new Error(text || 'Failed to fetch');
+      const errorText = await res.text();
+      try {
+        const errorJson = JSON.parse(errorText);
+        throw new Error(errorJson.message || 'Failed to fetch');
+      } catch {
+        throw new Error(errorText || 'Failed to fetch');
       }
-    }
-
-    if (!contentType.includes('application/json')) {
-      throw new Error('Unexpected response format');
     }
 
     return res.json();
@@ -35,25 +27,32 @@ async function genericGetRequest<T>(url: string, token?: string): Promise<T> {
   }
 }
 
-async function genericPostRequest(url: string, body: any) {
+async function genericPostRequest<T>(url: string, body: any, token?: string): Promise<T> {
   try {
-    console.log('Sending POST request to:', url);
-    console.log('Request body:', body);
-    const response = await fetch(url, {
+    const res = await fetch(url, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
       body: JSON.stringify(body),
     });
 
-    const data = await response.json();
-    console.log('Response data:', data);
-    return NextResponse.json(data);
+    if (!res.ok) {
+      const { message = 'Request failed', code } = await res.json().catch(() => ({}));
+      const error = new Error(message) as any;
+      if (code) error.code = code;
+      throw error;
+    }
 
+    return res.json();
   } catch (error) {
     console.error('POST request error:', error);
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+    throw error;
   }
 }
+
+
 
 async function genericPutRequest(url: string, body: any) {
   try {

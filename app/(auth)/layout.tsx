@@ -9,7 +9,7 @@ export default function Layout({
     <div className="relative flex flex-row min-h-screen bg-ma-red">
       <div className="hidden fixed left-0 top-0 bottom-0 w-1/2 p-8 lg:flex flex-col justify-between">
         <Image
-          src="/logos/ma-logo-white.svg"
+          src="/logos/logo_white.svg"
           width={128}
           height={128}
           alt="UBC MA Logo"
