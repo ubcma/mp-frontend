@@ -1,9 +1,10 @@
 "use client"
 
 import { useEventContext } from "@/context/EventContext"
-import { EventCard } from "./EventCard"
+
 import { Skeleton } from "@/components/ui/skeleton"
 import { Event } from "@/types"
+import { EventCard } from "./EventCard"
 
 export function EventList() {
   const { filteredEvents, isLoading } = useEventContext()

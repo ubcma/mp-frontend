@@ -1,37 +1,34 @@
-"use client";
+'use client';
 
-import React, { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Search } from "@/components/Search";
-import { EventStatus, getEventStatus } from "@/utils/eventStatus";
-import { EventList } from "@/components/EventList";
-import { EventProvider, useEventContext } from "@/context/EventContext";
+import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Search } from '@/components/Search';
+import { EventStatus, getEventStatus } from '@/helpers/eventStatus';
+import { EventList } from '@/components/EventList';
+import { EventProvider, useEventContext } from '@/context/EventContext';
 
 export type EventTagKeys =
-  | "networking"
-  | "conference"
-  | "competition"
-  | "workshop";
+  | 'networking'
+  | 'conference'
+  | 'competition'
+  | 'workshop';
 
-const tabs: { value: EventStatus | "All"; label: string }[] = [
-  { value: "All", label: "All" },
-  { value: "Upcoming", label: "Upcoming" },
-  { value: "Ongoing", label: "Ongoing" },
-  { value: "Past", label: "Past" },
+const tabs: { value: EventStatus | 'All'; label: string }[] = [
+  { value: 'All', label: 'All' },
+  { value: 'Upcoming', label: 'Upcoming' },
+  { value: 'Ongoing', label: 'Ongoing' },
+  { value: 'Past', label: 'Past' },
 ];
 
 export default function Home() {
-
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
   return (
     <EventProvider>
-      <main className="p-6">
-        <EventTabs />
-      </main>
+      <EventTabs />
     </EventProvider>
   );
 }
@@ -42,7 +39,7 @@ function EventTabs() {
   return (
     <Tabs
       value={activeTab}
-      onValueChange={(value) => setActiveTab(value as EventStatus | "All")}
+      onValueChange={(value) => setActiveTab(value as EventStatus | 'All')}
       className="space-y-6"
     >
       <div>

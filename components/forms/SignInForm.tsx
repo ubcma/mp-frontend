@@ -68,23 +68,6 @@ export default function SignInForm() {
           email: value.email,
           password: value.password,
         },
-        {
-          onSuccess: async (res) => {
-            const token = res.token;
-
-            await fetch('/api/auth/set-session', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ token }),
-            });
-
-            console.log('Session set successfully.');
-            redirect('/dashboard');
-          },
-          onError: (error) => {
-            console.error('Login failed:', error);
-          },
-        }
       );
     },
   });

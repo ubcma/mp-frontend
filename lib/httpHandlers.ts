@@ -1,13 +1,39 @@
 import { NextResponse } from 'next/server';
 
-async function genericGetRequest(url: string) {
+async function genericGetRequest<T>(url: string, token?: string): Promise<T> {
   try {
-    const response = await fetch(url, { method: 'GET' });
-    const data = await response.json();
-    return NextResponse.json(data);
+
+    console.log('Token:', token);
+
+    const res = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token ? { Cookie: `token=${token}` } : {}),
+      },
+      credentials: 'include',
+    });
+
+    const contentType = res.headers.get('Content-Type') || '';
+
+    if (!res.ok) {
+      if (contentType.includes('application/json')) {
+        const errorData = await res.json();
+        throw new Error(errorData.error || 'Failed to fetch');
+      } else {
+        const text = await res.text();
+        throw new Error(text || 'Failed to fetch');
+      }
+    }
+
+    if (!contentType.includes('application/json')) {
+      throw new Error('Unexpected response format');
+    }
+
+    return res.json();
   } catch (error) {
     console.error('GET request error:', error);
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+    throw error;
   }
 }
 
