@@ -2,59 +2,15 @@
 
 import * as React from 'react';
 import { useForm } from '@tanstack/react-form';
-import type { AnyFieldApi } from '@tanstack/react-form';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { CreditCardIcon } from 'lucide-react';
 import Link from 'next/link';
 import { useSignUpMutation } from '@/lib/mutations/auth';
-
-function FieldInfo({ field }: { field: AnyFieldApi }) {
-  return (
-    <div>
-      {field.state.meta.isTouched && field.state.meta.errors.length ? (
-        <p className="text-ma-red text-xs">
-          {field.state.meta.errors.join(', ')}
-        </p>
-      ) : null}
-      {field.state.meta.isValidating ? (
-        <p className="text-neutral-500 text-xs">Validating...</p>
-      ) : null}
-    </div>
-  );
-}
-
-function RenderInputField({
-  type,
-  placeholder,
-  label,
-  field,
-}: {
-  type?: string;
-  placeholder?: string;
-  label: string;
-  field: AnyFieldApi;
-}) {
-  return (
-    <div className="flex flex-col gap-2">
-      <Label htmlFor={field.name}>{label}</Label>
-      <Input
-        id={field.name}
-        name={field.name}
-        value={field.state.value}
-        onBlur={field.handleBlur}
-        onChange={(e) => field.handleChange(e.target.value)}
-        type={type}
-        placeholder={placeholder}
-      />
-      <FieldInfo field={field} />
-    </div>
-  );
-}
+import { toast } from 'sonner';
+import Spinner from '../Spinner';
+import { RenderInputField } from './FormComponents';
 
 export default function SignUpForm() {
-
   const signupMutation = useSignUpMutation();
 
   const form = useForm({
@@ -65,31 +21,45 @@ export default function SignUpForm() {
       password: '',
     },
     onSubmit: async ({ value }) => {
-      const fullName = `${value.firstName} ${value.lastName}`;
+      try {
+        await new Promise<void>((resolve, reject) => {
+          const fullName = `${value.firstName} ${value.lastName}`;
 
-      signupMutation.mutate(
-        {
-          name: fullName,
-          email: value.email,
-          password: value.password,
-        },
-        {
-          onSuccess: async (res) => {
-            const token = res.token;
+          signupMutation.mutate(
+            {
+              name: fullName,
+              email: value.email,
+              password: value.password,
+            },
+            {
+              onSuccess: async (res) => {
+                const token = res.token;
 
-            await fetch('/api/auth/set-session', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ token }),
-            });
+                console.log('Here');
+                await fetch('/api/auth/set-session', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ token }),
+                });
 
-            console.log('Session set successfully.');
-          },
-          onError: (error) => {
-            console.error('Signup failed:', error);
-          },
-        }
-      );
+                resolve();
+              },
+              onError: (error) => {
+                toast.error(error.message, {
+                  style: {
+                    background: '#FFE6E8',
+                    color: '#EF3050',
+                    border: '1px solid #EF3050',
+                  },
+                });
+                reject(error);
+              },
+            }
+          );
+        });
+      } catch (error) {
+        console.error('Login error:', error);
+      }
     },
   });
 
@@ -167,11 +137,20 @@ export default function SignUpForm() {
               type="submit"
               disabled={!canSubmit}
             >
-              <CreditCardIcon />
-              <div>
-                {' '}
-                Continue to payment with <b>Stripe</b>{' '}
-              </div>
+              {isSubmitting ? (
+                <>
+                  <Spinner />
+                  <div>Loading</div>
+                </>
+              ) : (
+                <>
+                  <CreditCardIcon />
+                  <div>
+                    {' '}
+                    Continue to payment with <b>Stripe</b>{' '}
+                  </div>
+                </>
+              )}
             </Button>
           )}
         />

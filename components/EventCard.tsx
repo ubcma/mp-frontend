@@ -16,7 +16,7 @@ export function EventCard({
   const router = useRouter();
 
   return (
-    <Card className="flex flex-col h-full overflow-hidden">
+    <Card className="flex flex-col h-full overflow-hidden gap-0 p-0">
       <CardContent className="p-0 flex-1 flex flex-col">
         <div className="relative">
           <div className="absolute left-4 top-4 rounded bg-ma-red px-2 py-1 text-xs font-semibold text-white">
@@ -26,15 +26,15 @@ export function EventCard({
             })}
           </div>
           <img
-            src={event.img || "/placeholder.svg"}
-            alt={event.eventName}
+            src={event.imageUrl || "/placeholder.svg"}
+            alt={event.title}
             className="h-64 w-full object-cover"
           />
           <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-black to-transparent"></div>
         </div>
         <div className="p-6 pt-2 bg-black text-center flex-1 flex flex-col justify-center">
           <h3 className="text-xl text-white font-semibold">
-            {event.eventName}
+            {event.title}
           </h3>
           <p className="text-muted-foreground truncate">
             {event.description}
@@ -43,16 +43,16 @@ export function EventCard({
       </CardContent>
       <CardFooter className="p-6 pt-0 bg-black">
         {status === "Upcoming" ? (
-            <Button onClick={()=> router.push(`/events/${event.eventID}`)} className="w-full bg-ma-red hover:bg-rose-600">
-              Register for this event
+            <Button onClick={()=> router.push(`/events/${event.title}`)} className="w-full bg-ma-red hover:bg-rose-600">
+              Register for this event!
             </Button>
         ) : status === "Ongoing" ? (
           <Button className="w-full bg-green-500 hover:bg-green-600">
-            Event in progress
+            Event in progress!
           </Button>
         ) : (
           <Button className="w-full bg-ma-red/60" disabled>
-            Event has passed
+            Event has passed.
           </Button>
         )}
       </CardFooter>

@@ -3,15 +3,24 @@ import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(req: NextRequest) {
-  const { token } = await req.json();
+  try {
+    const { token } = await req.json();
 
-  (await cookies()).set('token', token, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    path: '/',
-    sameSite: 'lax',
-    maxAge: 30 * 24 * 60 * 60,
-  });
+    if (!token) {
+      return NextResponse.json({ message: 'Missing token' }, { status: 400 });
+    }
 
-  return NextResponse.json({ success: true });
+    (await cookies()).set('sessionToken', token, {
+      httpOnly: true,
+      path: '/',
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 60 * 60 * 24 * 7,
+    });
+
+    return NextResponse.json({ message: 'Session set' });
+  } catch (err) {
+    console.error('Error setting session:', err);
+    return NextResponse.json({ message: 'Failed to set session' }, { status: 500 });
+  }
 }

@@ -4,6 +4,7 @@ import type React from "react"
 import { createContext, useContext, useState, useEffect } from "react"
 import type { Event } from "@/types"
 import { type EventStatus, getEventStatus } from "@/helpers/eventStatus"
+import { useGetEventsQuery } from "@/lib/queries/events"
 
 type EventContextType = {
   events: Event[]
@@ -27,38 +28,18 @@ export const useEventContext = () => {
 }
 
 export const EventProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [events, setEvents] = useState<Event[]>([])
+
   const [filteredEvents, setFilteredEvents] = useState<Event[]>([])
   const [searchTerm, setSearchTerm] = useState("")
   const [activeTab, setActiveTab] = useState<EventStatus | "All">("All")
-  const [isLoading, setIsLoading] = useState(true)
+
+  const {data: events, isLoading, isError } = useGetEventsQuery();
 
   useEffect(() => {
-      const fetchEvents = async () => {
-        try {
-          const eventsList = [] as Event[];
-  
-          eventsList.sort((a, b) => {
-            const dateA = new Date(a.date).getTime();
-            const dateB = new Date(b.date).getTime();
-            return dateB - dateA; // Ascending order of most recent event
-          });
-          setEvents(eventsList);
-          setIsLoading(false)
-        } catch (error) {
-          console.error("Error fetching events: ", error);
-          setIsLoading(false)
-        }
-      };
-  
-      fetchEvents();
-    }, []);
-
-  useEffect(() => {
-    const filtered = events.filter(
-      (event) =>
+    const filtered = events?.filter(
+      (event: Event) =>
         (activeTab === "All" || getEventStatus(event.date) === activeTab) &&
-        event.eventName.toLowerCase().includes(searchTerm.toLowerCase()),
+        event.title.toLowerCase().includes(searchTerm.toLowerCase()),
     )
     setFilteredEvents(filtered)
   }, [events, searchTerm, activeTab])

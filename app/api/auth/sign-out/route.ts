@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(req: NextRequest) {
   try {
-    const token = (await cookies()).get('token')?.value;
+    const token = (await cookies()).get('sessionToken')?.value;
 
     if (token) {
       await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/sign-out`, {
@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    (await cookies()).set('token', '', {
+    (await cookies()).set('sessionToken', '', {
       path: '/',
       httpOnly: true,
       sameSite: 'lax',
