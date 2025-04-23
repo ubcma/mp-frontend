@@ -20,9 +20,7 @@ export default function Home() {
 
   return (
     <EventProvider>
-      <main className="p-6">
         <EventTabs />
-      </main>
     </EventProvider>
   );
 }
