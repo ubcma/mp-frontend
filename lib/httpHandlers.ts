@@ -1,23 +1,34 @@
 import { NextResponse } from 'next/server';
 
-async function genericGetRequest<T>(url: string, token?: string): Promise<T> {
+async function genericGetRequest<T>(url: string, cookie?: string): Promise<T> {
+
+  const headers: HeadersInit = {
+    'Content-Type': 'application/json',
+  };
+
+  if (cookie) {
+    headers['Cookie'] = cookie;
+  }
+
   try {
     const res = await fetch(url, {
       method: 'GET',
-      headers: {
-        ...(token ? { Cookie: `token=${token}` } : {}),
-      },
+      headers: headers,
       credentials: 'include',
     });
 
     if (!res.ok) {
       const errorText = await res.text();
+      let errorMessage = 'Failed to fetch';
+
       try {
         const errorJson = JSON.parse(errorText);
-        throw new Error(errorJson.message || 'Failed to fetch');
+        errorMessage = errorJson.message || errorMessage;
       } catch {
-        throw new Error(errorText || 'Failed to fetch');
+        console.warn('Failed to parse error response as JSON');
       }
+
+      throw new Error(errorMessage);
     }
 
     return res.json();
@@ -27,21 +38,42 @@ async function genericGetRequest<T>(url: string, token?: string): Promise<T> {
   }
 }
 
-async function genericPostRequest<T>(url: string, body: any, token?: string): Promise<T> {
+async function genericPostRequest<T>(
+  url: string,
+  body: any,
+  cookie?: string,
+): Promise<T> {
   try {
+    const headers: HeadersInit = {
+      'Content-Type': 'application/json',
+    };
+
+    if (cookie) {
+      headers['Cookie'] = cookie;
+    }
+
+    console.log("Data: " + JSON.stringify(body))
+    console.log("Sending request to: " + url)
+
     const res = await fetch(url, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      },
+      headers,
       body: JSON.stringify(body),
+      credentials: 'include',
     });
 
     if (!res.ok) {
-      const { message = 'Request failed', code } = await res.json().catch(() => ({}));
-      const error = new Error(message) as any;
-      if (code) error.code = code;
+      const errorText = await res.text();
+      let errorMessage = 'Request failed';
+
+      try {
+        const errorJson = JSON.parse(errorText);
+        errorMessage = errorJson.message || errorMessage;
+      } catch {
+        console.warn('Failed to parse error response as JSON');
+      }
+
+      const error = new Error(errorMessage) as any;
       throw error;
     }
 
@@ -51,7 +83,6 @@ async function genericPostRequest<T>(url: string, body: any, token?: string): Pr
     throw error;
   }
 }
-
 
 
 async function genericPutRequest(url: string, body: any) {
@@ -65,7 +96,10 @@ async function genericPutRequest(url: string, body: any) {
     return NextResponse.json(data);
   } catch (error) {
     console.error('PUT request error:', error);
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Internal Server Error' },
+      { status: 500 }
+    );
   }
 }
 
@@ -76,8 +110,16 @@ async function genericDeleteRequest(url: string) {
     return NextResponse.json(data);
   } catch (error) {
     console.error('DELETE request error:', error);
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Internal Server Error' },
+      { status: 500 }
+    );
   }
 }
 
-export { genericGetRequest, genericPostRequest, genericPutRequest, genericDeleteRequest };
+export {
+  genericGetRequest,
+  genericPostRequest,
+  genericPutRequest,
+  genericDeleteRequest,
+};

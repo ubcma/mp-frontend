@@ -23,11 +23,11 @@ import {
   SidebarRail,
   useSidebar,
 } from '@/components/ui/sidebar';
-import { usePathname } from 'next/navigation';
+import { redirect, usePathname, useRouter } from 'next/navigation';
 import { getInitials } from '@/helpers/getInitials';
 import { useUserQuery } from '@/lib/queries/user';
 import { Skeleton } from './ui/skeleton';
-import { useSignoutMutation } from '@/lib/mutations/auth';
+import { signOut } from '@/lib/better-auth/sign-out';
 
 export function AppSidebar() {
   const {
@@ -40,11 +40,11 @@ export function AppSidebar() {
     toggleSidebar,
   } = useSidebar();
 
+  const router = useRouter();
+
   const pathname = usePathname();
 
   const { data: user, isLoading, isError } = useUserQuery();
-
-  const logoutMutation = useSignoutMutation();
 
   const memberMenu = [
     {
@@ -82,10 +82,19 @@ export function AppSidebar() {
     },
   ];
 
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      router.push('/sign-in');
+    } catch (error) {
+      console.error('Failed to sign out', error);
+    }
+  };
+
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader className="p-2 pt-4">
-        <Link href="/events" className="flex items-center">
+        <Link href="/home" className="flex items-center">
           <img
             src={`${
               state === 'collapsed'
@@ -133,7 +142,7 @@ export function AppSidebar() {
               <div>
                 <h3 className="font-medium">{user?.name}</h3>
                 <p className="text-xs text-muted-foreground text-nowrap">
-                  Year {user?.yearLevel} // {user?.specialization}
+                  {user.onboardingComplete && `Year ${user.yearLevel} // ${user.major}`}
                 </p>
               </div>
             </Link>
@@ -172,18 +181,13 @@ export function AppSidebar() {
               <SidebarMenuItem>
                 <SidebarMenuButton asChild>
                   <button
-                    onClick={() => logoutMutation.mutate()}
-                    disabled={logoutMutation.isPending}
-                    className='cursor-pointer'
+                    onClick={handleSignOut}
+                    className="cursor-pointer"
                   >
-                    {logoutMutation.isPending ? (
-                      'Logging out...'
-                    ) : (
-                      <>
-                        <LogOut className="w-4 h-4"/>
-                        <span>Logout</span>
-                      </>
-                    )}
+                    <>
+                      <LogOut className="w-4 h-4" />
+                      <span>Logout</span>
+                    </>
                   </button>
                 </SidebarMenuButton>
               </SidebarMenuItem>

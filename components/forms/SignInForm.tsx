@@ -8,13 +8,13 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { LogIn } from 'lucide-react';
 import Link from 'next/link';
-import { useSignInMutation } from '@/lib/mutations/auth';
 import Spinner from '../Spinner';
 import { toast } from 'sonner';
 import { RenderInputField } from './FormComponents';
+import { GoogleSignInButton } from '../GoogleSignInButton';
+import { signInWithEmail } from '@/lib/better-auth/sign-in';
 
 export default function SignInForm() {
-  const loginMutation = useSignInMutation();
 
   const form = useForm({
     defaultValues: {
@@ -24,29 +24,10 @@ export default function SignInForm() {
     onSubmit: async ({ value }) => {
       try {
         await new Promise<void>((resolve, reject) => {
-          loginMutation.mutate(
-            { email: value.email, password: value.password },
-            {
-              onSuccess: () => {
-                resolve();
-              },
-              onError: (error) => {
-                toast.error(error.message,
-                  {
-                    style: {
-                      background: '#FFE6E8',
-                      color: '#EF3050',
-                      border: '1px solid #EF3050',
-                    },
-                  }
-                );
-                reject(error);
-              },
-            }
-          );
+          signInWithEmail(value.email, value.password);
         });
       } catch (error) {
-        console.error('Login error:', error);
+        toast.error(String(error));
       }
     },
   });
@@ -117,6 +98,12 @@ export default function SignInForm() {
           )}
         />
       </form>
+      <div className="flex items-center justify-between">
+        <hr className="w-full border-gray-300" />
+        <span className="mx-2 text-gray-500">OR</span>
+        <hr className="w-full border-gray-300" />
+      </div>
+      <GoogleSignInButton />
       <h1 className="font-normal text-sm">
         New here?{' '}
         <Link href="/sign-up" className="text-ma-red font-semibold">

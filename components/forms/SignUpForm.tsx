@@ -5,14 +5,12 @@ import { useForm } from '@tanstack/react-form';
 import { Button } from '@/components/ui/button';
 import { CreditCardIcon } from 'lucide-react';
 import Link from 'next/link';
-import { useSignUpMutation } from '@/lib/mutations/auth';
 import { toast } from 'sonner';
 import Spinner from '../Spinner';
 import { RenderInputField } from './FormComponents';
+import { signUpWithEmail } from '@/lib/better-auth/sign-up';
 
 export default function SignUpForm() {
-  const signupMutation = useSignUpMutation();
-
   const form = useForm({
     defaultValues: {
       firstName: '',
@@ -22,43 +20,10 @@ export default function SignUpForm() {
     },
     onSubmit: async ({ value }) => {
       try {
-        await new Promise<void>((resolve, reject) => {
-          const fullName = `${value.firstName} ${value.lastName}`;
-
-          signupMutation.mutate(
-            {
-              name: fullName,
-              email: value.email,
-              password: value.password,
-            },
-            {
-              onSuccess: async (res) => {
-                const token = res.token;
-
-                console.log('Here');
-                await fetch('/api/auth/set-session', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({ token }),
-                });
-
-                resolve();
-              },
-              onError: (error) => {
-                toast.error(error.message, {
-                  style: {
-                    background: '#FFE6E8',
-                    color: '#EF3050',
-                    border: '1px solid #EF3050',
-                  },
-                });
-                reject(error);
-              },
-            }
-          );
-        });
+        const fullName = `${value.firstName} ${value.lastName}`;
+        await signUpWithEmail(fullName, value.email, value.password);
       } catch (error) {
-        console.error('Login error:', error);
+        toast.error(String(error));
       }
     },
   });

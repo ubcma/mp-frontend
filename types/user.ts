@@ -10,6 +10,18 @@ export interface UserProfileData {
     bio: string,
     linkedinUrl: string,
     coursesTaken: null,
-    diet: string,
-    specialization: string
+    diet: string[],
+    interests: string[]
+    faculty: string
   }
+
+export type UpdateMeInput = {
+    year?: string;
+    major?: string;
+    faculty?: string;
+    linkedinUrl?: string;
+    interests?: string[];
+    diet?: string[];
+    avatar?: string;
+    onboardingComplete?: boolean;
+  };
