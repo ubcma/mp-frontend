@@ -19,7 +19,7 @@ export default function Home() {
 
       <div className='flex flex-col gap-2'>
         <span className="flex flex-row text-3xl font-semibold">
-          {userFirstName ? `Welcome ${userFirstName}!` : <Skeleton className="h-8 w-32 rounded-xl"/>}
+          {userFirstName ? `Welcome back, ${userFirstName}!` : <Skeleton className="h-8 w-32 rounded-xl"/>}
         </span>
         <p className="text-muted-foreground">
           Check out the latest events, workshops, and opportunities we have for

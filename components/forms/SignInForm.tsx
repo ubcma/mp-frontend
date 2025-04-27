@@ -33,10 +33,10 @@ export default function SignInForm() {
   });
 
   return (
-    <div className="flex flex-col gap-8 h-full justify-center">
+    <div className="flex flex-col gap-6 h-full justify-center mx-8">
       <div>
         <h1 className="font-semibold text-xl">Sign In</h1>
-        <h1 className="font-normal text-sm">
+        <h1 className="font-normal text-sm text-muted-foreground">
           Enter your email and password to access your account.
         </h1>
       </div>
@@ -99,9 +99,9 @@ export default function SignInForm() {
         />
       </form>
       <div className="flex items-center justify-between">
-        <hr className="w-full border-gray-300" />
-        <span className="mx-2 text-gray-500">OR</span>
-        <hr className="w-full border-gray-300" />
+        <hr className="w-full border-neutral-300" />
+        <span className="mx-2 text-neutral-400 font-light">OR</span>
+        <hr className="w-full border-neutral-300" />
       </div>
       <GoogleSignInButton />
       <h1 className="font-normal text-sm">

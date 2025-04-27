@@ -28,6 +28,8 @@ import { getInitials } from '@/helpers/getInitials';
 import { useUserQuery } from '@/lib/queries/user';
 import { Skeleton } from './ui/skeleton';
 import { signOut } from '@/lib/better-auth/sign-out';
+import { useState } from 'react';
+import Spinner from './Spinner';
 
 export function AppSidebar() {
   const {
@@ -45,6 +47,8 @@ export function AppSidebar() {
   const pathname = usePathname();
 
   const { data: user, isLoading, isError } = useUserQuery();
+
+  const [isSignOutLoading, setIsSignOutLoading] = useState(false);
 
   const memberMenu = [
     {
@@ -84,10 +88,12 @@ export function AppSidebar() {
 
   const handleSignOut = async () => {
     try {
+      setIsSignOutLoading(true);
       await signOut();
       router.push('/sign-in');
     } catch (error) {
       console.error('Failed to sign out', error);
+      setIsSignOutLoading(false);
     }
   };
 
@@ -142,7 +148,8 @@ export function AppSidebar() {
               <div>
                 <h3 className="font-medium">{user?.name}</h3>
                 <p className="text-xs text-muted-foreground text-nowrap">
-                  {user.onboardingComplete && `Year ${user.yearLevel} // ${user.major}`}
+                  {user.onboardingComplete &&
+                    `Year ${user.yearLevel} // ${user.major}`}
                 </p>
               </div>
             </Link>
@@ -180,14 +187,18 @@ export function AppSidebar() {
             <SidebarMenu>
               <SidebarMenuItem>
                 <SidebarMenuButton asChild>
-                  <button
-                    onClick={handleSignOut}
-                    className="cursor-pointer"
-                  >
-                    <>
-                      <LogOut className="w-4 h-4" />
-                      <span>Logout</span>
-                    </>
+                  <button onClick={handleSignOut} className="cursor-pointer">
+                    {isSignOutLoading ? (
+                      <>
+                        <Spinner color="blue-500"/> 
+                        <span> Signing out... </span>
+                      </>
+                    ) : (
+                      <>
+                        <LogOut className="w-4 h-4" />
+                        <span>Logout</span>
+                      </>
+                    )}
                   </button>
                 </SidebarMenuButton>
               </SidebarMenuItem>

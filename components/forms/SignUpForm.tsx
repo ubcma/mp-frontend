@@ -29,10 +29,10 @@ export default function SignUpForm() {
   });
 
   return (
-    <div className="flex flex-col gap-8 h-full justify-center">
+    <div className="flex flex-col gap-8 h-full justify-center mx-8">
       <div>
         <h1 className="font-semibold text-xl">Sign Up</h1>
-        <h1 className="font-normal text-sm">
+        <h1 className="font-normal text-sm text-muted-foreground">
           Enter your details to register for an account.
         </h1>
       </div>
@@ -121,7 +121,7 @@ export default function SignUpForm() {
         />
       </form>
       <h1 className="font-normal text-sm">
-        Not a member yet?{' '}
+        Have an account?{' '}
         <Link href="/sign-in" className="text-ma-red font-semibold">
           Sign In
         </Link>
