@@ -5,8 +5,6 @@ export async function middleware(request: NextRequest) {
   const token = request.cookies.get('membership-portal.session_token')?.value;
   const { pathname } = request.nextUrl;
 
-  // console.log(token ? 'Token exists' : 'No token found');
-
   if (pathname === '/sign-in' || pathname === '/sign-up' || pathname === '/') {
     if (token) {
       return NextResponse.redirect(new URL('/home', request.url));

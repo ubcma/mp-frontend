@@ -28,7 +28,7 @@ export default function OnboardingModal() {
   const { width, height } = useWindowSize();
 
   useEffect(() => {
-    if (step === steps.length+1) {
+    if (step === steps.length + 1) {
       setShowConfetti(true);
     }
   }, [step]);
@@ -45,7 +45,6 @@ export default function OnboardingModal() {
       onboardingComplete: true,
     },
     onSubmit: async ({ value }) => {
-      // console.log(JSON.stringify(value))
       await fetch('/api/me/', {
         method: 'POST',
         body: JSON.stringify(value),
@@ -373,24 +372,24 @@ export default function OnboardingModal() {
               </motion.div>
             </AnimatePresence>
 
-            {step < steps.length && (
-              <div className="flex justify-between">
-                {step > 0 ? (
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => setStep((s) => s - 1)}
-                  >
-                    Back
-                  </Button>
-                ) : (
-                  <div />
-                )}
+            <div className="flex justify-between">
+              {step > 0 ? (
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setStep((s) => s - 1)}
+                >
+                  Back
+                </Button>
+              ) : (
+                <div />
+              )}
+              {step < steps.length && (
                 <Button type="button" onClick={() => setStep((s) => s + 1)}>
                   Next
                 </Button>
-              </div>
-            )}
+              )}
+            </div>
           </motion.form>
         </DialogContent>
       </Dialog>

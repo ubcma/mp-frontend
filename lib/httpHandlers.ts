@@ -52,9 +52,6 @@ async function genericPostRequest<T>(
       headers['Cookie'] = cookie;
     }
 
-    console.log("Data: " + JSON.stringify(body))
-    console.log("Sending request to: " + url)
-
     const res = await fetch(url, {
       method: 'POST',
       headers,

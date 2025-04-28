@@ -12,8 +12,11 @@ export function useUserQuery() {
         throw new Error(errorData.error || 'Failed to fetch user');
       }
 
-      return res.json();
+      const data = await res.json();
+    
+      return data;
     },
     retry: 1,
+    staleTime: 5 * 60 * 1000,
   });
 }

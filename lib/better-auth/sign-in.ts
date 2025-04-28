@@ -1,4 +1,5 @@
 import { authClient } from '@/lib/auth-client';
+import { toast } from 'sonner';
 
 export const signInWithGoogle = async () => {
   const frontendBaseURL =
@@ -34,7 +35,8 @@ export const signInWithEmail = async (email: string, password: string) => {
     }
   );
   if (response.error) {
-    console.error('Error signing in with email:', response.error);
+    console.error('Error signing in with email:', response.error.message);
+    toast.error(response.error.message);
     throw new Error(response.error.message);
   }
   return response;
