@@ -3,7 +3,7 @@
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { getEventStatus, type EventStatus } from '@/helpers/eventStatus';
-import { Event } from '@/types';
+import { Event } from '@/lib/types';
 import { useRouter } from 'next/navigation';
 import { ArrowUpRight } from 'lucide-react';
 import Link from 'next/link';

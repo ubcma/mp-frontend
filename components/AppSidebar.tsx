@@ -82,7 +82,7 @@ export function AppSidebar() {
       href: '/create-event',
       icon: PlusCircle,
       label: 'Create New Event',
-      disabled: true,
+      disabled: false,
     },
   ];
 
@@ -146,7 +146,7 @@ export function AppSidebar() {
                 )}
               </Avatar>
               <div>
-                <h3 className="font-medium">{user?.name}</h3>
+                <h3 className="font-medium text-nowrap">{user?.name}</h3>
                 <p className="text-xs text-muted-foreground text-nowrap">
                   {user.onboardingComplete &&
                     `Year ${user.yearLevel} // ${user.major}`}
@@ -181,6 +181,31 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
 
+        {/* Admin Section */}
+        {user?.role === "Admin" && <SidebarGroup>
+          <SidebarGroupLabel>Admin</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {adminMenu.map((item) => (
+                <SidebarMenuItem key={item.href}>
+                  <SidebarMenuButton asChild isActive={pathname === item.href}>
+                    <Link
+                      href={item.href}
+                      aria-disabled={item.disabled}
+                      {...(item.href.startsWith('http')
+                        ? { target: '_blank', rel: 'noopener noreferrer' }
+                        : {})}
+                    >
+                      <item.icon className="h-4 w-4" />
+                      <span>{item.label}</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>}
+
         {/* Logout */}
         <SidebarGroup className="mt-auto">
           <SidebarGroupContent>
@@ -190,7 +215,7 @@ export function AppSidebar() {
                   <button onClick={handleSignOut} className="cursor-pointer">
                     {isSignOutLoading ? (
                       <>
-                        <Spinner color="blue-500"/> 
+                        <Spinner color="blue-500" />
                         <span> Signing out... </span>
                       </>
                     ) : (

@@ -21,7 +21,7 @@ export default function ProfilePage() {
           >
             {user?.avatarUrl ? (
               <AvatarImage
-                src={user.avatarUrl}
+                src={user?.avatarUrl}
                 alt="Profile Image"
                 className="object-cover w-full h-full rounded-full"
               />
@@ -34,25 +34,25 @@ export default function ProfilePage() {
 
           <div className="space-y-1">
             <div className="flex items-center gap-2">
-              <h1 className="text-2xl font-semibold">{user.name}</h1>
-              <Badge variant="outline">{user.role}</Badge>
+              <h1 className="text-2xl font-semibold">{user?.name}</h1>
+              <Badge variant="outline">{user?.role}</Badge>
             </div>
-            <p className="text-muted-foreground">{user.email}</p>
-            <p className="text-sm text-gray-600 mt-1">{user.bio}</p>
+            <p className="text-muted-foreground">{user?.email}</p>
+            <p className="text-sm text-gray-600 mt-1">{user?.bio}</p>
             <div className="mt-3 flex flex-wrap gap-2 text-sm">
               <span className="bg-muted px-2 py-1 rounded">
-                Faculty: {user.faculty}
+                Faculty: {user?.faculty}
               </span>
               <span className="bg-muted px-2 py-1 rounded">
-                Year: {user.yearLevel}
+                Year: {user?.yearLevel}
               </span>
               <span className="bg-muted px-2 py-1 rounded">
-                Major: {user.major}
+                Major: {user?.major}
               </span>
             </div>
-            {user.linkedinUrl && (
+            {user?.linkedinUrl && (
               <Link
-                href={user.linkedinUrl}
+                href={user?.linkedinUrl}
                 target="_blank"
                 rel="noopener noreferrer"
               >

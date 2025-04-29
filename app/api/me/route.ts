@@ -1,5 +1,5 @@
 import { genericGetRequest, genericPostRequest } from '@/lib/httpHandlers';
-import { UpdateMeInput } from '@/types';
+import { UpdateMeInput } from '@/lib/types';
 import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
 

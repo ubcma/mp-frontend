@@ -1,7 +1,7 @@
 'use client';
 
 import { Skeleton } from '@/components/ui/skeleton';
-import { Event } from '@/types';
+import { Event } from '@/lib/types';
 import { EventCard } from './EventCard';
 import { useEventContext } from '@/context/EventContext';
 

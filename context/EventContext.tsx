@@ -2,7 +2,7 @@
 
 import type React from "react"
 import { createContext, useContext, useState, useEffect } from "react"
-import type { Event } from "@/types"
+import type { Event } from "@/lib/types"
 import { type EventStatus, getEventStatus } from "@/helpers/eventStatus"
 import { useGetEventsQuery } from "@/lib/queries/events"
 

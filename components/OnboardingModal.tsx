@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useForm } from '@tanstack/react-form';
+import { useForm, useStore } from '@tanstack/react-form';
 import Confetti from 'react-confetti';
 import { useWindowSize } from 'react-use';
 import { Button } from '@/components/ui/button';
@@ -14,11 +14,62 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { motion, AnimatePresence } from 'motion/react';
-import { RenderInputField } from './forms/FormComponents';
+import {
+  RenderComboBoxField,
+  RenderInputField,
+  RenderSelectField,
+} from './forms/FormComponents';
 import Spinner from './Spinner';
-import { DIETARY_RESTRICTIONS, INTEREST_OPTIONS } from '@/lib/constants';
+import {
+  DIETARY_RESTRICTIONS,
+  FACULTIES,
+  Faculty,
+  FacultyMajors,
+  getMajorsForFaculty,
+  INTEREST_OPTIONS,
+  YEAR_OPTIONS,
+} from '@/lib/constants';
+import {
+  GraduationCap,
+  PartyPopper,
+  Shapes,
+  SmileIcon,
+  UserRoundPen,
+  Vegan,
+} from 'lucide-react';
 
-const steps = ['Profile', 'Avatar', 'Dietary Restrictions', 'Interests'];
+const steps = [
+  {
+    title: 'Welcome to the portal!',
+    description: `Let's get to know you a little better.`,
+    icon: SmileIcon,
+  },
+  {
+    title: 'Student Profile',
+    description: `Your personal profile and background.`,
+    icon: GraduationCap,
+  },
+  {
+    title: 'Profile Picture',
+    description: `Upload a photo of yourself!`,
+    icon: UserRoundPen,
+  },
+  {
+    title: 'Dietary Restrictions',
+    description: `What food are you able to eat?`,
+    icon: Vegan,
+  },
+  {
+    title: 'Your Interests',
+    description: `Let us know what fields you're interested in! This will help us plan future events for you.`,
+    icon: Shapes,
+  },
+  {
+    title: 'Congrats!',
+    description: 'Welcome to the MA portal',
+    icon: PartyPopper,
+  },
+];
 
 export default function OnboardingModal() {
   const [showConfetti, setShowConfetti] = useState(false);
@@ -28,7 +79,19 @@ export default function OnboardingModal() {
   const { width, height } = useWindowSize();
 
   useEffect(() => {
-    if (step === steps.length + 1) {
+    const fetchProfile = async () => {
+      const res = await fetch('/api/me');
+      const data = await res.json();
+      if (!data.onboardingComplete) {
+        setOpen(true);
+      }
+    };
+
+    fetchProfile();
+  }, []);
+
+  useEffect(() => {
+    if (step === steps.length - 1) {
       setShowConfetti(true);
     }
   }, [step]);
@@ -53,17 +116,11 @@ export default function OnboardingModal() {
     },
   });
 
-  useEffect(() => {
-    const fetchProfile = async () => {
-      const res = await fetch('/api/me');
-      const data = await res.json();
-      if (!data.onboardingComplete) {
-        setOpen(true);
-      }
-    };
-
-    fetchProfile();
-  }, []);
+  const selectedFaculty = useStore(
+    form.store,
+    (state) => state.values.faculty
+  ) as Faculty;
+  const majors = selectedFaculty ? getMajorsForFaculty(selectedFaculty) : [];
 
   return (
     <>
@@ -84,13 +141,13 @@ export default function OnboardingModal() {
         <DialogOverlay className="backdrop-blur-xs" />
         <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle>{`Complete Your Profile ${step > 0 && step < 4 ? `(${step}/${steps.length})` : ''}`}</DialogTitle>
+            <DialogTitle>{`${steps[step]?.title} ${step > 0 && step < 5 ? `(${step}/${steps.length - 2})` : ''}`}</DialogTitle>
           </DialogHeader>
           {step > 0 && step < 4 && (
             <div className="flex justify-between mb-6">
               {steps.map((label, index) => (
                 <div
-                  key={label}
+                  key={index}
                   className={`flex-1 h-2 mx-1 rounded-full ${index + 1 <= step ? 'bg-primary' : 'bg-muted'}`}
                 />
               ))}
@@ -116,7 +173,7 @@ export default function OnboardingModal() {
                     className="space-y-4 w-full"
                   >
                     <p className="text-muted-foreground">
-                      Let's get to know you a little better.
+                      {steps[step].description}
                     </p>
                   </motion.div>
                 )}
@@ -130,36 +187,60 @@ export default function OnboardingModal() {
                     transition={{ duration: 0.3 }}
                     className="space-y-4 w-full"
                   >
-                    <form.Field
-                      name="year"
-                      validators={{
-                        onChange: ({ value }) =>
-                          !value ? 'Year is required.' : undefined,
-                      }}
-                      children={(field) => (
-                        <RenderInputField label="Year" field={field} />
-                      )}
-                    />
-                    <form.Field
-                      name="faculty"
-                      validators={{
-                        onChange: ({ value }) =>
-                          !value ? 'Faculty is required.' : undefined,
-                      }}
-                      children={(field) => (
-                        <RenderInputField label="Faculty" field={field} />
-                      )}
-                    />
-                    <form.Field
-                      name="major"
-                      validators={{
-                        onChange: ({ value }) =>
-                          !value ? 'Major is required.' : undefined,
-                      }}
-                      children={(field) => (
-                        <RenderInputField label="Major" field={field} />
-                      )}
-                    />
+                    <div className="flex gap-4 w-full">
+                      <div className="flex-[0_0_10%]">
+                        <form.Field
+                          name="year"
+                          validators={{
+                            onChange: ({ value }) =>
+                              !value ? 'Year is required.' : undefined,
+                          }}
+                          children={(field) => (
+                            <RenderSelectField
+                              options={YEAR_OPTIONS}
+                              label="Year"
+                              field={field}
+                              placeholder=" "
+                            />
+                          )}
+                        />
+                      </div>
+                      <div className="flex-1">
+                        <form.Field
+                          name="faculty"
+                          validators={{
+                            onChange: ({ value }) =>
+                              !value ? 'Faculty is required.' : undefined,
+                          }}
+                          children={(field) => (
+                            <RenderComboBoxField
+                              options={FACULTIES}
+                              label="Faculty"
+                              field={field}
+                            />
+                          )}
+                        />
+                      </div>
+                      <div className="flex-1">
+                        <form.Field
+                          name="major"
+                          validators={{
+                            onChange: ({ value }) =>
+                              !value ? 'Major is required.' : undefined,
+                          }}
+                          children={(field) => {
+                            return (
+                              <RenderComboBoxField
+                                options={majors}
+                                label="Major"
+                                field={field}
+                                disabled={!selectedFaculty}
+                              />
+                            );
+                          }}
+                        />
+                      </div>
+                    </div>
                     <form.Field
                       name="linkedinUrl"
                       children={(field) => (
@@ -336,21 +417,31 @@ export default function OnboardingModal() {
                         state.isSubmitting,
                       ]}
                       children={([canSubmit, isSubmitting]) => (
-                        <Button
-                          className="cursor-pointer font-regular bg-ma-red"
-                          variant="ma"
-                          type="submit"
-                          disabled={!canSubmit}
-                        >
-                          {isSubmitting ? (
-                            <>
-                              <Spinner />
-                              <div>Loading</div>
-                            </>
-                          ) : (
-                            <div>Complete Profile</div>
-                          )}
-                        </Button>
+                        <div className="flex justify-between">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            onClick={() => setStep((s) => s - 1)}
+                          >
+                            Back
+                          </Button>
+
+                          <Button
+                            className="cursor-pointer font-regular bg-ma-red"
+                            variant="ma"
+                            type="submit"
+                            disabled={!canSubmit}
+                          >
+                            {isSubmitting ? (
+                              <>
+                                <Spinner />
+                                <div>Loading</div>
+                              </>
+                            ) : (
+                              <div>Complete Profile</div>
+                            )}
+                          </Button>
+                        </div>
                       )}
                     />
                   </motion.div>
@@ -373,7 +464,7 @@ export default function OnboardingModal() {
             </AnimatePresence>
 
             <div className="flex justify-between">
-              {step > 0 ? (
+              {step > 0 && step < steps.length - 2 && (
                 <Button
                   type="button"
                   variant="outline"
@@ -381,10 +472,8 @@ export default function OnboardingModal() {
                 >
                   Back
                 </Button>
-              ) : (
-                <div />
               )}
-              {step < steps.length && (
+              {step < steps.length - 2 && (
                 <Button type="button" onClick={() => setStep((s) => s + 1)}>
                   Next
                 </Button>
