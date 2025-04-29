@@ -1,3 +1,14 @@
+export type CreateEventInput = {
+  title: string;
+  slug: string;
+  description: string;
+  imageUrl: string;
+  price: number;
+  location: string;
+  startsAt: Date;
+  endsAt: Date;
+}
+
 export type Event = {
   id: string;
   title: string;
@@ -7,7 +18,6 @@ export type Event = {
   tags: string[] | null;
   description: string | null;
   imageUrl: string | null;
-  stripeLink: string | null;
   createdAt: string | null;
   updatedAt: string | null;
 };
