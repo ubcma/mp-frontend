@@ -9,21 +9,19 @@ import { ArrowUpRight } from 'lucide-react';
 import Link from 'next/link';
 
 export function EventCard({ event }: { event: Event }) {
-  const status = getEventStatus(event.date);
+  const status = getEventStatus(event.startsAt);
 
   const router = useRouter();
 
   const dayjs = require('dayjs');
-  const eventDate = dayjs(event.date);
-  const dayOfTheWeek = eventDate.format('ddd');
-  const dayOfTheMonth = eventDate.format('DD');
-  const month = eventDate.format('MMM');
-
-  // shadow-[inset_-4_-4px_8px_rgba(255,255,255,0.5)]
+  const eventStartsAt = dayjs(event.startsAt);
+  const dayOfTheWeek = eventStartsAt.format('ddd');
+  const dayOfTheMonth = eventStartsAt.format('DD');
+  const month = eventStartsAt.format('MMM');
 
   return (
     <Link
-      href={`/events/${event.title}`}
+      href={`/events/${event.slug}`}
       className="hover:opacity-90 hover:rotate-1 hover:scale-105 transition-all duration-200"
     >
       <Card className="flex flex-col h-full overflow-hidden gap-0 p-0 bg-black">
@@ -41,7 +39,7 @@ export function EventCard({ event }: { event: Event }) {
               </p>
             </div>
             <img
-              src={event.imageUrl || '/placeholder.svg'}
+              src={event.imageUrl ?? '/no-event-image.png'}
               alt={event.title}
               className="h-64 w-full object-cover"
             />

@@ -7,17 +7,18 @@ export type CreateEventInput = {
   location: string;
   startsAt: Date;
   endsAt: Date;
-}
+};
 
 export type Event = {
   id: string;
   title: string;
-  price: string | null;
-  date: Date;
-  time: string | null;
-  tags: string[] | null;
-  description: string | null;
-  imageUrl: string | null;
+  slug: string;
+  description: string;
+  imageUrl: string;
+  price: number;
+  location: string;
+  startsAt: Date;
+  endsAt: Date;
   createdAt: string | null;
   updatedAt: string | null;
 };
@@ -27,15 +28,21 @@ export type NewEvent = Omit<Event, 'id' | 'createdAt' | 'updatedAt'>;
 export type EventQuestion = {
   id: string;
   eventId: string;
-  questionText: string;
-  questionType: string | null;
-  required: boolean | null;
-  sortOrder: number | null;
+  label: string;
+  type: QuestionType;
+  isRequired: boolean;
+  placeholder?: string;
+  options?: string[];
+  validation?: Record<string, any>;
+  sortOrder: number;
   createdAt: string | null;
   updatedAt: string | null;
 };
 
-export type NewEventQuestion = Omit<EventQuestion, 'id' | 'createdAt' | 'updatedAt'>;
+export type NewEventQuestion = Omit<
+  EventQuestion,
+  'id' | 'createdAt' | 'updatedAt'
+>;
 
 export type Signup = {
   id: string;
@@ -56,3 +63,30 @@ export type SignupAnswer = {
 };
 
 export type NewSignupAnswer = Omit<SignupAnswer, 'id' | 'createdAt'>;
+
+export const QUESTION_TYPES = [
+  'ShortText',
+  'LongText',
+  'Email',
+  'Number',
+  'Date',
+  'Time',
+  'Radio',
+  'Select',
+  'Checkbox',
+  'YesNo',
+  'FileUpload',
+] as const;
+
+export type QuestionType = (typeof QUESTION_TYPES)[number];
+
+export type QuestionInput = {
+  id: string;
+  label: string;
+  placeholder?: string;
+  type: QuestionType;
+  isRequired: boolean;
+  options?: string[];
+  validation?: Record<string, any>;
+  sortOrder: number;
+};

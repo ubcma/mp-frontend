@@ -21,6 +21,8 @@ import { Button } from '../ui/button';
 import { Check, ChevronsUpDown } from 'lucide-react';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
+import { Textarea } from '../ui/textarea';
+import { DateTimePicker } from '../DateTimePicker';
 
 export function FieldInfo({ field }: { field: AnyFieldApi }) {
   return (
@@ -42,11 +44,13 @@ export function RenderInputField({
   placeholder,
   label,
   field,
+  onChange,
 }: {
   type?: string;
   placeholder?: string;
-  label: string;
+  label: string;  
   field: AnyFieldApi;
+  onChange?: (value: string) => void;
 }) {
   return (
     <div className="flex flex-col gap-2">
@@ -56,14 +60,42 @@ export function RenderInputField({
         name={field.name}
         value={field.state.value}
         onBlur={field.handleBlur}
-        onChange={(e) => field.handleChange(e.target.value)}
+        onChange={(e) =>
+          onChange ? onChange(e.target.value) : field.handleChange(e.target.value)
+        }
         type={type}
-        placeholder={placeholder}
+        placeholder={placeholder ?? label}
       />
       <FieldInfo field={field} />
     </div>
   );
 }
+
+export function RenderTextArea({
+  placeholder,
+  label,
+  field,
+}: {
+  placeholder?: string;
+  label: string;
+  field: AnyFieldApi;
+}) {
+  return (
+    <div className="flex flex-col gap-2">
+      <Label htmlFor={field.name}>{label}</Label>
+      <Textarea
+        id={field.name}
+        name={field.name}
+        value={field.state.value}
+        onBlur={field.handleBlur}
+        onChange={(e) => field.handleChange(e.target.value)}
+        placeholder={placeholder ?? label}
+      />
+      <FieldInfo field={field} />
+    </div>
+  );
+}
+
 
 export function RenderSelectField({
   options,
@@ -201,6 +233,27 @@ export function RenderComboBoxField({
           </Command>
         </PopoverContent>
       </Popover>
+      <FieldInfo field={field} />
+    </div>
+  );
+}
+
+
+export function RenderDateTimeField({
+  label,
+  field,
+}: {
+  label: string;
+  field: AnyFieldApi;
+}) {
+  return (
+    <div className="flex flex-col gap-2">
+      <Label htmlFor={field.name}>{label}</Label>
+      <DateTimePicker
+        value={field.state.value ? new Date(field.state.value) : null}
+        onChange={(date) => field.handleChange(date)}
+        onBlur={field.handleBlur}
+      />
       <FieldInfo field={field} />
     </div>
   );

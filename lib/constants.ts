@@ -92,60 +92,13 @@ export function getMajorsForFaculty(faculty: Faculty) {
   return FacultyMajors[faculty];
 }
 
-
-// export const DEGREES: Degree[] = [
-//   {
-//     faculty: 'Commerce',
-//     majors: [
-//       'Accounting',
-//       'Business & Computer Science (BUCS)',
-//       'Business Technology Management (BTM)',
-//       'Entrepreneurship',
-//       'Finance',
-//       'Global Supply Chain',
-//       'Marketing',
-//       'OBHR',
-//       'Operations & Logistics',
-//       'Other',
-//       'Real Estate',
-//     ].sort((a, b) => a.localeCompare(b)),
-//   },
-//   {
-//     faculty: 'Arts',
-//     majors: [
-//       'Anthropology',
-//       'COGS',
-//       'Economics',
-//       'Journalism',
-//       'Media Studies',
-//       'Philosophy',
-//       'Political Science',
-//       'Psychology',
-//       'Other',
-//     ].sort((a, b) => a.localeCompare(b)),
-//   },
-//   {
-//     faculty: 'Science',
-//     majors: ['COGS', 'Computer Science', 'Other'].sort((a, b) =>
-//       a.localeCompare(b)
-//     ),
-//   },
-//   {
-//     faculty: 'Applied Science',
-//     majors: [
-//       'Biomedical Engineering',
-//       'Chemical Engineering',
-//       'Civil Engineering',
-//       'Electrical Engineering',
-//       'Materials Engineering',
-//       'Mechanical Engineering',
-//       'Other',
-//     ].sort((a, b) => a.localeCompare(b)),
-//   },
-//   {
-//     faculty: 'Other',
-//     majors: [],
-//   },
-// ];
-
-// export const FACULTIES: string[] = DEGREES.map((degree) => degree.faculty)
+export const EVENT_FIELDS_OLD = [
+  { name: 'title', label: 'Title', type: 'text' },
+  { name: 'slug', label: 'Slug', type: 'text' },
+  { name: 'description', label: 'Description', type: 'text' },
+  { name: 'imageUrl', label: 'Image URL', type: 'text' },
+  { name: 'price', label: 'Price', type: 'number' },
+  { name: 'location', label: 'Location', type: 'text' },
+  { name: 'startsAt', label: 'Start Date', type: 'datetime-local' },
+  { name: 'endsAt', label: 'End Date', type: 'datetime-local' },
+] as const;

@@ -4,7 +4,6 @@ import { cookies } from 'next/headers';
 
 export async function POST(req: NextRequest) {
   try {
-    console.log("HERE")
 
     const body = await req.json();
 
