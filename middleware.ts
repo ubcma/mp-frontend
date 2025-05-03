@@ -11,7 +11,7 @@ export async function middleware(request: NextRequest) {
       '/maintenance',
       '/favicon.ico',
       '/robots.txt',
-      '/_next', // static files
+      '/_next',
       '/api',
     ];
     const isAllowed = allowlist.some(path => pathname.startsWith(path));
@@ -21,18 +21,18 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  if (pathname === '/sign-in' || pathname === '/sign-up' || pathname === '/') {
-    if (token) {
+  const publicPaths = ['/sign-in', '/sign-up', '/forgot-password'];
+
+  const isPublic = publicPaths.includes(pathname) || pathname.startsWith('/_next') || pathname.startsWith('/api');
+
+  if (isPublic) {
+    if (token && (pathname === '/sign-in' || pathname === '/sign-up')) {
       return NextResponse.redirect(new URL('/home', request.url));
     }
     return NextResponse.next();
   }
 
   if (!token) {
-    return NextResponse.redirect(new URL('/sign-in', request.url));
-  }
-
-  if (pathname === '/') {
     return NextResponse.redirect(new URL('/sign-in', request.url));
   }
 
