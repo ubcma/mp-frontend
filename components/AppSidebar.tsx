@@ -2,12 +2,12 @@
 import Link from 'next/link';
 import {
   LayoutDashboard,
-  Network,
   PlusCircle,
   Calendar,
   Users,
   Home,
   LogOut,
+  CalendarCog,
 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
@@ -67,12 +67,6 @@ export function AppSidebar() {
 
   const adminMenu = [
     {
-      href: '/manage-members',
-      icon: Users,
-      label: 'Manage Members',
-      disabled: false,
-    },
-    {
       href: '/admin-dashboard',
       icon: LayoutDashboard,
       label: 'Admin Dashboard',
@@ -82,6 +76,18 @@ export function AppSidebar() {
       href: '/create-event',
       icon: PlusCircle,
       label: 'Create New Event',
+      disabled: false,
+    },
+    {
+      href: '/manage-events',
+      icon: CalendarCog,
+      label: 'Manage Events',
+      disabled: false,
+    },
+    {
+      href: '/manage-members',
+      icon: Users,
+      label: 'Manage Members',
       disabled: false,
     },
   ];
@@ -148,8 +154,7 @@ export function AppSidebar() {
               <div>
                 <h3 className="font-medium text-nowrap">{user?.name}</h3>
                 <p className="text-xs text-muted-foreground text-nowrap">
-                  {user.onboardingComplete &&
-                    `Year ${user.yearLevel} // ${user.major}`}
+                  {user.role}
                 </p>
               </div>
             </Link>
@@ -182,29 +187,34 @@ export function AppSidebar() {
         </SidebarGroup>
 
         {/* Admin Section */}
-        {user?.role === "Admin" && <SidebarGroup>
-          <SidebarGroupLabel>Admin</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {adminMenu.map((item) => (
-                <SidebarMenuItem key={item.href}>
-                  <SidebarMenuButton asChild isActive={pathname === item.href}>
-                    <Link
-                      href={item.href}
-                      aria-disabled={item.disabled}
-                      {...(item.href.startsWith('http')
-                        ? { target: '_blank', rel: 'noopener noreferrer' }
-                        : {})}
+        {user?.role === 'Admin' && (
+          <SidebarGroup>
+            <SidebarGroupLabel>Admin</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {adminMenu.map((item) => (
+                  <SidebarMenuItem key={item.href}>
+                    <SidebarMenuButton
+                      asChild
+                      isActive={pathname === item.href}
                     >
-                      <item.icon className="h-4 w-4" />
-                      <span>{item.label}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>}
+                      <Link
+                        href={item.href}
+                        aria-disabled={item.disabled}
+                        {...(item.href.startsWith('http')
+                          ? { target: '_blank', rel: 'noopener noreferrer' }
+                          : {})}
+                      >
+                        <item.icon className="h-4 w-4" />
+                        <span>{item.label}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
 
         {/* Logout */}
         <SidebarGroup className="mt-auto">

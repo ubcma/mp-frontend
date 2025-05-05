@@ -15,6 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import Spinner from '@/components/Spinner';
 
 export default function EventPage() {
   const { slug } = useParams<{ slug: string }>();
@@ -24,7 +25,7 @@ export default function EventPage() {
   return (
     <>
       {isLoading ? (
-        'Loading...'
+        <Spinner/>
       ) : (
         <div className="max-w-3xl mx-auto py-12 space-y-8">
           <div className="space-y-4">
@@ -96,7 +97,6 @@ export default function EventPage() {
           </Card>
         </div>
       )}
-      {JSON.stringify(data)}
     </>
   );
 }

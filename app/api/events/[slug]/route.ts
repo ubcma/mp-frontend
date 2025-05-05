@@ -6,7 +6,7 @@ export async function GET(
   req: NextRequest,
   { params }: { params: { slug: string } }
 ) {
-  const slug = params.slug;
+  const {slug} = await params;
 
   const cookieStore = cookies();
   const sessionCookie = (await cookieStore).get(
