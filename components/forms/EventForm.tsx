@@ -9,6 +9,8 @@ import {
   RenderInputField,
   RenderTextArea,
 } from './FormComponents';
+import { Event, QuestionInput } from '@/lib/types';
+import { DraggableCard } from '../DraggableCard';
 import {
   DndContext,
   closestCenter,
@@ -17,8 +19,6 @@ import {
   useSensor,
   PointerSensor,
 } from '@dnd-kit/core';
-import { QuestionInput } from '@/lib/types';
-import { DraggableCard } from '../DraggableCard';
 import {
   arrayMove,
   SortableContext,
@@ -29,10 +29,21 @@ import { Plus } from 'lucide-react';
 import { useState } from 'react';
 import { generateSlug } from '@/lib/utils';
 
-export default function CreateEventForm() {
-  const sensors = useSensors(useSensor(PointerSensor));
-  const [questions, setQuestions] = useState<QuestionInput[]>([]);
+type EventFormProps = {
+  mode: 'create' | 'update';
+  initialValues?: Partial<Event>;
+  onSubmit: (values: any) => Promise<void>;
+};
+
+export default function EventForm({
+  mode,
+  initialValues,
+  onSubmit,
+}: EventFormProps) {
   const [hasManuallyEditedSlug, setHasManuallyEditedSlug] = useState(false);
+  const [questions, setQuestions] = useState<QuestionInput[]>([]);
+
+  const sensors = useSensors(useSensor(PointerSensor));
 
   const addQuestion = () => {
     setQuestions((prev) => [
@@ -54,7 +65,6 @@ export default function CreateEventForm() {
 
     const oldIndex = questions.findIndex((q) => q.id === active.id);
     const newIndex = questions.findIndex((q) => q.id === over.id);
-
     const newArray = arrayMove(questions, oldIndex, newIndex);
 
     const withUpdatedSortOrder = newArray.map((q, index) => ({
@@ -84,56 +94,37 @@ export default function CreateEventForm() {
 
   const form = useForm({
     defaultValues: {
-      title: '',
-      slug: '',
-      description: '',
-      imageUrl: '',
-      price: 0,
-      location: '',
-      startsAt: '',
-      endsAt: '',
+      id: initialValues?.id ?? null,
+      title: initialValues?.title ?? '',
+      slug: initialValues?.slug ?? '',
+      description: initialValues?.description ?? '',
+      imageUrl: initialValues?.imageUrl ?? '',
+      price: initialValues?.price ?? 0,
+      location: initialValues?.location ?? '',
+      startsAt: initialValues?.startsAt ?? '',
+      endsAt: initialValues?.endsAt ?? '',
     },
     onSubmit: async ({ value }) => {
-      try {
-        const formattedQuestions = questions.map((q, index) => ({
-          label: q.label,
-          placeholder: q.placeholder,
-          type: q.type,
-          isRequired: q.isRequired,
-          options: q.options ?? null,
-          validation: q.validation ?? {},
-          sortOrder: index + 1,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        }));
+      const formattedData = {
+        ...value,
+        startsAt: new Date(value.startsAt),
+        endsAt: new Date(value.endsAt),
+        ...(mode === 'create' && {
+          questions: questions.map((q, index) => ({
+            label: q.label,
+            placeholder: q.placeholder,
+            type: q.type,
+            isRequired: q.isRequired,
+            options: q.options ?? null,
+            validation: q.validation ?? {},
+            sortOrder: index + 1,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          })),
+        }),
+      };
 
-        const formattedData = {
-          ...value,
-          startsAt: new Date(value.startsAt),
-          endsAt: new Date(value.endsAt),
-          questions: formattedQuestions,
-        };
-
-        console.log('Sending request with body:', formattedData);
-
-        const response = await fetch('/api/events/create', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(formattedData),
-        });
-
-        if (!response.ok) {
-          throw new Error('Fetch failed');
-        }
-
-        const result = await response.json();
-
-        toast.success('Event created successfully!', result);
-      } catch (error) {
-        toast.error(String(error));
-      }
+      await onSubmit(formattedData);
     },
   });
 
@@ -145,11 +136,16 @@ export default function CreateEventForm() {
   return (
     <div className="flex flex-col gap-8 h-full justify-center mx-8">
       <div>
-        <h1 className="font-semibold text-xl">Create New Event</h1>
+        <h1 className="font-semibold text-xl">
+          {mode === 'create'
+            ? 'Create New Event'
+            : `Edit Event "${initialValues?.title}"`}
+        </h1>
         <h1 className="font-normal text-sm text-muted-foreground">
           Fill out the event details below.
         </h1>
       </div>
+
       <form
         onSubmit={(e) => {
           e.preventDefault();
@@ -160,11 +156,7 @@ export default function CreateEventForm() {
       >
         <div className="flex flex-col gap-4">
           <div className="grid md:grid-cols-3 grid-cols-1 gap-4">
-            <form.Field
-              key="title"
-              name="title"
-              validators={requiredValidator('Title')}
-            >
+            <form.Field name="title" validators={requiredValidator('Title')}>
               {(field) => (
                 <RenderInputField
                   type="text"
@@ -179,11 +171,7 @@ export default function CreateEventForm() {
                 />
               )}
             </form.Field>
-            <form.Field
-              key="slug"
-              name="slug"
-              validators={requiredValidator('Slug')}
-            >
+            <form.Field name="slug" validators={requiredValidator('Slug')}>
               {(field) => (
                 <RenderInputField
                   type="text"
@@ -197,7 +185,6 @@ export default function CreateEventForm() {
               )}
             </form.Field>
             <form.Field
-              key="imageUrl"
               name="imageUrl"
               validators={requiredValidator('Image')}
               children={(fieldApi) => (
@@ -205,17 +192,17 @@ export default function CreateEventForm() {
               )}
             />
           </div>
+
           <form.Field
-            key="description"
             name="description"
             validators={requiredValidator('Description')}
             children={(fieldApi) => (
               <RenderTextArea label="Description" field={fieldApi} />
             )}
           />
+
           <div className="grid md:grid-cols-4 grid-cols-1 gap-4">
             <form.Field
-              key="price"
               name="price"
               validators={requiredValidator('Price')}
               children={(fieldApi) => (
@@ -227,7 +214,6 @@ export default function CreateEventForm() {
               )}
             />
             <form.Field
-              key="location"
               name="location"
               validators={requiredValidator('Location')}
               children={(fieldApi) => (
@@ -239,7 +225,6 @@ export default function CreateEventForm() {
               )}
             />
             <form.Field
-              key="startsAt"
               name="startsAt"
               validators={requiredValidator('Start Date & Time')}
               children={(fieldApi) => (
@@ -250,7 +235,6 @@ export default function CreateEventForm() {
               )}
             />
             <form.Field
-              key="endsAt"
               name="endsAt"
               validators={requiredValidator('End Date & Time')}
               children={(fieldApi) => (
@@ -260,40 +244,48 @@ export default function CreateEventForm() {
           </div>
         </div>
 
-        <div className="text-md font-medium"> Questions </div>
+        {mode === 'create' && (
+          <>
+            <div>
+              <div className="text-md font-medium"> Questions </div>
+              <div className="text-xs text-muted-foreground">
+                Note: Cannot questions cannot be edited later - ensure there are no spelling mistakes.
+              </div>
+            </div>
+            <div className="flex flex-col gap-4">
+              <DndContext
+                sensors={sensors}
+                collisionDetection={closestCenter}
+                onDragEnd={handleDragEnd}
+              >
+                <SortableContext
+                  items={questions.map((q) => q.id)}
+                  strategy={verticalListSortingStrategy}
+                >
+                  {questions.map((q, index) => (
+                    <DraggableCard
+                      key={q.id}
+                      index={index}
+                      question={q}
+                      onChange={handleQuestionChange}
+                      onDelete={handleDeleteQuestion}
+                    />
+                  ))}
+                </SortableContext>
+              </DndContext>
 
-        <div className="flex flex-col gap-4">
-          <DndContext
-            sensors={sensors}
-            collisionDetection={closestCenter}
-            onDragEnd={handleDragEnd}
-          >
-            <SortableContext
-              items={questions.map((q) => q.id)}
-              strategy={verticalListSortingStrategy}
-            >
-              {questions.map((q, index) => (
-                <DraggableCard
-                  key={q.id}
-                  index={index}
-                  question={q}
-                  onChange={handleQuestionChange}
-                  onDelete={handleDeleteQuestion}
-                />
-              ))}
-            </SortableContext>
-          </DndContext>
-
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => addQuestion()}
-            className="flex flex-row items-center justify-center w-full p-8 border border-dashed rounded-lg"
-          >
-            <Plus className="w-4 h-4" />
-            Add another question
-          </Button>
-        </div>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => addQuestion()}
+                className="flex flex-row items-center justify-center w-full p-8 border border-dashed rounded-lg"
+              >
+                <Plus className="w-4 h-4" />
+                Add another question
+              </Button>
+            </div>
+          </>
+        )}
 
         <form.Subscribe
           selector={(state) => [state.canSubmit, state.isSubmitting]}
@@ -307,10 +299,14 @@ export default function CreateEventForm() {
               {isSubmitting ? (
                 <>
                   <Spinner />
-                  <div>Creating Event...</div>
+                  <div>
+                    {mode === 'create'
+                      ? 'Creating Event...'
+                      : 'Saving Changes...'}
+                  </div>
                 </>
               ) : (
-                <div>Create Event</div>
+                <div>{mode === 'create' ? 'Create Event' : 'Update Event'}</div>
               )}
             </Button>
           )}

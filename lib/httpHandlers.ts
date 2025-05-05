@@ -83,42 +83,100 @@ async function genericPostRequest<T>(
   }
 }
 
-
-async function genericPutRequest(url: string, body: any) {
+async function genericPutRequest<T>(
+  url: string,
+  body: any,
+  cookie?: string,
+): Promise<T> {
   try {
-    const response = await fetch(url, {
+    const headers: HeadersInit = {
+      'Content-Type': 'application/json',
+    };
+
+    if (cookie) {
+      headers['Cookie'] = cookie;
+    }
+
+    console.log('Sending PUT request with body:', body);
+
+    const res = await fetch(url, {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
+      headers,
       body: JSON.stringify(body),
+      credentials: 'include',
     });
-    const data = await response.json();
-    return NextResponse.json(data);
+
+    if (!res.ok) {
+      const errorText = await res.text();
+      let errorMessage = 'Request failed';
+
+      try {
+        const errorJson = JSON.parse(errorText);
+        errorMessage = errorJson.message || errorMessage;
+      } catch {
+        console.warn('Failed to parse error response as JSON');
+      }
+
+      const error = new Error(errorMessage) as any;
+      throw error;
+    }
+
+    return res.json();
   } catch (error) {
     console.error('PUT request error:', error);
-    return NextResponse.json(
-      { error: 'Internal Server Error' },
-      { status: 500 }
-    );
+    throw error;
   }
 }
 
-async function genericDeleteRequest(url: string) {
+export async function genericRequest<T>(
+  method: 'POST' | 'PUT' | 'PATCH' | 'DELETE',
+  url: string,
+  body?: any,
+  cookie?: string,
+): Promise<T> {
   try {
-    const response = await fetch(url, { method: 'DELETE' });
-    const data = await response.json();
-    return NextResponse.json(data);
+    const headers: HeadersInit = {
+      'Content-Type': 'application/json',
+    };
+
+    if (cookie) {
+      headers['Cookie'] = cookie;
+    }
+
+    console.log(`${method} request to ${url}`, body);
+
+    const res = await fetch(url, {
+      method,
+      headers,
+      body: body ? JSON.stringify(body) : undefined,
+      credentials: 'include',
+    });
+
+    if (!res.ok) {
+      const errorText = await res.text();
+      let errorMessage = 'Request failed';
+
+      try {
+        const errorJson = JSON.parse(errorText);
+        errorMessage = errorJson.message || errorMessage;
+      } catch {
+        console.warn('Failed to parse error response as JSON');
+      }
+
+      throw new Error(errorMessage);
+    }
+
+    return res.json();
   } catch (error) {
-    console.error('DELETE request error:', error);
-    return NextResponse.json(
-      { error: 'Internal Server Error' },
-      { status: 500 }
-    );
+    console.error(`${method} request error:`, error);
+    throw error;
   }
 }
+
+
 
 export {
   genericGetRequest,
   genericPostRequest,
   genericPutRequest,
-  genericDeleteRequest,
 };
