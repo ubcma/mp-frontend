@@ -19,6 +19,7 @@ export type Event = {
   location: string;
   startsAt: Date;
   endsAt: Date;
+  isVisible: boolean;
   createdAt: string | null;
   updatedAt: string | null;
 };

@@ -39,7 +39,8 @@ export const EventProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     const filtered = events?.filter(
       (event: Event) =>
         (activeTab === "All" || getEventStatus(event.startsAt) === activeTab) &&
-        event.title.toLowerCase().includes(searchTerm.toLowerCase()),
+        event.title.toLowerCase().includes(searchTerm.toLowerCase()) &&
+        event.isVisible === true
     )
     setFilteredEvents(filtered)
   }, [events, searchTerm, activeTab])
