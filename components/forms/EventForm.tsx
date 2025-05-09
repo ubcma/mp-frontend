@@ -28,6 +28,8 @@ import { nanoid } from 'nanoid';
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
 import { generateSlug } from '@/lib/utils';
+import { Switch } from '../ui/switch';
+import { Label } from '../ui/label';
 
 type EventFormProps = {
   mode: 'create' | 'update';
@@ -101,6 +103,7 @@ export default function EventForm({
       imageUrl: initialValues?.imageUrl ?? '',
       price: initialValues?.price ?? 0,
       location: initialValues?.location ?? '',
+      isVisible: initialValues?.isVisible ?? '',
       startsAt: initialValues?.startsAt ?? '',
       endsAt: initialValues?.endsAt ?? '',
     },
@@ -109,6 +112,7 @@ export default function EventForm({
         ...value,
         startsAt: new Date(value.startsAt),
         endsAt: new Date(value.endsAt),
+        isVisible: value.isVisible,
         ...(mode === 'create' && {
           questions: questions.map((q, index) => ({
             label: q.label,
@@ -242,6 +246,19 @@ export default function EventForm({
               )}
             />
           </div>
+
+          <form.Field
+            name="isVisible"
+            children={(fieldApi) => (
+              <div className="flex items-center gap-2 cursor-pointer">
+                <Switch
+                  onCheckedChange={fieldApi.handleChange}
+                  className="data-[state=checked]:bg-emerald-400"
+                />
+                <Label htmlFor={fieldApi.name}>Required?</Label>
+              </div>
+            )}
+          />
         </div>
 
         {mode === 'create' && (
@@ -249,7 +266,8 @@ export default function EventForm({
             <div>
               <div className="text-md font-medium"> Questions </div>
               <div className="text-xs text-muted-foreground">
-                Note: Cannot questions cannot be edited later - ensure there are no spelling mistakes.
+                Note: Cannot questions cannot be edited later - ensure there are
+                no spelling mistakes.
               </div>
             </div>
             <div className="flex flex-col gap-4">
