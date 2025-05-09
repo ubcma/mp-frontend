@@ -103,7 +103,7 @@ export default function EventForm({
       imageUrl: initialValues?.imageUrl ?? '',
       price: initialValues?.price ?? 0,
       location: initialValues?.location ?? '',
-      isVisible: initialValues?.isVisible ?? '',
+      isVisible: initialValues?.isVisible ?? false,
       startsAt: initialValues?.startsAt ?? '',
       endsAt: initialValues?.endsAt ?? '',
     },
@@ -255,7 +255,7 @@ export default function EventForm({
                   onCheckedChange={fieldApi.handleChange}
                   className="data-[state=checked]:bg-emerald-400"
                 />
-                <Label htmlFor={fieldApi.name}>Required?</Label>
+                <Label htmlFor={fieldApi.name}>Make visible to the public?</Label>
               </div>
             )}
           />

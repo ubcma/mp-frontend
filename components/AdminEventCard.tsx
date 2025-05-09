@@ -17,6 +17,8 @@ import {
 import Image from 'next/image';
 import Link from 'next/link';
 import { Event } from '@/lib/types';
+import { Button } from './ui/button';
+import { toast } from 'sonner';
 
 interface AdminEventCardProps {
   event: Event;
@@ -26,6 +28,28 @@ interface AdminEventCardProps {
 export function AdminEventCard({ event, onEdit }: AdminEventCardProps) {
   const dayjs = require('dayjs');
   const eventStartsAt = dayjs(event.startsAt).format('MMMM D, YYYY');
+
+  async function deleteEventById() {
+    const {id} = event;
+
+    try {
+              
+      const res = await fetch('/api/events/delete', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: id }),
+      })
+
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.message || 'Failed to delete event');
+      }
+
+      toast.success('Event deleted!');
+    } catch (err: any) {
+      toast.error(err.message || 'An unexpected error occurred');
+    }
+  }
 
   return (
     <Card className="flex overflow-hidden mb-2 p-0">
@@ -73,6 +97,11 @@ export function AdminEventCard({ event, onEdit }: AdminEventCardProps) {
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link href={`/events/${event.slug}`}>View public page</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Button variant='destructive' onClick={deleteEventById}>
+                    Delete Event
+                  </Button>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
