@@ -32,7 +32,7 @@ function EventTabs() {
     <Tabs
       value={activeTab}
       onValueChange={(value) => setActiveTab(value as EventStatus | "All")}
-      className="space-y-6"
+      className="space-y-6 w=full"
     >
       <div>
         <h1 className="text-2xl font-bold">Upcoming Events</h1>
