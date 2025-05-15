@@ -1,5 +1,8 @@
 import { AppSidebar } from '@/components/AppSidebar';
-import { SidebarProvider } from '@/components/ui/sidebar';
+import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
+import { PanelLeftIcon } from 'lucide-react';
+import Image from 'next/image';
+import Link from 'next/link';
 
 export default function Layout({
   children,
@@ -9,7 +12,22 @@ export default function Layout({
   return (
     <SidebarProvider>
       <AppSidebar />
-      <main className="w-full m-8">{children}</main>
+      <main className="w-full mx-8 mb-8 mt-4 md:m-8">
+        <div className="md:hidden w-full flex flex-row justify-between items-center mb-8">
+          <SidebarTrigger />
+          <Link href="/">
+            <Image
+              src="/logos/logo_red.svg"
+              alt="Logo"
+              width={48}
+              height={48}
+            />
+          </Link>
+          <PanelLeftIcon className="invisible" />
+        </div>
+
+        {children}
+      </main>
     </SidebarProvider>
   );
 }

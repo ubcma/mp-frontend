@@ -168,7 +168,7 @@ export function AppSidebar() {
             <SidebarMenu>
               {memberMenu.map((item) => (
                 <SidebarMenuItem key={item.href}>
-                  <SidebarMenuButton asChild isActive={pathname === item.href}>
+                  <SidebarMenuButton asChild isActive={pathname.startsWith(item.href)}>
                     <Link
                       href={item.href}
                       aria-disabled={item.disabled}
