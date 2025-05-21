@@ -7,7 +7,6 @@ import { type EventStatus, getEventStatus } from "@/helpers/eventStatus"
 import { useGetEventsQuery } from "@/lib/queries/events"
 
 type EventContextType = {
-  events: Event[]
   filteredEvents: Event[]
   setFilteredEvents: React.Dispatch<React.SetStateAction<Event[]>>
   searchTerm: string
@@ -42,13 +41,12 @@ export const EventProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         event.title.toLowerCase().includes(searchTerm.toLowerCase()) &&
         event.isVisible === true
     )
-    setFilteredEvents(filtered)
+    setFilteredEvents(filtered ?? [])
   }, [events, searchTerm, activeTab])
 
   return (
     <EventContext.Provider
       value={{
-        events,
         filteredEvents,
         setFilteredEvents,
         searchTerm,

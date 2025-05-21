@@ -252,6 +252,7 @@ export default function EventForm({
             children={(fieldApi) => (
               <div className="flex items-center gap-2 cursor-pointer">
                 <Switch
+                  checked={fieldApi.state.value}
                   onCheckedChange={fieldApi.handleChange}
                   className="data-[state=checked]:bg-emerald-400"
                 />

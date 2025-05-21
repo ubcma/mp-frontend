@@ -154,7 +154,7 @@ export function AppSidebar() {
               <div>
                 <h3 className="font-medium text-nowrap">{user?.name}</h3>
                 <p className="text-xs text-muted-foreground text-nowrap">
-                  {user.role}
+                  {user?.role}
                 </p>
               </div>
             </Link>

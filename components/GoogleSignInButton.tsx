@@ -12,9 +12,6 @@ export const GoogleSignInButton = () => {
     try {
       setIsLoading(true);
       await signInWithGoogle();
-      // setTimeout(() => {
-      //   setIsLoading(false);
-      // }, 1000)
     } catch (error) {
       console.error('Google sign-in failed:', error);
       setIsLoading(false);

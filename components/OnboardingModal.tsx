@@ -37,6 +37,8 @@ import {
   UserRoundPen,
   Vegan,
 } from 'lucide-react';
+import { fetchFromAPI } from '@/lib/httpHandlers';
+import { UserProfileData } from '@/lib/types';
 
 const steps = [
   {
@@ -80,8 +82,14 @@ export default function OnboardingModal() {
 
   useEffect(() => {
     const fetchProfile = async () => {
-      const res = await fetch('/api/me');
-      const data = await res.json();
+      const data: UserProfileData = await fetchFromAPI('/api/me',
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      );
       if (!data.onboardingComplete) {
         setOpen(true);
       }
