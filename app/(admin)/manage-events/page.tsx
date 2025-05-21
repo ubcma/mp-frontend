@@ -32,7 +32,7 @@ export default function Home() {
     <div className="flex flex-col">
       {isLoading
         ? <Spinner/>
-        : events.map((event: Event, index: number) => (
+        : events?.map((event: Event, index: number) => (
             <AdminEventCard key={index} event={event} onEdit={onEdit}/>
           ))}
     </div>

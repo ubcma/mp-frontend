@@ -1,6 +1,7 @@
 'use client';
 
 import EventForm from '@/components/forms/EventForm';
+import { fetchFromAPI } from '@/lib/httpHandlers';
 import { toast } from 'sonner';
 
 export default function Home() {
@@ -10,20 +11,22 @@ export default function Home() {
         mode="create"
         onSubmit={async (data) => {
           try {
-            const res = await fetch('/api/events/create', {
+            console.log('Creating event with data:', data);
+
+            const res = await fetchFromAPI('/api/events/create', {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
               },
-              body: JSON.stringify(data),
+              body: data,
             });
 
-            if (!res.ok) {
-              const errorData = await res.json().catch(() => ({}));
-              throw new Error(errorData.message || 'Failed to create event');
+            if (res) {
+              toast.success('Event created!');
+            } else {
+              toast.error('Failed to create event');
             }
 
-            toast.success('Event created!');
           } catch (err: any) {
             toast.error(err.message || 'An unexpected error occurred');
           }

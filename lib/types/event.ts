@@ -1,3 +1,10 @@
+
+export type EventDisplay = {
+  event: Event;
+  questions: EventQuestion[];
+  tags: string[];
+}
+
 export type CreateEventInput = {
   title: string;
   slug: string;

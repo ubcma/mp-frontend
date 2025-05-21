@@ -11,8 +11,9 @@ export interface UserProfileData {
     linkedinUrl: string,
     coursesTaken: null,
     diet: string[],
-    interests: string[]
-    faculty: string
+    interests: string[],
+    faculty: string,
+    onboardingComplete?: boolean;
   }
 
 export type UpdateMeInput = {

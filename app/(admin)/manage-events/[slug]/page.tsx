@@ -5,6 +5,7 @@ import { useParams } from 'next/navigation';
 import EventForm from '@/components/forms/EventForm';
 import { toast } from 'sonner';
 import Spinner from '@/components/Spinner';
+import { fetchFromAPI } from '@/lib/httpHandlers';
 
 export default function EventPage() {
   const { slug } = useParams<{ slug: string }>();
@@ -14,26 +15,24 @@ export default function EventPage() {
   return (
     <div>
       {isLoading ? (
-        <Spinner/>
+        <Spinner />
       ) : (
         <EventForm
           mode="update"
-          initialValues={data.event}
+          initialValues={data?.event}
           onSubmit={async (data) => {
             try {
-              
-              const res = await fetch('/api/events/update', {
+              const res = await fetchFromAPI('/api/events/update', {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ id: data.id, ...data }),
-              })
- 
-              if (!res.ok) {
-                const errorData = await res.json().catch(() => ({}));
-                throw new Error(errorData.message || 'Failed to update event');
+                body: { id: data.id, ...data },
+              });
+
+              if (!res) {
+                throw new Error('Failed to update event');
+              } else {
+                toast.success('Event updated!');
               }
-        
-              toast.success('Event updated!');
             } catch (err: any) {
               toast.error(err.message || 'An unexpected error occurred');
             }

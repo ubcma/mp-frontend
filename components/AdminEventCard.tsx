@@ -19,6 +19,7 @@ import Link from 'next/link';
 import { Event } from '@/lib/types';
 import { Button } from './ui/button';
 import { toast } from 'sonner';
+import { fetchFromAPI } from '@/lib/httpHandlers';
 
 interface AdminEventCardProps {
   event: Event;
@@ -34,18 +35,18 @@ export function AdminEventCard({ event, onEdit }: AdminEventCardProps) {
 
     try {
               
-      const res = await fetch('/api/events/delete', {
+      const res = await fetchFromAPI('/api/events/delete', {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: id }),
+        body: { id: id },
       })
 
-      if (!res.ok) {
-        const errorData = await res.json().catch(() => ({}));
-        throw new Error(errorData.message || 'Failed to delete event');
+      if (!res) {
+        throw new Error('Failed to delete event');
+      } else {
+        toast.success('Event deleted!');
       }
 
-      toast.success('Event deleted!');
     } catch (err: any) {
       toast.error(err.message || 'An unexpected error occurred');
     }
