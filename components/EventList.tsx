@@ -28,8 +28,7 @@ export function EventList() {
         />
         <h3 className='text-lg font-semibold'>No events found.</h3>
         <p className='text-muted-foreground text-sm max-w-96'>
-          We couldn't find anything matching your search criteria.
-          Try adjusting your filters or search terms.
+          {"We couldn't find anything matching your search criteria. Try adjusting your filters or search terms"}
         </p>
       </div>
     );

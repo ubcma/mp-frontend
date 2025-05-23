@@ -5,7 +5,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useUserQuery } from '@/lib/queries/user';
 
 export default function Home() {
-  const { data: user, isLoading, isError } = useUserQuery();
+  const { data: user} = useUserQuery();
 
   const userFirstName = user?.name.split(' ')[0];
 

@@ -2,10 +2,7 @@ import { authClient } from '@/lib/auth-client';
 import { toast } from 'sonner';
 
 export const signInWithGoogle = async () => {
-  const frontendBaseURL =
-    process.env.NODE_ENV === 'development'
-      ? 'http://localhost:3000'
-      : 'https://membership.ubcma.ca';
+  const frontendBaseURL = 'http://localhost:3000'
 
   const response = await authClient.signIn.social({
     provider: 'google',

@@ -24,7 +24,6 @@ import {
   DIETARY_RESTRICTIONS,
   FACULTIES,
   Faculty,
-  FacultyMajors,
   getMajorsForFaculty,
   INTEREST_OPTIONS,
   YEAR_OPTIONS,
@@ -82,14 +81,16 @@ export default function OnboardingModal() {
 
   useEffect(() => {
     const fetchProfile = async () => {
-      const data: UserProfileData = await fetchFromAPI('/api/me',
-        {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        }
-      );
+      const res = await fetchFromAPI('/api/me', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+      });
+
+      const data = (await res.json()) as UserProfileData;
+
       if (!data.onboardingComplete) {
         setOpen(true);
       }
@@ -464,7 +465,7 @@ export default function OnboardingModal() {
                     transition={{ duration: 0.3 }}
                     className="text-center space-y-6 w-full"
                   >
-                    <p className="text-muted-foreground">You're all set!</p>
+                    <p className="text-muted-foreground">{"You're all set!"}</p>
                     <Button onClick={() => setOpen(false)}>Go to Home</Button>
                   </motion.div>
                 )}

@@ -18,17 +18,23 @@ export default function Home() {
               headers: {
                 'Content-Type': 'application/json',
               },
+              credentials: 'include',
               body: data,
             });
 
-            if (res) {
+            const result = (await res.json()) as {
+              success: boolean;
+              eventId: string;
+            };
+
+            if (result.success) {
               toast.success('Event created!');
-            } else {
-              toast.error('Failed to create event');
             }
 
-          } catch (err: any) {
-            toast.error(err.message || 'An unexpected error occurred');
+          } catch (err: unknown) {
+            if (err instanceof Error) {
+              toast.error(err.message || 'Unexpected error occured');
+            }
           }
         }}
       />

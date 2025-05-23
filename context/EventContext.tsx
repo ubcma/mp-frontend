@@ -3,7 +3,7 @@
 import type React from "react"
 import { createContext, useContext, useState, useEffect } from "react"
 import type { Event } from "@/lib/types"
-import { type EventStatus, getEventStatus } from "@/helpers/eventStatus"
+import { type EventStatus, getEventStatus } from '@/lib/utils';
 import { useGetEventsQuery } from "@/lib/queries/events"
 
 type EventContextType = {
@@ -32,7 +32,7 @@ export const EventProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [searchTerm, setSearchTerm] = useState("")
   const [activeTab, setActiveTab] = useState<EventStatus | "All">("All")
 
-  const {data: events, isLoading, isError } = useGetEventsQuery();
+  const {data: events, isLoading } = useGetEventsQuery();
 
   useEffect(() => {
     const filtered = events?.filter(

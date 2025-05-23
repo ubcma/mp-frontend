@@ -12,7 +12,6 @@ import {
   Calendar,
   Tag,
   MapPin,
-  CheckCircle,
 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -20,6 +19,7 @@ import { Event } from '@/lib/types';
 import { Button } from './ui/button';
 import { toast } from 'sonner';
 import { fetchFromAPI } from '@/lib/httpHandlers';
+import dayjs from 'dayjs';
 
 interface AdminEventCardProps {
   event: Event;
@@ -27,7 +27,6 @@ interface AdminEventCardProps {
 }
 
 export function AdminEventCard({ event, onEdit }: AdminEventCardProps) {
-  const dayjs = require('dayjs');
   const eventStartsAt = dayjs(event.startsAt).format('MMMM D, YYYY');
 
   async function deleteEventById() {
@@ -38,6 +37,7 @@ export function AdminEventCard({ event, onEdit }: AdminEventCardProps) {
       const res = await fetchFromAPI('/api/events/delete', {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: { id: id },
       })
 
@@ -47,8 +47,12 @@ export function AdminEventCard({ event, onEdit }: AdminEventCardProps) {
         toast.success('Event deleted!');
       }
 
-    } catch (err: any) {
-      toast.error(err.message || 'An unexpected error occurred');
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        toast.error(err.message);
+      } else {
+        console.error('Unexpected error:', err);
+      }
     }
   }
 

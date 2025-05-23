@@ -6,12 +6,15 @@ export function useGetEventQuery({ eventSlug }: { eventSlug: string }) {
   return useQuery<EventDisplay>({
     queryKey: ['event', eventSlug],
     queryFn: async () => {
-      const data: EventDisplay= await fetchFromAPI(`/api/events/${eventSlug}`, {
+      const res = await fetchFromAPI(`/api/events/${eventSlug}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
         },
+                credentials: 'include',
       });
+      
+      const data = await res.json() as EventDisplay;
 
       return data;
     },
