@@ -34,8 +34,6 @@ export default function SignInForm() {
         <h1 className="font-semibold text-xl">Sign In</h1>
         <h1 className="font-normal text-sm text-muted-foreground">
           Enter your email and password to access your account.
-
-          BACKEND ENVIRONMENT: {process.env.NEXT_PUBLIC_BACKEND_URL}
         </h1>
       </div>
       <form

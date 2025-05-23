@@ -1,12 +1,16 @@
+
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 export async function middleware(request: NextRequest) {
 
+  const accessCode = request.cookies.get('access_code')?.value;
+  const expectedCode = process.env.ACCESS_CODE;
+
   const token = request.cookies.get('membership-portal.session_token')?.value;
   const { pathname } = request.nextUrl;
 
-  if (process.env.NODE_ENV === 'production') {
+  if (process.env.NODE_ENV === 'development' && accessCode !== expectedCode) {
     const allowlist = [
       '/maintenance',
       '/favicon.ico',
@@ -47,9 +51,9 @@ export const config = {
   matcher: [
     '/:path',
     '/',
-    '/home/:path*', 
-    '/events/:path*',  
-    '/profile/:path*', 
+    '/home/:path*',
+    '/events/:path*',
+    '/profile/:path*',
     '/sign-in',
     '/sign-up',
     '/forgot-password',
