@@ -2,21 +2,17 @@ type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE';
 
 interface FetchOptions {
   method?: HttpMethod;
-  body?: any;
+  body?: Record<string, unknown>;
   headers?: Record<string, string>;
+  credentials?: RequestCredentials;
 }
 
-export async function fetchFromAPI<T>(
+export async function fetchFromAPI(
   endpoint: string,
   options: FetchOptions = {}
-): Promise<T> {
-  const { method = 'GET', body, headers: customHeaders = {} } = options;
+): Promise<Response> {
 
-  console.log('Fetching from API:', endpoint, {
-    method,
-    body,
-    headers: customHeaders,
-  });
+  const { method = 'GET', body, credentials, headers: customHeaders = {} } = options;
 
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
@@ -27,8 +23,8 @@ export async function fetchFromAPI<T>(
   const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}${endpoint}`, {
     method,
     headers,
+    credentials: credentials || 'include',
     body: body ? JSON.stringify(body) : undefined,
-    credentials: 'include',
   });
 
   if (!res.ok) {
@@ -45,5 +41,5 @@ export async function fetchFromAPI<T>(
     throw new Error(errorMessage);
   }
 
-  return res.json();
+  return res;
 }

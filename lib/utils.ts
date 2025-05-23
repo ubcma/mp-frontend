@@ -13,3 +13,29 @@ export function generateSlug(title: string): string {
     .replace(/\s+/g, '-')     
     .replace(/-+/g, '-');    
 }
+
+export function getInitials(name: string | undefined): string {
+  if (name) {
+    return name
+      .split(" ")
+      .map((word) => word.charAt(0).toUpperCase())
+      .join("");
+  } else {
+    return "";
+  }
+}
+
+export type EventStatus = "Upcoming" | "Ongoing" | "Past"
+
+export const getEventStatus = (date: Date) => {
+  const today = new Date()
+  const eventDate = new Date(date)
+
+  if (eventDate > today) {
+    return "Upcoming"
+  } else if (eventDate.toDateString() === today.toDateString()) {
+    return "Ongoing"
+  } else {
+    return "Past"
+  }
+}

@@ -23,8 +23,8 @@ import {
   SidebarRail,
   useSidebar,
 } from '@/components/ui/sidebar';
-import { redirect, usePathname, useRouter } from 'next/navigation';
-import { getInitials } from '@/helpers/getInitials';
+import { usePathname, useRouter } from 'next/navigation';
+import { getInitials } from '@/lib/utils';
 import { useUserQuery } from '@/lib/queries/user';
 import { Skeleton } from './ui/skeleton';
 import { signOut } from '@/lib/better-auth/sign-out';
@@ -34,19 +34,19 @@ import Spinner from './Spinner';
 export function AppSidebar() {
   const {
     state,
-    open,
-    setOpen,
-    openMobile,
-    setOpenMobile,
-    isMobile,
-    toggleSidebar,
+    // open,
+    // setOpen,
+    // openMobile,
+    // setOpenMobile,
+    // isMobile,
+    // toggleSidebar,
   } = useSidebar();
 
   const router = useRouter();
 
   const pathname = usePathname();
 
-  const { data: user, isLoading, isError } = useUserQuery();
+  const { data: user, isLoading } = useUserQuery();
 
   const [isSignOutLoading, setIsSignOutLoading] = useState(false);
 

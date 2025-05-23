@@ -24,7 +24,7 @@ export function DraggableCard({
 }: {
   question: QuestionInput;
   index: number;
-  onChange: (index: number, field: keyof QuestionInput, value: any) => void;
+  onChange: (index: number, field: keyof QuestionInput, value: string | string[] | number | boolean) => void;
   onDelete: (index: number) => void;
 }) {
   const {

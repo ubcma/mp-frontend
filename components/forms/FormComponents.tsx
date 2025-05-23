@@ -18,7 +18,7 @@ import {
   CommandList,
 } from '../ui/command';
 import { Button } from '../ui/button';
-import { Check, ChevronsUpDown } from 'lucide-react';
+import { ChevronsUpDown } from 'lucide-react';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { Textarea } from '../ui/textarea';
@@ -142,7 +142,6 @@ export function RenderComboBoxField({
   placeholder,
   label,
   field,
-  disabled,
 }: {
   options: string[];
   placeholder?: string;
@@ -225,7 +224,7 @@ export function RenderComboBoxField({
                       setOpen(false);
                     }}
                   >
-                    Choose "{inputValue}"
+                    {`Choose "${inputValue}"`}
                   </CommandItem>
                 )}
               </CommandGroup>

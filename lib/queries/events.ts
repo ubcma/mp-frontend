@@ -7,12 +7,15 @@ export function useGetEventsQuery() {
   return useQuery({
     queryKey: ['events'],
     queryFn: async () => {
-      const data: Event[] = await fetchFromAPI('/api/events', {
+      const res = await fetchFromAPI('/api/events', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include',
       });
+
+      const data = (await res.json()) as Event[];
 
       return data;
     },

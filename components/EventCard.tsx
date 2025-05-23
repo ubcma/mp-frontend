@@ -1,19 +1,19 @@
 'use client';
 
-import { Card, CardContent, CardFooter } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { getEventStatus, type EventStatus } from '@/helpers/eventStatus';
+import { getEventStatus } from '@/lib/utils';
 import { Event } from '@/lib/types';
 import { useRouter } from 'next/navigation';
 import { ArrowUpRight } from 'lucide-react';
 import Link from 'next/link';
+import dayjs from 'dayjs';
 
 export function EventCard({ event }: { event: Event }) {
   const status = getEventStatus(event.startsAt);
 
   const router = useRouter();
 
-  const dayjs = require('dayjs');
   const eventStartsAt = dayjs(event.startsAt);
   const dayOfTheWeek = eventStartsAt.format('ddd');
   const dayOfTheMonth = eventStartsAt.format('DD');

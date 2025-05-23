@@ -10,7 +10,7 @@ import { fetchFromAPI } from '@/lib/httpHandlers';
 export default function EventPage() {
   const { slug } = useParams<{ slug: string }>();
 
-  const { data, isLoading, isError } = useGetEventQuery({ eventSlug: slug });
+  const { data, isLoading } = useGetEventQuery({ eventSlug: slug });
 
   return (
     <div>
@@ -25,7 +25,8 @@ export default function EventPage() {
               const res = await fetchFromAPI('/api/events/update', {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
-                body: { id: data.id, ...data },
+                credentials: 'include',
+                body: data,
               });
 
               if (!res) {
@@ -33,8 +34,12 @@ export default function EventPage() {
               } else {
                 toast.success('Event updated!');
               }
-            } catch (err: any) {
-              toast.error(err.message || 'An unexpected error occurred');
+            } catch (err: unknown) {
+              if (err instanceof Error) {
+                toast.error(err.message);
+              } else {
+                toast.error('An unexpected error occurred');
+              }
             }
           }}
         />

@@ -12,7 +12,7 @@ import {
   CommandList,
 } from '@/components/ui/command';
 import { Button } from '@/components/ui/button';
-import { getEventStatus } from '@/helpers/eventStatus';
+import { getEventStatus } from '@/lib/utils';
 import { useEventContext } from '@/context/EventContext';
 
 export function Search() {

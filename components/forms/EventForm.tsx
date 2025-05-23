@@ -2,14 +2,18 @@
 
 import { useForm } from '@tanstack/react-form';
 import { Button } from '@/components/ui/button';
-import { toast } from 'sonner';
 import Spinner from '../Spinner';
 import {
   RenderDateTimeField,
   RenderInputField,
   RenderTextArea,
 } from './FormComponents';
-import { Event, QuestionInput } from '@/lib/types';
+import {
+  Event,
+  EventPayload,
+  EventQuestionResponse,
+  QuestionInput,
+} from '@/lib/types';
 import { DraggableCard } from '../DraggableCard';
 import {
   DndContext,
@@ -34,7 +38,7 @@ import { Label } from '../ui/label';
 type EventFormProps = {
   mode: 'create' | 'update';
   initialValues?: Partial<Event>;
-  onSubmit: (values: any) => Promise<void>;
+  onSubmit: (values: EventPayload) => Promise<void>;
 };
 
 export default function EventForm({
@@ -80,7 +84,7 @@ export default function EventForm({
   const handleQuestionChange = (
     index: number,
     field: keyof QuestionInput,
-    value: any
+    value: EventQuestionResponse
   ) => {
     const updated = [...questions];
     updated[index] = {
@@ -108,32 +112,39 @@ export default function EventForm({
       endsAt: initialValues?.endsAt ?? '',
     },
     onSubmit: async ({ value }) => {
-      const formattedData = {
-        ...value,
-        startsAt: new Date(value.startsAt),
-        endsAt: new Date(value.endsAt),
-        isVisible: value.isVisible,
-        ...(mode === 'create' && {
-          questions: questions.map((q, index) => ({
-            label: q.label,
-            placeholder: q.placeholder,
-            type: q.type,
-            isRequired: q.isRequired,
-            options: q.options ?? null,
-            validation: q.validation ?? {},
-            sortOrder: index + 1,
-            createdAt: new Date(),
-            updatedAt: new Date(),
-          })),
-        }),
-      };
+      const formattedData: EventPayload =
+        mode === 'create'
+          ? {
+              ...value,
+              startsAt: new Date(value.startsAt),
+              endsAt: new Date(value.endsAt),
+              isVisible: value.isVisible,
+              ...(mode === 'create' && {
+                questions: questions.map((q, index) => ({
+                  label: q.label,
+                  placeholder: q.placeholder,
+                  type: q.type,
+                  isRequired: q.isRequired,
+                  options: q.options ?? null,
+                  validation: q.validation ?? {},
+                  sortOrder: index + 1,
+                  createdAt: new Date(),
+                  updatedAt: new Date(),
+                })),
+              }),
+            }
+          : {
+              ...value,
+              startsAt: new Date(value.startsAt),
+              endsAt: new Date(value.endsAt),
+            };
 
       await onSubmit(formattedData);
     },
   });
 
   const requiredValidator = (fieldName: string) => ({
-    onChange: ({ value }: { value: any }) =>
+    onChange: ({ value }: { value: EventQuestionResponse }) =>
       !value ? `${fieldName} is required.` : undefined,
   });
 
@@ -256,7 +267,9 @@ export default function EventForm({
                   onCheckedChange={fieldApi.handleChange}
                   className="data-[state=checked]:bg-emerald-400"
                 />
-                <Label htmlFor={fieldApi.name}>Make visible to the public?</Label>
+                <Label htmlFor={fieldApi.name}>
+                  Make visible to the public?
+                </Label>
               </div>
             )}
           />

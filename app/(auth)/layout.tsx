@@ -17,7 +17,7 @@ export default function Layout({
         <div>
           <h2 className="font-medium text-md text-white">Membership Portal</h2>
           <p className="text-xs text-white">
-            UBC's Only Marketing-Focused Club
+            {"UBC's Only Marketing-Focused Club"}
           </p>
         </div>
       </div>

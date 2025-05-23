@@ -3,14 +3,14 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { getInitials } from '@/helpers/getInitials';
 import { useUserQuery } from '@/lib/queries/user';
+import { getInitials } from '@/lib/utils';
 import { Avatar, AvatarFallback, AvatarImage } from '@radix-ui/react-avatar';
 import { ExternalLink } from 'lucide-react';
 import Link from 'next/link';
 
 export default function ProfilePage() {
-  const { data: user, isLoading, isError } = useUserQuery();
+  const { data: user} = useUserQuery();
 
   return (
     <div className="">

@@ -1,5 +1,3 @@
-import { Degree } from "./types";
-
 export const INTEREST_OPTIONS = [
   'Digital Marketing',
   'Brand Management',

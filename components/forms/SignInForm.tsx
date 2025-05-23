@@ -1,10 +1,6 @@
 'use client';
 
-import { useState } from 'react';
 import { useForm } from '@tanstack/react-form';
-import type { AnyFieldApi } from '@tanstack/react-form';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { LogIn } from 'lucide-react';
 import Link from 'next/link';
@@ -23,7 +19,7 @@ export default function SignInForm() {
     },
     onSubmit: async ({ value }) => {
       try {
-        await new Promise<void>((resolve, reject) => {
+        await new Promise<void>(() => {
           signInWithEmail(value.email, value.password);
         });
       } catch (error) {
@@ -38,6 +34,8 @@ export default function SignInForm() {
         <h1 className="font-semibold text-xl">Sign In</h1>
         <h1 className="font-normal text-sm text-muted-foreground">
           Enter your email and password to access your account.
+
+          BACKEND ENVIRONMENT: {process.env.NEXT_PUBLIC_BACKEND_URL}
         </h1>
       </div>
       <form
@@ -81,7 +79,7 @@ export default function SignInForm() {
               className="cursor-pointer font-regular bg-ma-red"
               variant="ma"
               type="submit"
-              disabled={isSubmitting}
+              disabled={isSubmitting || !canSubmit}
             >
               {isSubmitting ? (
                 <>

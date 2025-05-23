@@ -1,8 +1,9 @@
 import { AppSidebar } from '@/components/AppSidebar';
 import { SidebarProvider } from '@/components/ui/sidebar';
-import { getCurrentUserRole } from '@/lib/getCurrentUserRole';
-import { UserProfileData } from '@/lib/types';
+import { getUserRole } from '@/lib/queries/userRole';
 import { redirect } from 'next/navigation';
+
+export const dynamic = 'force-dynamic'
 
 export default async function AdminLayout({
   children,
@@ -10,7 +11,7 @@ export default async function AdminLayout({
   children: React.ReactNode;
 }>) {
 
-  const userRole = await getCurrentUserRole()
+  const userRole = await getUserRole()
 
   if (userRole !== 'Admin') {
     redirect('/home')
