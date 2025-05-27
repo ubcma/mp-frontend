@@ -10,7 +10,7 @@ export async function middleware(request: NextRequest) {
   const token = request.cookies.get('membership-portal.session_token')?.value;
   const { pathname } = request.nextUrl;
 
-  if (process.env.NODE_ENV === 'development' && accessCode !== expectedCode) {
+  if (accessCode !== expectedCode) {
     const allowlist = [
       '/maintenance',
       '/favicon.ico',
