@@ -19,8 +19,6 @@ export default async function ProtectedLayout({
 
   const res = await getServerSession(cookieHeader);
 
-  console.log('ProtectedLayout session:', res);
-
   if (!res) {
     redirect('/sign-in');
   }

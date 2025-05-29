@@ -9,6 +9,7 @@ import { toast } from 'sonner';
 import Spinner from '../Spinner';
 import { RenderInputField } from './FormComponents';
 import { signUpWithEmail } from '@/lib/better-auth/sign-up';
+import { handleError } from '@/lib/error/handle';
 
 export default function SignUpForm() {
   const form = useForm({
@@ -23,7 +24,7 @@ export default function SignUpForm() {
         const fullName = `${value.firstName} ${value.lastName}`;
         await signUpWithEmail(fullName, value.email, value.password);
       } catch (error) {
-        toast.error(String(error));
+        handleError('Error', error);
       }
     },
   });
