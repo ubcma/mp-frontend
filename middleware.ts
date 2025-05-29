@@ -1,13 +1,12 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { getServerSession } from './lib/auth-server';
 
-export async function middleware(request: NextRequest) {
+export function middleware(request: NextRequest) {
   const accessCode = request.cookies.get('access_code')?.value;
   const expectedCode = process.env.ACCESS_CODE;
-
   const { pathname } = request.nextUrl;
 
+  // Maintenance Mode: Only allow access with a valid access code
   if (accessCode !== expectedCode) {
     const allowlist = [
       '/maintenance',
@@ -23,34 +22,7 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  const publicPaths = ['/sign-in', '/sign-up', '/forgot-password'];
-
-  const isPublic =
-    publicPaths.includes(pathname) ||
-    pathname.startsWith('/_next') ||
-    pathname.startsWith('/api');
-
-  let hasValidSession = false;
-
-  if (!isPublic) {
-    const session = await getServerSession(request.headers.get('cookie') || '');
-    hasValidSession = !!session?.user;
-  }
-
-  if (isPublic) {
-    if (
-      hasValidSession &&
-      (pathname === '/sign-in' || pathname === '/sign-up')
-    ) {
-      return NextResponse.redirect(new URL('/home', request.url));
-    }
-    return NextResponse.next();
-  }
-
-  if (!hasValidSession) {
-    return NextResponse.redirect(new URL('/sign-in', request.url));
-  }
-
+  // Prevent access to root and redirect to /home
   if (pathname === '/') {
     return NextResponse.redirect(new URL('/home', request.url));
   }
