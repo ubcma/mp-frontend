@@ -19,7 +19,7 @@ export default function Layout({
         <main className="w-full mx-8 mb-8 mt-4 md:m-8">
           <div className="md:hidden w-full flex flex-row justify-between items-center mb-8">
             <SidebarTrigger />
-            <Link href="/">
+            <Link href="/" prefetch={true}>
               <Image
                 src="/logos/logo_red.svg"
                 alt="Logo"
