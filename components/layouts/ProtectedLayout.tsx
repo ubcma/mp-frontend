@@ -1,18 +1,19 @@
 // app/(protected)/layout.tsx
-import { getServerSession } from "@/lib/auth-server";
-import { redirect } from "next/navigation";
+import { getServerSession } from '@/lib/auth-server';
+import { cookies } from 'next/headers';
+import { redirect } from 'next/navigation';
 
-export default async function ProtectedLayout({ children }: { children: React.ReactNode }) {
-  const res = await getServerSession();
+export default async function ProtectedLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const cookieHeader = cookies().toString();
 
-  if (!res.ok) {
-    redirect("/sign-in");
-  }
+  const res = await getServerSession(cookieHeader);
 
-  const session = await res.json();
-
-  if (!session?.user) {
-    redirect("/sign-in");
+  if (!res) {
+    redirect('/sign-in');
   }
 
   return <>{children}</>;
