@@ -9,9 +9,17 @@ export default async function ProtectedLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const cookieHeader = (await cookies()).toString();
+
+  const cookieStore = await cookies();
+
+  const cookieHeader = cookieStore
+    .getAll()
+    .map(({ name, value }) => `${name}=${value}`)
+    .join('; ');
 
   const res = await getServerSession(cookieHeader);
+
+  console.log('ProtectedLayout session:', res);
 
   if (!res) {
     redirect('/sign-in');
