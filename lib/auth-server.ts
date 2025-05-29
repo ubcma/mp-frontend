@@ -1,9 +1,9 @@
 import { fetchFromAPI } from './httpHandlers';
 
-export async function getServerSession(cookieHeader: string) {
+export async function getServerSession() {
   const res = await fetchFromAPI('/api/auth/get-session', {
     method: 'GET',
-    headers: { 'Content-Type': 'application/json', cookie: cookieHeader },
+    headers: { 'Content-Type': 'application/json', cookie: "" },
     credentials: 'include',
   });
 
