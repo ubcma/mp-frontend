@@ -23,6 +23,7 @@ export function EventCard({ event }: { event: Event }) {
     <Link
       href={`/events/${event.slug}`}
       className="hover:opacity-90 hover:rotate-1 hover:scale-105 transition-all duration-200"
+      prefetch={true}
     >
       <Card className="flex flex-col h-full overflow-hidden gap-0 p-0 bg-black">
         <CardContent className="p-0 flex-1 flex flex-col">

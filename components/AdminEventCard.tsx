@@ -101,7 +101,7 @@ export function AdminEventCard({ event, onEdit }: AdminEventCardProps) {
                   Edit event
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link href={`/events/${event.slug}`}>View public page</Link>
+                  <Link href={`/events/${event.slug}`} prefetch={true}>View public page</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Button variant='destructive' onClick={deleteEventById}>

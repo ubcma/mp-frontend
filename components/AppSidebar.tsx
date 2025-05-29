@@ -106,7 +106,7 @@ export function AppSidebar() {
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader className="p-2 pt-4">
-        <Link href="/home" className="flex items-center">
+        <Link href="/home" className="flex items-center" prefetch={true}>
           <img
             src={`${
               state === 'collapsed'
@@ -135,6 +135,7 @@ export function AppSidebar() {
               className={`flex items-center gap-3 transition-all duration-300 ease-in-out hover:opacity-70 ${
                 state === 'collapsed' ? 'p-0' : 'p-2'
               }`}
+              prefetch={true}
             >
               <Avatar
                 className={`rounded-md ${
@@ -175,6 +176,7 @@ export function AppSidebar() {
                       {...(item.href.startsWith('http')
                         ? { target: '_blank', rel: 'noopener noreferrer' }
                         : {})}
+                      prefetch={true}
                     >
                       <item.icon className="h-4 w-4" />
                       <span>{item.label}</span>
@@ -204,6 +206,7 @@ export function AppSidebar() {
                         {...(item.href.startsWith('http')
                           ? { target: '_blank', rel: 'noopener noreferrer' }
                           : {})}
+                        prefetch={true}
                       >
                         <item.icon className="h-4 w-4" />
                         <span>{item.label}</span>

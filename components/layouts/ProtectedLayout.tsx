@@ -1,6 +1,7 @@
 // app/(protected)/layout.tsx
 import { getServerSession } from '@/lib/auth-server';
 import { cookies } from 'next/headers';
+
 import { redirect } from 'next/navigation';
 
 export default async function ProtectedLayout({
@@ -8,7 +9,7 @@ export default async function ProtectedLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const cookieHeader = cookies().toString();
+  const cookieHeader = (await cookies()).toString();
 
   const res = await getServerSession(cookieHeader);
 
