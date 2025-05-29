@@ -2,6 +2,7 @@ import { authClient } from '@/lib/auth-client';
 import { toast } from 'sonner';
 
 export const signInWithGoogle = async () => {
+
   const frontendBaseURL =
     process.env.NEXT_PUBLIC_FRONTEND_URL;
 
@@ -29,7 +30,10 @@ export const signInWithEmail = async (email: string, password: string) => {
       rememberMe: true,
     },
     {
-      //callbacks
+      onSuccess(ctx) {
+        console.log('Sign in successful:', ctx);
+        toast.success('Sign in successful!');
+      }
     }
   );
   if (response.error) {
