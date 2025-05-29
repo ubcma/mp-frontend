@@ -5,10 +5,10 @@ import { Button } from '@/components/ui/button';
 import { LogIn } from 'lucide-react';
 import Link from 'next/link';
 import Spinner from '../Spinner';
-import { toast } from 'sonner';
 import { RenderInputField } from './FormComponents';
 import { GoogleSignInButton } from '../GoogleSignInButton';
 import { signInWithEmail } from '@/lib/better-auth/sign-in';
+import { handleError } from '@/lib/error/handle';
 
 export default function SignInForm() {
 
@@ -19,11 +19,10 @@ export default function SignInForm() {
     },
     onSubmit: async ({ value }) => {
       try {
-        await new Promise<void>(() => {
-          signInWithEmail(value.email, value.password);
-        });
+        await signInWithEmail(value.email, value.password);
       } catch (error) {
-        toast.error(String(error));
+        console.error('Submit error:', error);
+        handleError('Error', error);
       }
     },
   });

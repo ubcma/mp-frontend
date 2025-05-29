@@ -20,6 +20,7 @@ import { Button } from './ui/button';
 import { toast } from 'sonner';
 import { fetchFromAPI } from '@/lib/httpHandlers';
 import dayjs from 'dayjs';
+import { handleError } from '@/lib/error/handle';
 
 interface AdminEventCardProps {
   event: Event;
@@ -48,11 +49,7 @@ export function AdminEventCard({ event, onEdit }: AdminEventCardProps) {
       }
 
     } catch (err: unknown) {
-      if (err instanceof Error) {
-        toast.error(err.message);
-      } else {
-        console.error('Unexpected error:', err);
-      }
+      handleError('Error', err);
     }
   }
 

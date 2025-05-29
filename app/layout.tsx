@@ -26,7 +26,7 @@ export default async function RootLayout({
         <QueryProvider>
           {children}
         </QueryProvider>
-        <Toaster />
+        <Toaster richColors/>
       </body>
     </html>
   );
