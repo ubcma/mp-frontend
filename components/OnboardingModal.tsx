@@ -38,6 +38,7 @@ import {
 } from 'lucide-react';
 import { fetchFromAPI } from '@/lib/httpHandlers';
 import { UserProfileData } from '@/lib/types';
+import { Select } from './ui/select';
 
 const steps = [
   {
@@ -117,9 +118,9 @@ export default function OnboardingModal() {
       onboardingComplete: true,
     },
     onSubmit: async ({ value }) => {
-      await fetch('/api/me/', {
+      await fetchFromAPI('/api/me/', {
         method: 'POST',
-        body: JSON.stringify(value),
+        body: value,
       });
       setStep((s) => s + 1);
     },
@@ -222,7 +223,7 @@ export default function OnboardingModal() {
                               !value ? 'Faculty is required.' : undefined,
                           }}
                           children={(field) => (
-                            <RenderComboBoxField
+                            <RenderSelectField
                               options={FACULTIES}
                               label="Faculty"
                               field={field}
@@ -243,7 +244,6 @@ export default function OnboardingModal() {
                                 options={majors}
                                 label="Major"
                                 field={field}
-                                disabled={!selectedFaculty}
                               />
                             );
                           }}

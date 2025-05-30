@@ -27,7 +27,7 @@ export const signUpWithEmail = async (
   );
 
   if (error) {
-    handleError('Error signing up with email:', error);
+    handleError('Error signing up with email', error);
   }
   
   return data;

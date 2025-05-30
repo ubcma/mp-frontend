@@ -11,7 +11,7 @@ export function useGetEventQuery({ eventSlug }: { eventSlug: string }) {
         headers: {
           'Content-Type': 'application/json',
         },
-                credentials: 'include',
+        credentials: 'include',
       });
       
       const data = await res.json() as EventDisplay;

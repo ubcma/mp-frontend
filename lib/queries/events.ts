@@ -1,4 +1,3 @@
-// lib/queries/user.ts
 import { useQuery } from '@tanstack/react-query';
 import { fetchFromAPI } from '../httpHandlers';
 import { Event } from '../types';

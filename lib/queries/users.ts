@@ -2,12 +2,11 @@ import { useQuery } from '@tanstack/react-query';
 import { fetchFromAPI } from '../httpHandlers';
 import { UserProfileData } from '../types';
 
-export function useUserQuery() {
-  return useQuery<UserProfileData>({
-    queryKey: ['user'],
+export function useGetAllUsersQuery() {
+  return useQuery({
+    queryKey: ['users'],
     queryFn: async () => {
-      console.log('Fetching user data...');
-      const res = await fetchFromAPI('/api/me', {
+      const res = await fetchFromAPI('/api/users', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -15,7 +14,7 @@ export function useUserQuery() {
         credentials: 'include',
       });
 
-      const data = (await res.json()) as UserProfileData;
+      const data = (await res.json()) as UserProfileData[];
 
       return data;
     },

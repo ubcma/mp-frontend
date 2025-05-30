@@ -10,8 +10,11 @@ import Spinner from '../Spinner';
 import { RenderInputField } from './FormComponents';
 import { signUpWithEmail } from '@/lib/better-auth/sign-up';
 import { handleError } from '@/lib/error/handle';
+import { useRouter } from 'next/navigation';
 
 export default function SignUpForm() {
+
+  const router = useRouter();
   const form = useForm({
     defaultValues: {
       firstName: '',
@@ -22,9 +25,15 @@ export default function SignUpForm() {
     onSubmit: async ({ value }) => {
       try {
         const fullName = `${value.firstName} ${value.lastName}`;
-        await signUpWithEmail(fullName, value.email, value.password);
+        const data = await signUpWithEmail(fullName, value.email, value.password);
+
+        if (data?.user) {
+          toast.success('Sign up successful! Please check your email for verification.');
+          router.push('/sign-in');
+        }
+        
       } catch (error) {
-        handleError('Error', error);
+        handleError('Sign Up Error', error);
       }
     },
   });

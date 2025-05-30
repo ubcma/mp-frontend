@@ -31,7 +31,7 @@ export async function fetchFromAPI(
 
   if (!res.ok) {
     const errorText = await res.text();
-    let errorMessage = 'Failed to fetch data from' + endpoint;
+    let errorMessage = 'Failed to fetch data from ' + endpoint;
 
     try {
       const errorJson = JSON.parse(errorText);
