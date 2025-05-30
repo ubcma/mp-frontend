@@ -19,9 +19,9 @@ export default function ProfilePage() {
           <Avatar
             className={`rounded-full h-32 w-32 bg-neutral-100 flex items-center justify-center`}
           >
-            {user?.avatarUrl ? (
+            {user?.avatar ? (
               <AvatarImage
-                src={user?.avatarUrl}
+                src={user?.avatar}
                 alt="Profile Image"
                 className="object-cover w-full h-full rounded-full"
               />
@@ -44,7 +44,7 @@ export default function ProfilePage() {
                 Faculty: {user?.faculty}
               </span>
               <span className="bg-muted px-2 py-1 rounded">
-                Year: {user?.yearLevel}
+                Year: {user?.year}
               </span>
               <span className="bg-muted px-2 py-1 rounded">
                 Major: {user?.major}

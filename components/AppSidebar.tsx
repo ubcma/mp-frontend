@@ -142,9 +142,9 @@ export function AppSidebar() {
                   state === 'collapsed' ? 'h-8 w-8' : 'h-10 w-10'
                 }`}
               >
-                {user?.avatarUrl ? (
+                {user?.avatar ? (
                   <AvatarImage
-                    src={user.avatarUrl}
+                    src={user.avatar}
                     alt="Profile Image"
                     className="object-cover w-full h-full rounded-md"
                   />
