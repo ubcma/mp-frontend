@@ -121,8 +121,7 @@ export default function SignUpForm() {
                 <>
                   <CreditCardIcon />
                   <div>
-                    {' '}
-                    Continue to payment with <b>Stripe</b>{' '}
+                    {' '} Create Account {' '}
                   </div>
                 </>
               )}
