@@ -10,7 +10,7 @@ export default function Home() {
   const userFirstName = user?.name.split(' ')[0];
 
   return (
-    <div className="flex flex-col justify-center w-full h-full">
+    <div className="flex flex-col justify-center w-full">
       {!user?.onboardingComplete && <OnboardingModal />}
 
       <div className="flex flex-col gap-2">
