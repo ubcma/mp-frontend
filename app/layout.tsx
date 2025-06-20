@@ -3,6 +3,8 @@ import { Onest } from 'next/font/google';
 import './globals.css';
 import { Toaster } from 'sonner';
 import { QueryProvider } from './providers/query-provider';
+import { ThemeProvider } from './providers/theme-provider';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 const onest = Onest({
   subsets: ['latin'],
@@ -21,12 +23,19 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body className={onest.className}>
-        <QueryProvider>
-          {children}
-        </QueryProvider>
-        <Toaster richColors/>
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          <QueryProvider>
+            {children}
+          </QueryProvider>
+
+          <Toaster richColors />
+
+          <div className='fixed bottom-3 right-3 z-50'>
+              <ThemeToggle />
+            </div>
+        </ThemeProvider>
       </body>
     </html>
   );
