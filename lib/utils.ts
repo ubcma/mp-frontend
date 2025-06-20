@@ -39,3 +39,7 @@ export const getEventStatus = (date: Date) => {
     return "Past"
   }
 }
+
+export const isValidImageUrl = (url: string | undefined | null) => {
+  return !!url && (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('/'));
+};

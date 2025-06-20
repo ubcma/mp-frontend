@@ -30,6 +30,7 @@ import { Skeleton } from './ui/skeleton';
 import { signOut } from '@/lib/better-auth/sign-out';
 import { useState } from 'react';
 import Spinner from './Spinner';
+import { ThemeToggle } from './ThemeToggle';
 
 export function AppSidebar() {
   const {
@@ -169,7 +170,10 @@ export function AppSidebar() {
             <SidebarMenu>
               {memberMenu.map((item) => (
                 <SidebarMenuItem key={item.href}>
-                  <SidebarMenuButton asChild isActive={pathname.startsWith(item.href)}>
+                  <SidebarMenuButton
+                    asChild
+                    isActive={pathname.startsWith(item.href)}
+                  >
                     <Link
                       href={item.href}
                       aria-disabled={item.disabled}

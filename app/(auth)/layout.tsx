@@ -6,7 +6,7 @@ export default function Layout({
   children: React.ReactNode;
 }>) {
   return (
-    <div className="relative flex flex-row min-h-screen bg-ma-red">
+    <div className="relative flex flex-row min-h-screen bg-ma-red dark:bg-background/20">
       <div className="hidden fixed left-0 top-0 bottom-0 w-1/2 p-8 lg:flex flex-col justify-between">
         <Image
           src="/logos/logo_white.svg"
@@ -23,7 +23,7 @@ export default function Layout({
       </div>
 
       {/* Right Content Panel */}
-      <div className="w-full lg:w-1/2 lg:ml-[50%] px-16 py-24 bg-white lg:m-4 lg:rounded-lg shadow-[inset_4_4px_8px_rgba(0,0,0,0.25)]">
+      <div className="w-full lg:w-1/2 lg:ml-[50%] px-16 py-24 bg-white dark:bg-[#101010] lg:m-4 lg:rounded-lg shadow-[inset_4_4px_8px_rgba(0,0,0,0.25)]">
         {children}
       </div>
     </div>

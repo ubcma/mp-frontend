@@ -2,12 +2,13 @@
 
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { getEventStatus } from '@/lib/utils';
+import { getEventStatus, isValidImageUrl } from '@/lib/utils';
 import { Event } from '@/lib/types';
 import { useRouter } from 'next/navigation';
 import { ArrowUpRight } from 'lucide-react';
 import Link from 'next/link';
 import dayjs from 'dayjs';
+import Image from 'next/image';
 
 export function EventCard({ event }: { event: Event }) {
   const status = getEventStatus(event.startsAt);
@@ -39,9 +40,11 @@ export function EventCard({ event }: { event: Event }) {
                 {dayOfTheWeek}
               </p>
             </div>
-            <img
-              src={event.imageUrl ?? '/no-event-image.png'}
+            <Image
+              src={isValidImageUrl(event.imageUrl) ? event.imageUrl! : '/no-event-image.png'}
               alt={event.title}
+              height={256}
+              width={128}
               className="h-64 w-full object-cover"
             />
             <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-black to-transparent"></div>

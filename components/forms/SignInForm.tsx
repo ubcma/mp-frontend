@@ -94,9 +94,9 @@ export default function SignInForm() {
         />
       </form>
       <div className="flex items-center justify-between">
-        <hr className="w-full border-neutral-300" />
-        <span className="mx-2 text-neutral-400 font-light">OR</span>
-        <hr className="w-full border-neutral-300" />
+        <hr className="w-full border-foreground/20" />
+        <span className="mx-2 text-foreground/40 font-light">OR</span>
+        <hr className="w-full border-foreground/20" />
       </div>
       <GoogleSignInButton />
       <h1 className="font-normal text-sm">

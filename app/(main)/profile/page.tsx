@@ -17,7 +17,7 @@ export default function ProfilePage() {
       <Card>
         <CardContent className="p-12 flex flex-col gap-6 items-start">
           <Avatar
-            className={`rounded-full h-32 w-32 bg-neutral-100 flex items-center justify-center`}
+            className={`rounded-full h-32 w-32 bg-muted flex items-center justify-center`}
           >
             {user?.avatar ? (
               <AvatarImage
@@ -26,7 +26,7 @@ export default function ProfilePage() {
                 className="object-cover w-full h-full rounded-full"
               />
             ) : (
-              <AvatarFallback className="text-4xl font-medium">
+              <AvatarFallback className="text-4xl">
                 {getInitials(user?.name)}
               </AvatarFallback>
             )}
@@ -38,7 +38,7 @@ export default function ProfilePage() {
               <Badge variant="outline">{user?.role}</Badge>
             </div>
             <p className="text-muted-foreground">{user?.email}</p>
-            <p className="text-sm text-gray-600 mt-1">{user?.bio}</p>
+            <p className="text-sm muted mt-1">{user?.bio}</p>
             <div className="mt-3 flex flex-wrap gap-2 text-sm">
               <span className="bg-muted px-2 py-1 rounded">
                 Faculty: {user?.faculty}
@@ -56,7 +56,7 @@ export default function ProfilePage() {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <Button variant="link" className="mt-2 h-fit py-2 bg-blue-200">
+                <Button variant="link" className="mt-2 h-fit py-2 bg-blue-300 dark:bg-blue-700">
                   LinkedIn Profile
                   <ExternalLink className="w-4 h-4 mr-1" />
                 </Button>

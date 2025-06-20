@@ -21,6 +21,7 @@ import { toast } from 'sonner';
 import { fetchFromAPI } from '@/lib/httpHandlers';
 import dayjs from 'dayjs';
 import { handleError } from '@/lib/error/handle';
+import { isValidImageUrl } from '@/lib/utils';
 
 interface AdminEventCardProps {
   event: Event;
@@ -57,7 +58,7 @@ export function AdminEventCard({ event, onEdit }: AdminEventCardProps) {
     <Card className="flex overflow-hidden mb-2 p-0">
       <div className="flex flex-1 p-4">
         <Image
-          src={event.imageUrl || '/no-event-image.png'}
+          src={isValidImageUrl(event.imageUrl) ? event.imageUrl! : '/no-event-image.png'}
           alt={event.title}
           width={128}
           height={48}
