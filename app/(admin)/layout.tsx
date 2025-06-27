@@ -1,4 +1,5 @@
 import { AppSidebar } from '@/components/AppSidebar';
+import { Breadcrumbs } from '@/components/Breadcrumbs';
 import ProtectedLayout from '@/components/layouts/ProtectedLayout';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { getUserRole } from '@/lib/queries/userRole';
@@ -21,7 +22,10 @@ export default async function AdminLayout({
     <SidebarProvider>
       <ProtectedLayout>
         <AppSidebar />
-        <main className="w-full m-8">{children}</main>
+        <main className="w-full m-8 lg:m-12">
+          <Breadcrumbs />
+          {children}
+        </main>
       </ProtectedLayout>
     </SidebarProvider>
   );

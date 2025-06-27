@@ -149,7 +149,7 @@ export default function EventForm({
   });
 
   return (
-    <div className="flex flex-col gap-8 h-full justify-center mx-8">
+    <div className="flex flex-col gap-8 h-full justify-center">
       <div>
         <h1 className="font-semibold text-xl">
           {mode === 'create'
