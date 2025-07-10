@@ -90,7 +90,7 @@ const uploadToUploadThing = async (file: File): Promise<string> => {
 };
 
   const updateProfilePicture = async (avatarUrl: string) => {
-    const response = await fetch('http://localhost:3001/api/me', { // Your backend URL
+    const response = await fetch('http://localhost:8080/api/me', { // Your backend URL
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
