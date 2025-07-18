@@ -8,6 +8,7 @@ import { EventStatus, getEventStatus } from '@/helpers/eventStatus';
 import { EventList } from '@/components/EventList';
 import { EventProvider, useEventContext } from '@/context/EventContext';
 import { useGetEventsQuery } from '@/lib/queries/events';
+import EventDetails from '@/components/EventDetails';
 
 const tabs: { value: EventStatus | "All"; label: string }[] = [
   { value: "All", label: "All" },
