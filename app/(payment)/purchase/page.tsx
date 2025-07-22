@@ -1,4 +1,5 @@
 'use client';
+
 import { useEffect, useState } from 'react';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements } from '@stripe/react-stripe-js';
@@ -20,7 +21,7 @@ export default function PurchasePage() {
         credentials: 'include',
         body: JSON.stringify({
           purchaseType: 'membership',
-          amount: 2000,
+          amount: 0,
           currency: 'cad',
         }),
       });
