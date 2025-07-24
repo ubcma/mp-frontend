@@ -8,7 +8,7 @@ import Spinner from '../Spinner';
 import { RenderInputField } from './FormComponents';
 import { GoogleSignInButton } from '../GoogleSignInButton';
 import { signInWithEmail } from '@/lib/better-auth/sign-in';
-import { handleError } from '@/lib/error/handle';
+import { handleClientError } from '@/lib/error/handleClient';
 
 export default function SignInForm() {
 
@@ -22,7 +22,7 @@ export default function SignInForm() {
         await signInWithEmail(value.email, value.password);
       } catch (error) {
         console.error('Submit error:', error);
-        handleError('Error', error);
+        handleClientError('Error', error);
       }
     },
   });

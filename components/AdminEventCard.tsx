@@ -20,7 +20,7 @@ import { Button } from './ui/button';
 import { toast } from 'sonner';
 import { fetchFromAPI } from '@/lib/httpHandlers';
 import dayjs from 'dayjs';
-import { handleError } from '@/lib/error/handle';
+import { handleClientError } from '@/lib/error/handleClient';
 import { isValidImageUrl } from '@/lib/utils';
 
 interface AdminEventCardProps {
@@ -50,7 +50,7 @@ export function AdminEventCard({ event, onEdit }: AdminEventCardProps) {
       }
 
     } catch (err: unknown) {
-      handleError('Error', err);
+      handleClientError('Error', err);
     }
   }
 

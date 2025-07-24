@@ -6,7 +6,7 @@ import EventForm from '@/components/forms/EventForm';
 import { toast } from 'sonner';
 import Spinner from '@/components/Spinner';
 import { fetchFromAPI } from '@/lib/httpHandlers';
-import { handleError } from '@/lib/error/handle';
+import { handleClientError } from '@/lib/error/handleClient';
 
 export default function EventPage() {
   const { slug } = useParams<{ slug: string }>();
@@ -36,7 +36,7 @@ export default function EventPage() {
                 toast.success('Event updated!');
               }
             } catch (err: unknown) {
-              handleError('Error', err);
+              handleClientError('Error', err);
             }
           }}
         />

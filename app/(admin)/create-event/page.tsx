@@ -1,7 +1,7 @@
 'use client';
 
 import EventForm from '@/components/forms/EventForm';
-import { handleError } from '@/lib/error/handle';
+import { handleClientError } from '@/lib/error/handleClient';
 import { fetchFromAPI } from '@/lib/httpHandlers';
 import { toast } from 'sonner';
 
@@ -33,7 +33,7 @@ export default function Home() {
             }
 
           } catch (err: unknown) {
-            handleError('Error creating event', err);
+            handleClientError('Error creating event', err);
           }
         }}
       />

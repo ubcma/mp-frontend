@@ -1,4 +1,4 @@
-import { handleError } from "./error/handle";
+import { handleServerError } from "./error/handleServer";
 
 type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE';
 
@@ -40,7 +40,7 @@ export async function fetchFromAPI(
       console.warn('Failed to parse error response as JSON');
     }
 
-    handleError('Error', errorMessage);
+    handleServerError('Error', errorMessage);
     throw new Error(errorMessage);
   }
 

@@ -1,7 +1,7 @@
 import { cookies } from 'next/headers';
 import { fetchFromAPI } from '../httpHandlers';
 import { UserProfileData } from '../types';
-import { handleError } from '../error/handle';
+import { handleServerError } from '../error/handleServer';
 
 export async function getUserRole() {
   try {
@@ -24,7 +24,7 @@ export async function getUserRole() {
 
     return data.role;
   } catch (error) {
-    handleError('Error fetching user role:', error);
+    handleServerError('Error fetching user role:', error);
     throw error;
   }
 }

@@ -9,7 +9,7 @@ import { toast } from 'sonner';
 import Spinner from '../Spinner';
 import { RenderInputField } from './FormComponents';
 import { signUpWithEmail } from '@/lib/better-auth/sign-up';
-import { handleError } from '@/lib/error/handle';
+import { handleClientError } from '@/lib/error/handleClient';
 import { useRouter } from 'next/navigation';
 
 export default function SignUpForm() {
@@ -33,7 +33,7 @@ export default function SignUpForm() {
         }
         
       } catch (error) {
-        handleError('Sign Up Error', error);
+        handleClientError('Sign Up Error', error);
       }
     },
   });

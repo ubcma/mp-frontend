@@ -1,5 +1,5 @@
 import { authClient } from '../auth-client';
-import { handleError } from '../error/handle';
+import { handleServerError } from '../error/handleServer';
 
 export const signUpWithEmail = async (
   name: string,
@@ -27,7 +27,7 @@ export const signUpWithEmail = async (
   );
 
   if (error) {
-    handleError('Error signing up with email', error);
+    handleServerError('Error signing up with email', error);
   }
   
   return data;

@@ -1,6 +1,6 @@
 import { authClient } from '@/lib/auth-client';
 import { toast } from 'sonner';
-import { handleError } from '../error/handle';
+import { handleServerError } from '../error/handleServer';
 
 export const signInWithGoogle = async () => {
   const frontendBaseURL = process.env.NEXT_PUBLIC_FRONTEND_URL;
@@ -15,7 +15,7 @@ export const signInWithGoogle = async () => {
   );
 
   if (response.error) {
-    handleError('Error signing in with Google:', response.error);
+    handleServerError('Error signing in with Google:', response.error);
   }
 
   const redirectUrl = response.data?.url;
@@ -43,7 +43,7 @@ export const signInWithEmail = async (email: string, password: string) => {
     }
   );
   if (response.error) {
-    handleError('Error', response.error.message);
+    handleServerError('Error', response.error.message);
   }
   return response;
 };
