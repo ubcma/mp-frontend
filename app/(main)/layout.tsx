@@ -1,5 +1,6 @@
 import { AlertBanner } from '@/components/AlertBanner';
 import { AppSidebar } from '@/components/AppSidebar';
+import { Breadcrumbs } from '@/components/Breadcrumbs';
 import ProtectedLayout from '@/components/layouts/ProtectedLayout';
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { getUserRole } from '@/lib/queries/userRole';
@@ -22,7 +23,7 @@ export default async function Layout({
     <SidebarProvider>
       <ProtectedLayout>
         <AppSidebar />
-        <main className="w-full space-y-8 mx-8 mb-8 mt-4 md:m-8">
+        <main className="w-full m-8 lg:m-12">
           <div className="md:hidden w-full flex flex-row justify-between items-center mb-8">
             <SidebarTrigger />
             <Link href="/" prefetch={true}>
@@ -50,6 +51,8 @@ export default async function Layout({
               </div>
             </AlertBanner>
           )}
+
+          <Breadcrumbs/>
 
           {children}
         </main>
