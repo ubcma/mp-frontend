@@ -6,7 +6,6 @@ export function middleware(request: NextRequest) {
   const expectedCode = process.env.ACCESS_CODE;
   const { pathname } = request.nextUrl;
 
-  // Maintenance Mode: Only allow access with a valid access code
   if (accessCode !== expectedCode) {
     const allowlist = [
       '/maintenance',
@@ -22,7 +21,6 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // Prevent access to root and redirect to /home
   if (pathname === '/') {
     return NextResponse.redirect(new URL('/home', request.url));
   }
