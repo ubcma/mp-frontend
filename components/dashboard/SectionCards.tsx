@@ -47,7 +47,7 @@ export function SectionCards() {
               {detail.value}
             </CardTitle>
             <CardAction>
-              <Badge className={cn(detail.change < 0 ? 'bg-rose-300' : 'bg-emerald-300')}variant="outline">
+              <Badge className={cn(detail.change < 0 ? 'bg-rose-300 text-rose-900' : 'bg-emerald-300 text-emerald-900')}variant="outline">
                 {detail.changeIcon} {detail.change > 0 && "+"}{detail.change}%
               </Badge>
             </CardAction>
