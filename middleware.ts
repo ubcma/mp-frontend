@@ -3,25 +3,48 @@ import type { NextRequest } from 'next/server';
 
 export function middleware(request: NextRequest) {
   const accessCode = request.cookies.get('access_code')?.value;
+  const sessionCookie = request.cookies.get(
+    'membership-portal.session_token'
+  )?.value;
   const expectedCode = process.env.ACCESS_CODE;
   const { pathname } = request.nextUrl;
 
-  if (accessCode !== expectedCode) {
-    const allowlist = [
-      '/maintenance',
-      '/favicon.ico',
-      '/robots.txt',
-      '/_next',
-      '/api',
-    ];
-    const isAllowed = allowlist.some((path) => pathname.startsWith(path));
-    if (!isAllowed) {
-      return NextResponse.redirect(new URL('/maintenance', request.url));
-    }
+  const allowlist = [
+    '/maintenance',
+    '/favicon.ico',
+    '/robots.txt',
+    '/_next',
+    '/api',
+  ];
+
+  const isStaticAsset = pathname.match(
+    /\.(png|jpg|jpeg|svg|gif|webp|ico|woff2?|ttf|otf|eot|mp4|webm)$/
+  );
+
+  const isAllowlisted =
+    allowlist.some((path) => pathname.startsWith(path)) || isStaticAsset;
+
+  if (isAllowlisted) {
     return NextResponse.next();
   }
 
-  if (pathname === '/') {
+  const isAuthPage =
+    pathname.startsWith('/sign-in') ||
+    pathname.startsWith('/sign-up') ||
+    pathname.startsWith('/forgot-password');
+
+  const isMaintenance = pathname.startsWith('/maintenance');
+
+  if (accessCode !== expectedCode) {
+    return NextResponse.redirect(new URL('/maintenance', request.url));
+  }
+
+  if (!sessionCookie) {
+    if (isAuthPage) return NextResponse.next();
+    return NextResponse.redirect(new URL('/sign-in', request.url));
+  }
+
+  if (isAuthPage || isMaintenance) {
     return NextResponse.redirect(new URL('/home', request.url));
   }
 
@@ -29,14 +52,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: [
-    '/:path',
-    '/',
-    '/home/:path*',
-    '/events/:path*',
-    '/profile/:path*',
-    '/sign-in',
-    '/sign-up',
-    '/forgot-password',
-  ],
+  matcher: ['/', '/:path*'],
 };

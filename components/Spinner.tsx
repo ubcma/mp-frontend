@@ -1,9 +1,9 @@
-export default function Spinner({color}: {color?: string}) {
+export default function Spinner({color, size}: {color?: string, size?: number}) {
   return (
     <div role="status">
       <svg
         aria-hidden="true"
-        className={`inline w-8 h-8 text-neutral-300 animate-spin ${color ? `fill-${color}` : 'fill-white'}`}
+        className={`inline ${size ? `w-${size} h-${size}` : `w-8 h-8`} text-neutral-300 animate-spin ${color ? `fill-${color}` : 'fill-blue-500'}`}
         viewBox="0 0 100 101"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"

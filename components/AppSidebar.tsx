@@ -232,7 +232,7 @@ export function AppSidebar() {
                   <button onClick={handleSignOut} className="cursor-pointer">
                     {isSignOutLoading ? (
                       <>
-                        <Spinner color="blue-500" />
+                        <Spinner color="blue-500" size={4}/>
                         <span> Signing out... </span>
                       </>
                     ) : (
