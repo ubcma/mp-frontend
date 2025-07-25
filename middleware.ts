@@ -44,6 +44,10 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/sign-in', request.url));
   }
 
+  if (pathname === '/') {
+    return NextResponse.redirect(new URL('/home', request.url));
+  }
+
   if (isAuthPage || isMaintenance) {
     return NextResponse.redirect(new URL('/home', request.url));
   }

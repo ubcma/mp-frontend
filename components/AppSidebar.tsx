@@ -31,6 +31,7 @@ import { signOut } from '@/lib/better-auth/sign-out';
 import { useState } from 'react';
 import Spinner from './Spinner';
 import { ThemeToggle } from './ThemeToggle';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 export function AppSidebar() {
   const {
@@ -93,6 +94,8 @@ export function AppSidebar() {
     },
   ];
 
+  const isMobile = useIsMobile();
+
   const handleSignOut = async () => {
     try {
       setIsSignOutLoading(true);
@@ -105,7 +108,7 @@ export function AppSidebar() {
   };
 
   return (
-    <Sidebar collapsible="icon">
+    <Sidebar collapsible="icon" side={isMobile ? "right" : "left"}>
       <SidebarHeader className="p-2 pt-4">
         <Link href="/home" className="flex items-center" prefetch={true}>
           <img
