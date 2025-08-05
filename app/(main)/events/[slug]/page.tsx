@@ -57,8 +57,8 @@ export default function EventPage() {
         user={user} 
       />
 
-      Debug: Render raw data
-      <pre>{JSON.stringify(data, null, 2)}</pre>
+      {/* Debug: Render raw data
+      <pre>{JSON.stringify(data, null, 2)}</pre> */}
     </div>
   );
 }

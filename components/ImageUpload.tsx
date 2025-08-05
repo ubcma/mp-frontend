@@ -21,7 +21,7 @@ export default function ImageUpload({
   onImageUpload,
   buttonVariant = 'floating',
   acceptedFileTypes = 'image/*',
-  maxFileSize = 5,
+  maxFileSize = 2,
   className = ''
 }: ImageUploadProps) {
   const [isUploading, setIsUploading] = useState(false);
@@ -91,7 +91,7 @@ export default function ImageUpload({
         <Button
           onClick={triggerFileSelect}
           disabled={isUploading}
-          className={`absolute -bottom-2 -right-2 rounded-full w-10 h-10 p-0 bg-blue-600 hover:bg-blue-700 shadow-lg ${className}`}
+          className={`absolute -bottom-2 -right-2 rounded-full w-10 h-10 p-0 bg-ma-red hover:bg-ma-red/80 shadow-lg transition-colors duration-150 ${className}`}
           size="sm"
         >
           {isUploading ? (

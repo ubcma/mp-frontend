@@ -28,6 +28,7 @@ import { nanoid } from 'nanoid';
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
 import { generateSlug } from '@/lib/utils';
+import EventImageUpload from '../EventImageUpload';
 
 export default function CreateEventForm() {
   const sensors = useSensors(useSensor(PointerSensor));
@@ -200,10 +201,42 @@ export default function CreateEventForm() {
               key="imageUrl"
               name="imageUrl"
               validators={requiredValidator('Image')}
-              children={(fieldApi) => (
-                <RenderInputField type="text" label="Image" field={fieldApi} />
-              )}
-            />
+            >
+              {(field) => {
+                // pull value & error from FieldApi
+                const imageUrl = field.state.value as string;
+                const error = field.state.meta.errors?.[0];
+
+                return (
+                  <div className="flex flex-col gap-2">
+                    {/* Label */}
+                    <label htmlFor="imageUrl" className="text-sm font-medium">
+                      Image
+                    </label>
+
+                    {/* Upload button */}
+                    <EventImageUpload
+                      onImageUpload={(url) => field.handleChange(url)}
+                      maxFileSizeMB={4}
+                    />
+
+                    {/* Preview */}
+                    {imageUrl && (
+                      <img
+                        src={imageUrl}
+                        alt="Event preview"
+                        className="mt-2 w-32 h-32 object-cover rounded"
+                      />
+                    )}
+
+                    {/* Validation error */}
+                    {error && (
+                      <p className="text-xs text-red-500 mt-1">{error}</p>
+                    )}
+                  </div>
+                );
+              }}
+            </form.Field>
           </div>
           <form.Field
             key="description"
