@@ -5,10 +5,9 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET() {
   const cookieStore = cookies();
-
-  const sessionCookie = (await cookieStore).get(
-    'membership-portal.session_token'
-  )?.value;
+  const sessionCookie = (await cookieStore)
+    .get('membership-portal.session_token')
+    ?.value;
 
   if (!sessionCookie) {
     return NextResponse.json(
@@ -29,21 +28,29 @@ export async function GET() {
   return NextResponse.json(user);
 }
 
-export async function POST(req: NextRequest) {
-
+async function handleUpdate(req: NextRequest) {
   try {
-    const data = await req.json();
+    const data = (await req.json()) as UpdateMeInput;
 
     const cookieStore = cookies();
-    const sessionCookie = (await cookieStore).get('membership-portal.session_token')?.value;
+    const sessionCookie = (await cookieStore)
+      .get('membership-portal.session_token')
+      ?.value;
 
     if (!sessionCookie) {
-      return NextResponse.json({ error: 'No session cookie found' }, { status: 401 });
+      return NextResponse.json(
+        { error: 'No session cookie found' },
+        { status: 401 }
+      );
     }
 
     const cookieHeader = `membership-portal.session_token=${sessionCookie}`;
 
-    const response = await genericPostRequest(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/me`, data, cookieHeader);
+    const response = await genericPostRequest(
+      `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/me`,
+      data,
+      cookieHeader
+    );
 
     if (!response) {
       return NextResponse.json({ error: 'Failed to update' }, { status: 401 });
@@ -51,8 +58,13 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(response);
   } catch (error) {
-    console.error('Error in update POST:', error);
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+    console.error('Error in update handler:', error);
+    return NextResponse.json(
+      { error: 'Internal Server Error' },
+      { status: 500 }
+    );
   }
-
 }
+
+export const POST = handleUpdate;
+export const PUT = handleUpdate;

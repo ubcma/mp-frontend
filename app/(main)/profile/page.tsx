@@ -8,29 +8,63 @@ import { useUserQuery } from '@/lib/queries/user';
 import { Avatar, AvatarFallback, AvatarImage } from '@radix-ui/react-avatar';
 import { ExternalLink } from 'lucide-react';
 import Link from 'next/link';
+import ImageUpload from '@/components/ImageUpload';
 
 export default function ProfilePage() {
-  const { data: user, isLoading, isError } = useUserQuery();
+  const { data: user, isLoading, isError, refetch } = useUserQuery();
+
+  const updateUserAvatar = async (avatarUrl: string) => {
+    try {
+      const response = await fetch('/api/me', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({ avatar: avatarUrl }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update profile');
+      }
+
+      // Refetch user data to update the UI
+      refetch();
+    } catch (error) {
+      console.error('Error updating avatar:', error);
+      alert('Failed to update profile picture. Please try again.');
+    }
+  };
 
   return (
     <div className="">
       <Card>
         <CardContent className="p-12 flex flex-col gap-6 items-start">
-          <Avatar
-            className={`rounded-full h-32 w-32 bg-neutral-100 flex items-center justify-center`}
-          >
-            {user?.avatarUrl ? (
-              <AvatarImage
-                src={user?.avatarUrl}
-                alt="Profile Image"
-                className="object-cover w-full h-full rounded-full"
-              />
-            ) : (
-              <AvatarFallback className="text-4xl font-medium">
-                {getInitials(user?.name)}
-              </AvatarFallback>
-            )}
-          </Avatar>
+          <div className="relative">
+            <Avatar
+              className={`rounded-full h-32 w-32 bg-neutral-100 flex items-center justify-center`}
+            >
+              {user?.avatarUrl ? (
+                <AvatarImage
+                  src={user?.avatarUrl}
+                  alt="Profile Image"
+                  className="object-cover w-full h-full rounded-full"
+                />
+              ) : (
+                <AvatarFallback className="text-4xl font-medium">
+                  {getInitials(user?.name)}
+                </AvatarFallback>
+              )}
+            </Avatar>
+            
+            {/* Change Profile Picture Button */}
+            <ImageUpload
+              currentImageUrl={user?.avatarUrl}
+              onImageUpload={updateUserAvatar}
+              buttonVariant="floating"
+              maxFileSize={5}
+            />
+          </div>
 
           <div className="space-y-1">
             <div className="flex items-center gap-2">

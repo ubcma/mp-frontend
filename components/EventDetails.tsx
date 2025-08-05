@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Calendar, MapPin, Shirt } from 'lucide-react'; // Added Lucide icons
 
 export interface EventDetailsData {
   id: number;
@@ -42,11 +43,11 @@ const EventDetails: React.FC<EventDetailsProps> = ({ event, questions, user }) =
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleChange = (questionId: number, value: string) => {
-    setResponses(prev => ({ ...prev, [questionId]: value }));
+    setResponses((prev) => ({ ...prev, [questionId]: value }));
   };
 
   const isFormValid = questions.every(
-    q => !q.isRequired || (responses[q.id] && responses[q.id].trim() !== '')
+    (q) => !q.isRequired || (responses[q.id] && responses[q.id].trim() !== '')
   );
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -75,8 +76,9 @@ const EventDetails: React.FC<EventDetailsProps> = ({ event, questions, user }) =
       {event.imageUrl && (
         <div className="relative w-full h-64 rounded-lg overflow-hidden">
           <Image
-            // src={event.imageUrl}
-            src={"https://pq44cnt1zt.ufs.sh/f/yWjajdKSlYnoG7FCyX5qW3K91vwg42msxzbiEo5QVIXSjhyZ"} // filler
+            src={
+              'https://pq44cnt1zt.ufs.sh/f/yWjajdKSlYnoG7FCyX5qW3K91vwg42msxzbiEo5QVIXSjhyZ'
+            } // filler
             alt={event.title}
             fill
             className="object-cover"
@@ -90,27 +92,33 @@ const EventDetails: React.FC<EventDetailsProps> = ({ event, questions, user }) =
 
         {/* Price under title */}
         <p className="text-[#71717a] text-base mt-1">
-          $24.00 for members (<span className="text-[#09090b] font-medium">${Number(event.price).toFixed(2)} for non-members</span>)
+          $24.00 for members (
+          <span className="text-[#09090b] font-medium">
+            ${Number(event.price).toFixed(2)} for non-members
+          </span>
+          )
         </p>
 
         {/* Description */}
         <p className="text-[#71717a] text-sm mt-2">
-          UBCMA Gateways is an annual marketing conference organized by the UBC Marketing Association (UBCMA),
-          designed to connect students with industry professionals and provide learning and networking opportunities.
+          UBCMA Gateways is an annual marketing conference organized by the UBC
+          Marketing Association (UBCMA), designed to connect students with
+          industry professionals and provide learning and networking
+          opportunities.
         </p>
 
         {/* Tag pills: date, location, dress code */}
         <div className="flex flex-wrap gap-3 mt-4">
           <div className="flex items-center gap-2 px-3 py-1 bg-[#cce0ff] text-[#4a7dca] rounded-full text-sm">
-            <span role="img" aria-label="calendar">📅</span>
+            <Calendar className="h-4 w-4 text-[#4a7dca]" />
             <span>{format(new Date(event.startsAt), 'EEEE, MMMM d @ h:mm a')}</span>
           </div>
           <div className="flex items-center gap-2 px-3 py-1 bg-[#dbccff] text-[#5d4aca] rounded-full text-sm">
-            <span role="img" aria-label="location">📍</span>
+            <MapPin className="h-4 w-4 text-[#5d4aca]" />
             <span>{event.location || 'AMS Great Hall'}</span>
           </div>
           <div className="flex items-center gap-2 px-3 py-1 bg-[#fbccff] text-[#b14aca] rounded-full text-sm">
-            <span role="img" aria-label="attire">👔</span>
+            <Shirt className="h-4 w-4 text-[#b14aca]" />
             <span>Business Formal</span>
           </div>
         </div>
@@ -119,7 +127,9 @@ const EventDetails: React.FC<EventDetailsProps> = ({ event, questions, user }) =
       {/* Registration Form */}
       <Card>
         <CardContent className="p-6">
-          <h2 className="text-xl font-semibold text-[#09090b] mb-6">Event Registration Form</h2>
+          <h2 className="text-xl font-semibold text-[#09090b] mb-6">
+            Event Registration Form
+          </h2>
           <form onSubmit={handleSubmit} className="space-y-6">
             {questions.map((q) => (
               <div key={q.id} className="space-y-2">
@@ -128,7 +138,12 @@ const EventDetails: React.FC<EventDetailsProps> = ({ event, questions, user }) =
                   {q.isRequired && <span className="text-red-500"> *</span>}
                 </Label>
 
-                {(q.type === 'ShortText' || q.type === 'LongText' || q.type === 'Email' || q.type === 'Number' || q.type === 'Date' || q.type === 'Time') && (
+                {(q.type === 'ShortText' ||
+                  q.type === 'LongText' ||
+                  q.type === 'Email' ||
+                  q.type === 'Number' ||
+                  q.type === 'Date' ||
+                  q.type === 'Time') && (
                   <Input
                     placeholder={q.placeholder || ''}
                     required={q.isRequired}
@@ -162,7 +177,9 @@ const EventDetails: React.FC<EventDetailsProps> = ({ event, questions, user }) =
               disabled={!isFormValid || isSubmitting}
               className="w-full bg-[#ef3050] hover:bg-[#ef3050]/90 text-white"
             >
-              {isSubmitting ? 'Submitting...' : `Continue with Purchase ($${Number(event.price).toFixed(2)})`}
+              {isSubmitting
+                ? 'Submitting...'
+                : `Continue with Purchase ($${Number(event.price).toFixed(2)})`}
             </Button>
           </form>
         </CardContent>
