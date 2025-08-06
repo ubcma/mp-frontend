@@ -62,7 +62,7 @@ export default function ProfilePage() {
               currentImageUrl={user?.avatar}
               onImageUpload={updateUserAvatar}
               buttonVariant="floating"
-              maxFileSize={2}
+              maxFileSize={4}
             />
           </div>
 

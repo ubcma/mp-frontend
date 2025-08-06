@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Upload } from 'lucide-react';
 import { useUploadThing } from '@/helpers/uploadThing';
 import { handleClientError } from '@/lib/error/handleClient';
+import imageCompression from 'browser-image-compression';
 
 interface Props {
   onImageUpload: (url: string) => void;
@@ -14,7 +15,7 @@ interface Props {
 
 export default function EventImageUpload({
   onImageUpload,
-  maxFileSizeMB = 4,
+  maxFileSizeMB = 5,
 }: Props) {
   const [uploading, setUploading] = useState(false);
   const fileInput = useRef<HTMLInputElement>(null);
@@ -33,7 +34,13 @@ export default function EventImageUpload({
 
   const pickFile = () => fileInput.current?.click();
 
-  const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const options = {
+    maxSizeMB: 5,
+    maxWidthOrHeight: 1920,
+    useWebWorker: true,
+  }
+
+  const handleFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     if (!file.type.startsWith("image/")) {
@@ -41,13 +48,12 @@ export default function EventImageUpload({
       return;
     }
     if (file.size > maxFileSizeMB * 1024 * 1024) {
-      
       handleClientError(`File size must be less than ${maxFileSizeMB}MB.`, new Error());
-    
       return;
     }
     setUploading(true);
-    startUpload([file]);
+    const compressedFile = await imageCompression(file, options);
+    startUpload([compressedFile]);
   };
 
   return (

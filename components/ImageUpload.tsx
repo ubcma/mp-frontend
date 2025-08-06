@@ -7,6 +7,7 @@ import { Camera, Upload, X } from 'lucide-react';
 import { useUploadThing } from '@/helpers/uploadThing';
 import Image from 'next/image';
 import { handleClientError } from '@/lib/error/handleClient';
+import imageCompression from 'browser-image-compression';
 
 interface ImageUploadProps {
   currentImageUrl?: string;
@@ -45,7 +46,13 @@ export default function ImageUpload({
     },
   });
 
-  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const options = {
+    maxSizeMB: 0.5,
+    maxWidthOrHeight: 1920,
+    useWebWorker: true,
+  }
+
+  const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (!files || files.length === 0) return;
 
@@ -71,7 +78,10 @@ export default function ImageUpload({
     reader.readAsDataURL(file);
 
     setIsUploading(true);
-    startUpload([file]);
+    const compressedFile = await imageCompression(file, options);
+    console.log("Image size: " + file.size)
+    console.log("Compressed size: " + compressedFile.size)
+    startUpload([compressedFile]);
   };
 
   const triggerFileSelect = () => {
