@@ -6,9 +6,10 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: '**',
+        hostname: 'pq44cnt1zt.ufs.sh',
+        port: '',
+        pathname: '**',
       },
-      new URL('https://pq44cnt1zt.ufs.sh/**'),
     ],
   },
 };

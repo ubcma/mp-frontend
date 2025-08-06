@@ -6,7 +6,6 @@ export function useUserQuery() {
   return useQuery<UserProfileData>({
     queryKey: ['user'],
     queryFn: async () => {
-      console.log('Fetching user data...');
       const res = await fetchFromAPI('/api/me', {
         method: 'GET',
         headers: {

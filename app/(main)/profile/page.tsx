@@ -10,6 +10,7 @@ import { ExternalLink } from 'lucide-react';
 import Link from 'next/link';
 import ImageUpload from '@/components/ImageUpload';
 import { fetchFromAPI } from '@/lib/httpHandlers';
+import { handleClientError } from '@/lib/error/handleClient';
 
 export default function ProfilePage() {
   const { data: user, isLoading, isError, refetch } = useUserQuery();
@@ -32,7 +33,7 @@ export default function ProfilePage() {
       refetch();
     } catch (error) {
       console.error('Error updating avatar:', error);
-      alert('Failed to update profile picture. Please try again.');
+      handleClientError('Failed to update profile picture. Please try again.', new Error());
     }
   };
 

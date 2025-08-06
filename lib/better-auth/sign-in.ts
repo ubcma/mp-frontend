@@ -37,7 +37,6 @@ export const signInWithEmail = async (email: string, password: string) => {
     },
     {
       onSuccess(ctx) {
-        console.log('Sign in successful:', ctx);
         toast.success('Sign in successful!');
       },
     }

@@ -32,7 +32,6 @@ export default function ImageUpload({
 
   const { startUpload } = useUploadThing("imageUploader", {
     onClientUploadComplete: (res) => {
-      console.log("Upload complete:", res);
       if (res && res[0]) {
         onImageUpload(res[0].url);
         setPreviewUrl(null);
@@ -79,8 +78,6 @@ export default function ImageUpload({
 
     setIsUploading(true);
     const compressedFile = await imageCompression(file, options);
-    console.log("Image size: " + file.size)
-    console.log("Compressed size: " + compressedFile.size)
     startUpload([compressedFile]);
   };
 
