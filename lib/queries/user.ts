@@ -1,19 +1,22 @@
-// lib/queries/user.ts
 import { useQuery } from '@tanstack/react-query';
+import { fetchFromAPI } from '../httpHandlers';
+import { UserProfileData } from '../types';
 
 export function useUserQuery() {
-  return useQuery({
+  return useQuery<UserProfileData>({
     queryKey: ['user'],
     queryFn: async () => {
-      const res: Response = await fetch('/api/me');
+      console.log('Fetching user data...');
+      const res = await fetchFromAPI('/api/me', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+      });
 
-      if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.error || 'Failed to fetch user');
-      }
+      const data = (await res.json()) as UserProfileData;
 
-      const data = await res.json();
-    
       return data;
     },
     retry: 1,

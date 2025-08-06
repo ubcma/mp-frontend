@@ -18,7 +18,7 @@ import {
   CommandList,
 } from '../ui/command';
 import { Button } from '../ui/button';
-import { Check, ChevronsUpDown } from 'lucide-react';
+import { ChevronsUpDown } from 'lucide-react';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { Textarea } from '../ui/textarea';
@@ -48,7 +48,7 @@ export function RenderInputField({
 }: {
   type?: string;
   placeholder?: string;
-  label: string;  
+  label: string;
   field: AnyFieldApi;
   onChange?: (value: string) => void;
 }) {
@@ -61,7 +61,9 @@ export function RenderInputField({
         value={field.state.value}
         onBlur={field.handleBlur}
         onChange={(e) =>
-          onChange ? onChange(e.target.value) : field.handleChange(e.target.value)
+          onChange
+            ? onChange(e.target.value)
+            : field.handleChange(e.target.value)
         }
         type={type}
         placeholder={placeholder ?? label}
@@ -96,7 +98,6 @@ export function RenderTextArea({
   );
 }
 
-
 export function RenderSelectField({
   options,
   placeholder,
@@ -118,7 +119,7 @@ export function RenderSelectField({
         onValueChange={(value) => field.handleChange(value)}
         disabled={disabled}
       >
-        <SelectTrigger>
+        <SelectTrigger className='w-full'>
           <SelectValue
             placeholder={placeholder || 'Select'}
             defaultValue={field.state.value}
@@ -164,7 +165,7 @@ export function RenderComboBoxField({
     <div className="flex flex-col gap-2 w-full">
       <Label htmlFor={field.name}>{label}</Label>
       <Popover open={open} onOpenChange={setOpen}>
-        <PopoverTrigger asChild>
+        <PopoverTrigger asChild disabled={disabled}>
           <Button
             variant="outline"
             role="combobox"
@@ -225,7 +226,7 @@ export function RenderComboBoxField({
                       setOpen(false);
                     }}
                   >
-                    Choose "{inputValue}"
+                    {`Choose "${inputValue}"`}
                   </CommandItem>
                 )}
               </CommandGroup>
@@ -237,7 +238,6 @@ export function RenderComboBoxField({
     </div>
   );
 }
-
 
 export function RenderDateTimeField({
   label,

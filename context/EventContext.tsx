@@ -2,14 +2,13 @@
 
 import type React from "react"
 import { createContext, useContext, useState, useEffect } from "react"
-import type { Event } from "@/lib/types"
-import { type EventStatus, getEventStatus } from "@/helpers/eventStatus"
+import type { EventDetails } from "@/lib/types"
+import { type EventStatus, getEventStatus } from '@/lib/utils';
 import { useGetEventsQuery } from "@/lib/queries/events"
 
 type EventContextType = {
-  events: Event[]
-  filteredEvents: Event[]
-  setFilteredEvents: React.Dispatch<React.SetStateAction<Event[]>>
+  filteredEvents: EventDetails[]
+  setFilteredEvents: React.Dispatch<React.SetStateAction<EventDetails[]>>
   searchTerm: string
   setSearchTerm: React.Dispatch<React.SetStateAction<string>>
   activeTab: EventStatus | "All"
@@ -29,25 +28,25 @@ export const useEventContext = () => {
 
 export const EventProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
-  const [filteredEvents, setFilteredEvents] = useState<Event[]>([])
+  const [filteredEvents, setFilteredEvents] = useState<EventDetails[]>([])
   const [searchTerm, setSearchTerm] = useState("")
   const [activeTab, setActiveTab] = useState<EventStatus | "All">("All")
 
-  const {data: events, isLoading, isError } = useGetEventsQuery();
+  const {data: events, isLoading } = useGetEventsQuery();
 
   useEffect(() => {
     const filtered = events?.filter(
-      (event: Event) =>
+      (event: EventDetails) =>
         (activeTab === "All" || getEventStatus(event.startsAt) === activeTab) &&
-        event.title.toLowerCase().includes(searchTerm.toLowerCase()),
+        event.title.toLowerCase().includes(searchTerm.toLowerCase()) &&
+        event.isVisible === true
     )
-    setFilteredEvents(filtered)
+    setFilteredEvents(filtered ?? [])
   }, [events, searchTerm, activeTab])
 
   return (
     <EventContext.Provider
       value={{
-        events,
         filteredEvents,
         setFilteredEvents,
         searchTerm,

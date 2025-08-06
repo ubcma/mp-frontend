@@ -1,4 +1,5 @@
 import { authClient } from '../auth-client';
+import { handleServerError } from '../error/handleServer';
 
 export const signUpWithEmail = async (
   name: string,
@@ -26,8 +27,7 @@ export const signUpWithEmail = async (
   );
 
   if (error) {
-    console.error('Error signing up with email:', error);
-    throw new Error(error.message);
+    handleServerError('Error signing up with email', error);
   }
   
   return data;

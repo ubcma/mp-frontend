@@ -1,15 +1,32 @@
 import { AppSidebar } from '@/components/AppSidebar';
+import { Breadcrumbs } from '@/components/Breadcrumbs';
+import ProtectedLayout from '@/components/layouts/ProtectedLayout';
 import { SidebarProvider } from '@/components/ui/sidebar';
+import { getUserRole } from '@/lib/queries/userRole';
+import { redirect } from 'next/navigation';
 
-export default function Layout({
+export const dynamic = 'force-dynamic';
+
+export default async function AdminLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const userRole = await getUserRole();
+
+  if (userRole !== 'Admin') {
+    redirect('/home');
+  }
+
   return (
     <SidebarProvider>
-      <AppSidebar />
-      <main className="w-full m-8">{children}</main>
+      <ProtectedLayout>
+        <AppSidebar />
+        <main className="w-full m-8 lg:m-12">
+          <Breadcrumbs />
+          {children}
+        </main>
+      </ProtectedLayout>
     </SidebarProvider>
   );
 }

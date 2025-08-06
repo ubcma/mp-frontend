@@ -3,32 +3,32 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { getInitials } from '@/helpers/getInitials';
 import { useUserQuery } from '@/lib/queries/user';
+import { getInitials } from '@/lib/utils';
 import { Avatar, AvatarFallback, AvatarImage } from '@radix-ui/react-avatar';
 import { ExternalLink } from 'lucide-react';
 import Link from 'next/link';
 import ImageUpload from '@/components/ImageUpload';
+import { fetchFromAPI } from '@/lib/httpHandlers';
 
 export default function ProfilePage() {
   const { data: user, isLoading, isError, refetch } = useUserQuery();
 
   const updateUserAvatar = async (avatarUrl: string) => {
     try {
-      const response = await fetch('/api/me', {
+      const response = await fetchFromAPI('/api/me', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
         credentials: 'include',
-        body: JSON.stringify({ avatar: avatarUrl }),
+        body: { avatar: avatarUrl },
       });
 
       if (!response.ok) {
         throw new Error('Failed to update profile');
       }
 
-      // Refetch user data to update the UI
       refetch();
     } catch (error) {
       console.error('Error updating avatar:', error);
@@ -44,9 +44,9 @@ export default function ProfilePage() {
             <Avatar
               className={`rounded-full h-32 w-32 bg-neutral-100 flex items-center justify-center`}
             >
-              {user?.avatarUrl ? (
+              {user?.avatar ? (
                 <AvatarImage
-                  src={user?.avatarUrl}
+                  src={user?.avatar}
                   alt="Profile Image"
                   className="object-cover w-full h-full rounded-full"
                 />
@@ -56,13 +56,13 @@ export default function ProfilePage() {
                 </AvatarFallback>
               )}
             </Avatar>
-            
+
             {/* Change Profile Picture Button */}
             <ImageUpload
-              currentImageUrl={user?.avatarUrl}
+              currentImageUrl={user?.avatar}
               onImageUpload={updateUserAvatar}
               buttonVariant="floating"
-              maxFileSize={5}
+              maxFileSize={2}
             />
           </div>
 
@@ -72,13 +72,13 @@ export default function ProfilePage() {
               <Badge variant="outline">{user?.role}</Badge>
             </div>
             <p className="text-muted-foreground">{user?.email}</p>
-            <p className="text-sm text-gray-600 mt-1">{user?.bio}</p>
+            <p className="text-sm muted mt-1">{user?.bio}</p>
             <div className="mt-3 flex flex-wrap gap-2 text-sm">
               <span className="bg-muted px-2 py-1 rounded">
                 Faculty: {user?.faculty}
               </span>
               <span className="bg-muted px-2 py-1 rounded">
-                Year: {user?.yearLevel}
+                Year: {user?.year}
               </span>
               <span className="bg-muted px-2 py-1 rounded">
                 Major: {user?.major}
@@ -90,7 +90,10 @@ export default function ProfilePage() {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <Button variant="link" className="mt-2 h-fit py-2 bg-blue-200">
+                <Button
+                  variant="link"
+                  className="mt-2 h-fit py-2 bg-blue-300 dark:bg-blue-700"
+                >
                   LinkedIn Profile
                   <ExternalLink className="w-4 h-4 mr-1" />
                 </Button>

@@ -1,19 +1,21 @@
-// lib/queries/user.ts
 import { useQuery } from '@tanstack/react-query';
+import { fetchFromAPI } from '../httpHandlers';
+import { EventDisplay } from '../types';
 
-export function useGetEventQuery({eventSlug}: {eventSlug: string}) {
-  return useQuery({
+export function useGetEventQuery({ eventSlug }: { eventSlug: string }) {
+  return useQuery<EventDisplay>({
     queryKey: ['event', eventSlug],
     queryFn: async () => {
-      const res: Response = await fetch(`/api/events/${eventSlug}`);
+      const res = await fetchFromAPI(`/api/events/${eventSlug}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+      });
+      
+      const data = await res.json() as EventDisplay;
 
-      if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.error || 'Failed to fetch event details');
-      }
-
-      const data = await res.json();
-    
       return data;
     },
     retry: 1,

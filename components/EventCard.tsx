@@ -1,19 +1,20 @@
 'use client';
 
-import { Card, CardContent, CardFooter } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { getEventStatus, type EventStatus } from '@/helpers/eventStatus';
-import { Event } from '@/lib/types';
+import { getEventStatus, isValidImageUrl } from '@/lib/utils';
+import { EventDetails } from '@/lib/types';
 import { useRouter } from 'next/navigation';
 import { ArrowUpRight } from 'lucide-react';
 import Link from 'next/link';
+import dayjs from 'dayjs';
+import Image from 'next/image';
 
-export function EventCard({ event }: { event: Event }) {
+export function EventCard({ event }: { event: EventDetails }) {
   const status = getEventStatus(event.startsAt);
 
   const router = useRouter();
 
-  const dayjs = require('dayjs');
   const eventStartsAt = dayjs(event.startsAt);
   const dayOfTheWeek = eventStartsAt.format('ddd');
   const dayOfTheMonth = eventStartsAt.format('DD');
@@ -23,6 +24,7 @@ export function EventCard({ event }: { event: Event }) {
     <Link
       href={`/events/${event.slug}`}
       className="hover:opacity-90 hover:rotate-1 hover:scale-105 transition-all duration-200"
+      prefetch={true}
     >
       <Card className="flex flex-col h-full overflow-hidden gap-0 p-0 bg-black">
         <CardContent className="p-0 flex-1 flex flex-col">
@@ -38,9 +40,11 @@ export function EventCard({ event }: { event: Event }) {
                 {dayOfTheWeek}
               </p>
             </div>
-            <img
-              src={event.imageUrl ?? '/no-event-image.png'}
+            <Image
+              src={isValidImageUrl(event.imageUrl) ? event.imageUrl! : '/no-event-image.png'}
               alt={event.title}
+              height={1080}
+              width={1080}
               className="h-64 w-full object-cover"
             />
             <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-black to-transparent"></div>

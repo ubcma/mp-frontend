@@ -1,3 +1,10 @@
+
+export type EventDisplay = {
+  event: EventDetails;
+  questions: EventQuestion[];
+  tags: string[];
+}
+
 export type CreateEventInput = {
   title: string;
   slug: string;
@@ -9,7 +16,7 @@ export type CreateEventInput = {
   endsAt: Date;
 };
 
-export type Event = {
+export type EventDetails = {
   id: string;
   title: string;
   slug: string;
@@ -19,21 +26,22 @@ export type Event = {
   location: string;
   startsAt: Date;
   endsAt: Date;
+  isVisible: boolean;
   createdAt: string | null;
   updatedAt: string | null;
 };
 
-export type NewEvent = Omit<Event, 'id' | 'createdAt' | 'updatedAt'>;
+export type NewEvent = Omit<EventDetails, 'id' | 'createdAt' | 'updatedAt'>;
 
 export type EventQuestion = {
-  id: string;
+  id: number;
   eventId: string;
   label: string;
   type: QuestionType;
   isRequired: boolean;
   placeholder?: string;
   options?: string[];
-  validation?: Record<string, any>;
+  validation?: Record<string, unknown>;
   sortOrder: number;
   createdAt: string | null;
   updatedAt: string | null;
@@ -87,6 +95,34 @@ export type QuestionInput = {
   type: QuestionType;
   isRequired: boolean;
   options?: string[];
-  validation?: Record<string, any>;
+  validation?: Record<string, unknown>;
   sortOrder: number;
 };
+
+export type EventQuestionResponse = string | number | boolean | string[] | null | Date;
+
+export type BaseEventForm = {
+  id: string | null;
+  title: string;
+  slug: string;
+  description: string;
+  imageUrl: string;
+  price: number;
+  location: string;
+  isVisible: boolean;
+  startsAt: string;
+  endsAt: string;
+};
+
+export type CreateEventPayload = Omit<BaseEventForm, 'startsAt' | 'endsAt'> & {
+  startsAt: Date;
+  endsAt: Date;
+  questions: EventQuestion[];
+};
+
+export type UpdateEventPayload = Omit<BaseEventForm, 'startsAt' | 'endsAt'> & {
+  startsAt: Date;
+  endsAt: Date;
+};
+
+export type EventPayload = CreateEventPayload | UpdateEventPayload;

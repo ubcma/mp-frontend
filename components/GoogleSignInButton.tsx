@@ -12,9 +12,6 @@ export const GoogleSignInButton = () => {
     try {
       setIsLoading(true);
       await signInWithGoogle();
-      // setTimeout(() => {
-      //   setIsLoading(false);
-      // }, 1000)
     } catch (error) {
       console.error('Google sign-in failed:', error);
       setIsLoading(false);
@@ -22,7 +19,7 @@ export const GoogleSignInButton = () => {
   };
 
   return (
-    <Button onClick={handleGoogleSignIn} disabled={isLoading} className='bg-background text-foreground border-neutral-150 border hover:bg-neutral-50'>
+    <Button onClick={handleGoogleSignIn} disabled={isLoading} className='bg-background/20 text-foreground border-neutral-150 border hover:bg-foreground/10'>
       {isLoading ? (
         <>
           <Spinner color="blue-500"/> 

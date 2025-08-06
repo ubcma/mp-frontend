@@ -1,14 +1,12 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Search } from '@/components/Search';
-import { EventStatus, getEventStatus } from '@/helpers/eventStatus';
+import { EventStatus } from '@/lib/utils';
 import { EventList } from '@/components/EventList';
 import { EventProvider, useEventContext } from '@/context/EventContext';
 import { useGetEventsQuery } from '@/lib/queries/events';
-import EventDetails from '@/components/EventDetails';
+import RenderEventDetails from '@/components/EventDetails';
 
 const tabs: { value: EventStatus | "All"; label: string }[] = [
   { value: "All", label: "All" },
@@ -33,12 +31,12 @@ function EventTabs() {
     <Tabs
       value={activeTab}
       onValueChange={(value) => setActiveTab(value as EventStatus | "All")}
-      className="space-y-6"
+      className="space-y-6 w=full"
     >
       <div>
         <h1 className="text-2xl font-bold">Upcoming Events</h1>
         <p className="text-muted-foreground">
-          Check out what exciting events we're bringing to you next!
+          {"Check out what exciting events we're bringing to you next!"}
         </p>
       </div>
 

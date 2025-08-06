@@ -10,40 +10,18 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Calendar, MapPin, Shirt } from 'lucide-react';
-
-export interface EventDetailsData {
-  id: number;
-  title: string;
-  description: string;
-  location: string;
-  startsAt: string;
-  endsAt: string;
-  price: number;
-  imageUrl?: string;
-}
-
-export interface Question {
-  id: number;
-  eventId: number;
-  label: string;
-  placeholder?: string;
-  type: string;
-  isRequired: boolean;
-  options?: string[];
-}
+import { EventDetails, EventQuestion} from '@/lib/types';
 
 interface EventDetailsProps {
-  event: EventDetailsData;
-  questions: Question[];
-  user: { name: string; email: string };
+  event: EventDetails;
+  questions: EventQuestion[];
   memberPrice?: number; // Optional member pricing
   dressCode?: string; // Optional dress code
 }
 
-const EventDetails: React.FC<EventDetailsProps> = ({ 
+const RenderEventDetails: React.FC<EventDetailsProps> = ({ 
   event, 
   questions, 
-  user, 
   memberPrice,
   dressCode 
 }) => {
@@ -70,7 +48,6 @@ const EventDetails: React.FC<EventDetailsProps> = ({
     };
 
     console.log('Signup Details:', {
-      user,
       responses,
       stripe: dummyStripeData,
     });
@@ -221,4 +198,4 @@ const EventDetails: React.FC<EventDetailsProps> = ({
   );
 };
 
-export default EventDetails;
+export default RenderEventDetails;

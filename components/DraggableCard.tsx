@@ -24,7 +24,11 @@ export function DraggableCard({
 }: {
   question: QuestionInput;
   index: number;
-  onChange: (index: number, field: keyof QuestionInput, value: any) => void;
+  onChange: (
+    index: number,
+    field: keyof QuestionInput,
+    value: string | string[] | number | boolean
+  ) => void;
   onDelete: (index: number) => void;
 }) {
   const {
@@ -46,6 +50,15 @@ export function DraggableCard({
   };
 
   const NEEDS_OPTIONS = ['Select', 'Radio', 'Checkbox'].includes(question.type);
+  const NEEDS_PLACEHOLDER = [
+    'ShortText',
+    'LongText',
+    'Email',
+    'Date',
+    'Time',
+    'Select',
+    'YesNo',
+  ].includes(question.type);
 
   return (
     <Card
@@ -110,11 +123,15 @@ export function DraggableCard({
           value={question.label}
           onChange={(e) => onChange(index, 'label', e.target.value)}
         />
-        <Input
-          placeholder="Placeholder Text"
-          value={question.placeholder}
-          onChange={(e) => onChange(index, 'placeholder', e.target.value)}
-        />
+        
+        {NEEDS_PLACEHOLDER && (
+          <Input
+            placeholder="Placeholder Text"
+            value={question.placeholder}
+            onChange={(e) => onChange(index, 'placeholder', e.target.value)}
+          />
+        )}
+
         {NEEDS_OPTIONS && (
           <div className="space-y-2">
             <Label className="block text-sm font-medium">Field Options</Label>

@@ -5,6 +5,7 @@ import { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Upload } from 'lucide-react';
 import { useUploadThing } from '@/helpers/uploadThing';
+import { handleClientError } from '@/lib/error/handleClient';
 
 interface Props {
   onImageUpload: (url: string) => void;
@@ -25,7 +26,7 @@ export default function EventImageUpload({
       setUploading(false);
     },
     onUploadError: () => {
-      alert("Upload failed");
+      handleClientError("File upload failed, please contact our team.", new Error());
       setUploading(false);
     },
   });
@@ -35,9 +36,15 @@ export default function EventImageUpload({
   const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    if (!file.type.startsWith("image/")) return alert("Not an image");
+    if (!file.type.startsWith("image/")) {
+      handleClientError("Invalid file type, must be an image.", new Error());
+      return;
+    }
     if (file.size > maxFileSizeMB * 1024 * 1024) {
-      return alert(`Must be < ${maxFileSizeMB}MB`);
+      
+      handleClientError(`File size must be less than ${maxFileSizeMB}MB.`, new Error());
+    
+      return;
     }
     setUploading(true);
     startUpload([file]);

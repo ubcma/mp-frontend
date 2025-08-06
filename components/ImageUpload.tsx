@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Camera, Upload, X } from 'lucide-react';
 import { useUploadThing } from '@/helpers/uploadThing';
 import Image from 'next/image';
+import { handleClientError } from '@/lib/error/handleClient';
 
 interface ImageUploadProps {
   currentImageUrl?: string;
@@ -38,8 +39,7 @@ export default function ImageUpload({
       setIsUploading(false);
     },
     onUploadError: (error: Error) => {
-      console.error("Upload error:", error);
-      alert("Upload failed. Please try again.");
+      handleClientError("File upload failed, please try again.", error);
       setIsUploading(false);
       setPreviewUrl(null);
     },
@@ -53,13 +53,13 @@ export default function ImageUpload({
     
     // Validate file type
     if (!file.type.startsWith('image/')) {
-      alert('Please select an image file.');
+      handleClientError('Please select an image file.', new Error());
       return;
     }
 
     // Validate file size
     if (file.size > maxFileSize * 1024 * 1024) {
-      alert(`File size must be less than ${maxFileSize}MB.`);
+      handleClientError(`File size must be less than ${maxFileSize}MB.`, new Error());
       return;
     }
 

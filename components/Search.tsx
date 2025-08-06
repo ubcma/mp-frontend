@@ -1,7 +1,7 @@
-"use client"
+'use client';
 
-import * as React from "react"
-import { SearchIcon, X } from "lucide-react"
+import * as React from 'react';
+import { SearchIcon, X } from 'lucide-react';
 
 import {
   CommandDialog,
@@ -10,25 +10,25 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from "@/components/ui/command"
-import { Button } from "@/components/ui/button"
-import { getEventStatus } from "@/helpers/eventStatus"
-import { useEventContext } from "@/context/EventContext"
+} from '@/components/ui/command';
+import { Button } from '@/components/ui/button';
+import { getEventStatus } from '@/lib/utils';
+import { useEventContext } from '@/context/EventContext';
 
 export function Search() {
-  const [open, setOpen] = React.useState(false)
-  const { events, setSearchTerm, searchTerm } = useEventContext()
+  const [open, setOpen] = React.useState(false);
+  const { filteredEvents, setSearchTerm, searchTerm } = useEventContext();
 
   React.useEffect(() => {
     const down = (e: KeyboardEvent) => {
-      if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
-        e.preventDefault()
-        setOpen((open) => !open)
+      if (e.key === 'k' && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        setOpen((open) => !open);
       }
-    }
-    document.addEventListener("keydown", down)
-    return () => document.removeEventListener("keydown", down)
-  }, [])
+    };
+    document.addEventListener('keydown', down);
+    return () => document.removeEventListener('keydown', down);
+  }, []);
 
   return (
     <div className="relative ">
@@ -41,12 +41,12 @@ export function Search() {
         onClick={() => setOpen(true)}
       >
         <SearchIcon className="mr-2 h-4 w-4 shrink-0 opacity-50" />
-        <span className="inline-flex">{searchTerm || "Search events..."}</span>
+        <span className="inline-flex">{searchTerm || 'Search events...'}</span>
         {searchTerm && (
           <span
             onClick={(e) => {
-              e.stopPropagation()
-              setSearchTerm("")
+              e.stopPropagation();
+              setSearchTerm('');
             }}
             className="h-full px-2 py-3 absolute right-[2.4rem]"
           >
@@ -59,36 +59,41 @@ export function Search() {
         </kbd>
       </Button>
       <CommandDialog open={open} onOpenChange={setOpen}>
-        <CommandInput placeholder="Search all events..." value={searchTerm} onValueChange={setSearchTerm} />
+        <CommandInput
+          placeholder="Search all events..."
+          value={searchTerm}
+          onValueChange={setSearchTerm}
+        />
         <CommandList>
           <CommandEmpty>No events found.</CommandEmpty>
-          <CommandGroup heading="Events">
-            {events?.map((event) => (
-              <CommandItem
-                key={event.id}
-                value={event.title}
-                onSelect={() => {
-                  setSearchTerm(event.title)
-                  setOpen(false)
-                }}
-              >
-                <div className="flex flex-col">
-                  <span>{event.title}</span>
-                  <span className="text-xs text-muted-foreground">
-                    {new Date(event.date).toLocaleDateString("en-US", {
-                      month: "short",
-                      day: "numeric",
-                      year: "numeric",
-                    })}{" "}
-                    • {getEventStatus(event.date)}
-                  </span>
-                </div>
-              </CommandItem>
-            ))}
-          </CommandGroup>
+          {filteredEvents?.length > 0 && (
+            <CommandGroup heading="Events">
+              {filteredEvents?.map((event) => (
+                <CommandItem
+                  key={event.id}
+                  value={event.title}
+                  onSelect={() => {
+                    setSearchTerm(event.title);
+                    setOpen(false);
+                  }}
+                >
+                  <div className="flex flex-col">
+                    <span>{event.title}</span>
+                    <span className="text-xs text-muted-foreground">
+                      {new Date(event.startsAt).toLocaleDateString('en-US', {
+                        month: 'short',
+                        day: 'numeric',
+                        year: 'numeric',
+                      })}{' '}
+                      • {getEventStatus(event.startsAt)}
+                    </span>
+                  </div>
+                </CommandItem>
+              ))}
+            </CommandGroup>
+          )}
         </CommandList>
       </CommandDialog>
     </div>
-  )
+  );
 }
-

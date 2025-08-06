@@ -77,12 +77,12 @@ export const DateTimePicker = React.forwardRef<HTMLButtonElement, DateTimePicker
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-auto p-0">
-          <div className="sm:flex">
+          <div className="flex flex-row">
             <Calendar
+            className="w-full flex-col"
               mode="single"
               selected={date ?? undefined}
               onSelect={handleDateSelect}
-              initialFocus
             />
             <div className="flex flex-col sm:flex-row sm:h-[300px] divide-y sm:divide-y-0 sm:divide-x">
               <ScrollArea className="w-64 sm:w-auto">

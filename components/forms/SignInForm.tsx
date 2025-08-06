@@ -1,18 +1,14 @@
 'use client';
 
-import { useState } from 'react';
 import { useForm } from '@tanstack/react-form';
-import type { AnyFieldApi } from '@tanstack/react-form';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { LogIn } from 'lucide-react';
 import Link from 'next/link';
 import Spinner from '../Spinner';
-import { toast } from 'sonner';
 import { RenderInputField } from './FormComponents';
 import { GoogleSignInButton } from '../GoogleSignInButton';
 import { signInWithEmail } from '@/lib/better-auth/sign-in';
+import { handleClientError } from '@/lib/error/handleClient';
 
 export default function SignInForm() {
 
@@ -23,11 +19,10 @@ export default function SignInForm() {
     },
     onSubmit: async ({ value }) => {
       try {
-        await new Promise<void>((resolve, reject) => {
-          signInWithEmail(value.email, value.password);
-        });
+        await signInWithEmail(value.email, value.password);
       } catch (error) {
-        toast.error(String(error));
+        console.error('Submit error:', error);
+        handleClientError('Error', error);
       }
     },
   });
@@ -81,7 +76,7 @@ export default function SignInForm() {
               className="cursor-pointer font-regular bg-ma-red"
               variant="ma"
               type="submit"
-              disabled={isSubmitting}
+              disabled={isSubmitting || !canSubmit}
             >
               {isSubmitting ? (
                 <>
@@ -99,9 +94,9 @@ export default function SignInForm() {
         />
       </form>
       <div className="flex items-center justify-between">
-        <hr className="w-full border-neutral-300" />
-        <span className="mx-2 text-neutral-400 font-light">OR</span>
-        <hr className="w-full border-neutral-300" />
+        <hr className="w-full border-foreground/20" />
+        <span className="mx-2 text-foreground/40 font-light">OR</span>
+        <hr className="w-full border-foreground/20" />
       </div>
       <GoogleSignInButton />
       <h1 className="font-normal text-sm">
