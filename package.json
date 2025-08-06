@@ -39,6 +39,7 @@
     "@tanstack/react-table": "^8.21.3",
     "@uploadthing/react": "^7.3.2",
     "better-auth": "^1.2.7",
+    "canvas-confetti": "^1.9.3",
     "browser-image-compression": "^2.0.2",
     "canvas-confetti": "^1.9.3",
     "class-variance-authority": "^0.7.1",

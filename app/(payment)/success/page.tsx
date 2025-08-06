@@ -76,6 +76,7 @@ export default function SuccessPage() {
         </div>
       )}
 
+
       {/* ERROR */}
       {status === 'error' && (
         <div className="text-center p-8 text-red-600">
