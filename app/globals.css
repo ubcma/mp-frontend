@@ -4,7 +4,9 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme {
+  --color-ma-red-light: #FF5A75;
   --color-ma-red: #EF3050;
+  --color-ma-red-dark: #D91E3E;
 }
 
 @theme inline {

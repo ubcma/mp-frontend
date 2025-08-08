@@ -7,6 +7,7 @@ export const signOut = async () => {
     fetchOptions: {
       onSuccess: () => {
         toast.success('Signed out successfully!');
+        sessionStorage.removeItem('onboarding_skipped');
       },
     },
   });

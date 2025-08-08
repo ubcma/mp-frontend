@@ -1,17 +1,31 @@
 'use client';
 
-import OnboardingModal from '@/components/OnboardingModal';
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useUserQuery } from '@/lib/queries/user';
 
 export default function Home() {
   const { data: user} = useUserQuery();
+  const router = useRouter();
 
   const userFirstName = user?.name.split(' ')[0];
 
+  useEffect(() => {
+    if (user) {
+      if (user.onboardingComplete) {
+        sessionStorage.removeItem('onboarding_skipped');
+      } else {
+        const hasSkippedOnboarding = sessionStorage.getItem('onboarding_skipped') === 'true';    
+        if (!hasSkippedOnboarding) {
+          router.push('/onboarding');
+        }
+      }
+    }
+  }, [user, router]);
+
   return (
-    <div className="flex flex-col justify-center w-full">
-      {!user?.onboardingComplete && <OnboardingModal />}
+    <div className="flex flex-col justify-center w-full h-full">
 
       <div className="flex flex-col gap-2">
         <span className="flex flex-row text-3xl font-semibold">
