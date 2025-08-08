@@ -11,7 +11,7 @@ export const signUpWithEmail = async (
       email,
       password,
       name,
-      callbackURL: '/home',
+      callbackURL: '/home', // TODO: change to onboarding
     },
     {
       onRequest: (ctx) => {

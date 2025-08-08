@@ -5,14 +5,12 @@ import { handleServerError } from '../error/handleServer';
 export const signInWithGoogle = async () => {
   const frontendBaseURL = process.env.NEXT_PUBLIC_FRONTEND_URL;
 
-  const response = await authClient.signIn.social(
-    {
-      provider: 'google',
-      callbackURL: `${frontendBaseURL}/home`,
-      errorCallbackURL: `${frontendBaseURL}/error`,
-      newUserCallbackURL: `${frontendBaseURL}/home`,
-    }
-  );
+  const response = await authClient.signIn.social({
+    provider: 'google',
+    callbackURL: `${frontendBaseURL}/home`,
+    errorCallbackURL: `${frontendBaseURL}/error`,
+    newUserCallbackURL: `${frontendBaseURL}/home`, // TODO: change to onboarding
+  });
 
   if (response.error) {
     handleServerError('Error signing in with Google:', response.error);

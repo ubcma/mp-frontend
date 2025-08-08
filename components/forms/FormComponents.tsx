@@ -45,16 +45,18 @@ export function RenderInputField({
   label,
   field,
   onChange,
+  className,
 }: {
   type?: string;
   placeholder?: string;
   label: string;
   field: AnyFieldApi;
   onChange?: (value: string) => void;
+  className?: string;
 }) {
   return (
     <div className="flex flex-col gap-2">
-      <Label htmlFor={field.name}>{label}</Label>
+      <Label htmlFor={field.name} className="text-white">{label}</Label>
       <Input
         id={field.name}
         name={field.name}
@@ -67,6 +69,7 @@ export function RenderInputField({
         }
         type={type}
         placeholder={placeholder ?? label}
+        className={cn("bg-white text-black placeholder-gray-400", className)}
       />
       <FieldInfo field={field} />
     </div>
@@ -84,7 +87,7 @@ export function RenderTextArea({
 }) {
   return (
     <div className="flex flex-col gap-2">
-      <Label htmlFor={field.name}>{label}</Label>
+      <Label htmlFor={field.name} className="text-white">{label}</Label>
       <Textarea
         id={field.name}
         name={field.name}
@@ -92,6 +95,7 @@ export function RenderTextArea({
         onBlur={field.handleBlur}
         onChange={(e) => field.handleChange(e.target.value)}
         placeholder={placeholder ?? label}
+        className="bg-white text-black placeholder-gray-400"
       />
       <FieldInfo field={field} />
     </div>
@@ -113,21 +117,22 @@ export function RenderSelectField({
 }) {
   return (
     <div className="flex flex-col gap-2 w-full">
-      <Label htmlFor={field.name}>{label}</Label>
+      <Label htmlFor={field.name} className="text-white">{label}</Label>
       <Select
         value={field.state.value ?? ''}
         onValueChange={(value) => field.handleChange(value)}
         disabled={disabled}
       >
-        <SelectTrigger className='w-full'>
+        <SelectTrigger className="bg-white text-black w-full">
           <SelectValue
             placeholder={placeholder || 'Select'}
             defaultValue={field.state.value}
+            className="placeholder-gray-400"
           />
         </SelectTrigger>
-        <SelectContent>
+        <SelectContent className="bg-white">
           {options.map((option, index) => (
-            <SelectItem key={index} value={option}>
+            <SelectItem key={index} value={option} className="text-black hover:bg-gray-100">
               {option}
             </SelectItem>
           ))}
@@ -163,7 +168,7 @@ export function RenderComboBoxField({
 
   return (
     <div className="flex flex-col gap-2 w-full">
-      <Label htmlFor={field.name}>{label}</Label>
+      <Label htmlFor={field.name} className="text-white">{label}</Label>
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild disabled={disabled}>
           <Button
@@ -171,8 +176,8 @@ export function RenderComboBoxField({
             role="combobox"
             aria-expanded={open}
             className={cn(
-              'justify-between font-normal w-full',
-              value ? '' : 'text-neutral-400'
+              'justify-between font-normal w-full bg-white text-black hover:bg-gray-50',
+              value ? '' : 'text-gray-400'
             )}
           >
             <span className="truncate overflow-hidden whitespace-nowrap max-w-[6rem] lg:max-w-[8rem]">
@@ -182,10 +187,10 @@ export function RenderComboBoxField({
           </Button>
         </PopoverTrigger>
         <PopoverContent
-          className="w-[--radix-popover-trigger-width] p-0"
+          className="w-[--radix-popover-trigger-width] p-0 bg-white"
           align="start"
         >
-          <Command>
+          <Command className="bg-white">
             <CommandInput
               placeholder="Search..."
               value={inputValue}
@@ -197,9 +202,10 @@ export function RenderComboBoxField({
                 }
                 setOpen(false);
               }}
+              className="bg-white text-black placeholder-gray-400"
             />
-            <CommandList>
-              <CommandEmpty> No options found </CommandEmpty>
+            <CommandList className="bg-white">
+              <CommandEmpty className="text-black"> No options found </CommandEmpty>
               <CommandGroup>
                 {options.map((option) => (
                   <CommandItem
@@ -211,6 +217,7 @@ export function RenderComboBoxField({
                       setInputValue('');
                       setOpen(false);
                     }}
+                    className="text-black hover:bg-gray-100"
                   >
                     {option}
                   </CommandItem>
@@ -225,6 +232,7 @@ export function RenderComboBoxField({
                       setInputValue('');
                       setOpen(false);
                     }}
+                    className="text-black hover:bg-gray-100"
                   >
                     {`Choose "${inputValue}"`}
                   </CommandItem>
