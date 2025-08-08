@@ -11,6 +11,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Calendar, MapPin, Shirt } from 'lucide-react';
 import { EventDetails, EventQuestion} from '@/lib/types';
+import TagPill from './TagPill'; // Adjust the import path as needed
 
 interface EventDetailsProps {
   event: EventDetails;
@@ -111,25 +112,22 @@ const RenderEventDetails: React.FC<EventDetailsProps> = ({
           </p>
         )}
 
-        {/* Tag pills: date, location, dress code */}
+        {/* Tag pills using the reusable component */}
         <div className="flex flex-wrap gap-3 mt-4">
-          <div className="flex items-center gap-2 px-3 py-1 bg-[#cce0ff] text-[#4a7dca] rounded-full text-sm">
-            <Calendar className="h-4 w-4 text-[#4a7dca]" />
-            <span>{formatEventDate()}</span>
-          </div>
+          <TagPill
+            icon={Calendar}
+            text={formatEventDate()}
+            textColor="#4a7dca"
+            bgColor="#cce0ff"
+          />
           
           {event.location && (
-            <div className="flex items-center gap-2 px-3 py-1 bg-[#dbccff] text-[#5d4aca] rounded-full text-sm">
-              <MapPin className="h-4 w-4 text-[#5d4aca]" />
-              <span>{event.location}</span>
-            </div>
-          )}
-          
-          {dressCode && (
-            <div className="flex items-center gap-2 px-3 py-1 bg-[#fbccff] text-[#b14aca] rounded-full text-sm">
-              <Shirt className="h-4 w-4 text-[#b14aca]" />
-              <span>{dressCode}</span>
-            </div>
+            <TagPill
+              icon={MapPin}
+              text={event.location}
+              textColor="#5d4aca"
+              bgColor="#dbccff"
+            />
           )}
         </div>
       </div>

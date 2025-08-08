@@ -7,7 +7,7 @@ import { Camera, Upload, X } from 'lucide-react';
 import { useUploadThing } from '@/helpers/uploadThing';
 import Image from 'next/image';
 import { handleClientError } from '@/lib/error/handleClient';
-import imageCompression from 'browser-image-compression';
+import { processImageFile } from '@/lib/utils';
 
 interface ImageUploadProps {
   currentImageUrl?: string;
@@ -45,40 +45,33 @@ export default function ImageUpload({
     },
   });
 
-  const options = {
-    maxSizeMB: 0.5,
-    maxWidthOrHeight: 1920,
-    useWebWorker: true,
-  }
-
   const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (!files || files.length === 0) return;
 
     const file = files[0];
-    
-    // Validate file type
-    if (!file.type.startsWith('image/')) {
-      handleClientError('Please select an image file.', new Error());
-      return;
-    }
-
-    // Validate file size
-    if (file.size > maxFileSize * 1024 * 1024) {
-      handleClientError(`File size must be less than ${maxFileSize}MB.`, new Error());
-      return;
-    }
-
-    // Show preview
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      setPreviewUrl(e.target?.result as string);
-    };
-    reader.readAsDataURL(file);
-
     setIsUploading(true);
-    const compressedFile = await imageCompression(file, options);
-    startUpload([compressedFile]);
+
+    try {
+      const { compressedFile, previewUrl: preview } = await processImageFile(file, {
+        validation: {
+          maxFileSizeMB: maxFileSize,
+          acceptedTypes: ['image/']
+        },
+        compression: {
+          maxSizeMB: 0.5,
+          maxWidthOrHeight: 1920,
+          useWebWorker: true
+        },
+        createPreview: true
+      });
+
+      setPreviewUrl(preview!);
+      startUpload([compressedFile]);
+    } catch (error) {
+      setIsUploading(false);
+      // Error is already handled in processImageFile
+    }
   };
 
   const triggerFileSelect = () => {
