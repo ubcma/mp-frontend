@@ -102,20 +102,20 @@ const RenderEventDetails: React.FC<EventDetailsProps> = ({
 
       {/* Event Info Section */}
       <div className="space-y-4">
-        <h1 className="text-3xl font-bold text-[#09090b]">{event.title}</h1>
+        <h1 className="text-3xl font-bold">{event.title}</h1>
 
         {/* Dynamic pricing display */}
-        <div className="text-[#71717a] text-base mt-1">
+        <div className="text-base mt-1">
           {memberPrice ? (
             <p>
               ${memberPrice.toFixed(2)} for members (
-              <span className="text-[#09090b] font-medium">
+              <span className="font-medium">
                 ${Number(event.price).toFixed(2)} for non-members
               </span>
               )
             </p>
           ) : (
-            <p className="text-[#09090b] font-medium">
+            <p className="font-medium">
               ${Number(event.price).toFixed(2)}
             </p>
           )}
@@ -123,7 +123,7 @@ const RenderEventDetails: React.FC<EventDetailsProps> = ({
 
         {/* Dynamic Description */}
         {event.description && (
-          <p className="text-[#71717a] text-sm mt-2">
+          <p className="text-sm mt-2">
             {event.description}
           </p>
         )}
@@ -160,7 +160,7 @@ const RenderEventDetails: React.FC<EventDetailsProps> = ({
       {/* Registration Form */}
       <Card>
         <CardContent className="p-6">
-          <h2 className="text-xl font-semibold text-[#09090b] mb-6">
+          <h2 className="text-xl font-semibold mb-6">
             Event Registration Form
           </h2>
           <form onSubmit={handleSubmit} className="space-y-6">

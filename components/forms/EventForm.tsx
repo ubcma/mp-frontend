@@ -241,7 +241,7 @@ export default function EventForm({
                 const error = field.state.meta.errors?.[0];
 
                 return (
-                  <div className="flex flex-col gap-2">
+                  <div className="flex flex-col gap-2 w-full">
                     <label htmlFor="imageUrl" className="text-sm font-medium">
                       Image
                     </label>
@@ -256,16 +256,18 @@ export default function EventForm({
                       maxFileSizeMB={10}
                     />
 
-                    {/* Show existing image if no pending file */}
+                    {/* Show existing image if no pending file - appears below upload component */}
                     {imageUrl && !eventImageUploadRef.current?.hasPendingFile() && (
-                      <div className="relative inline-block">
-                        <img
-                          src={imageUrl}
-                          alt="Current event image"
-                          className="w-32 h-32 object-cover rounded border"
-                        />
-                        <div className="absolute bottom-1 left-1 bg-black/70 text-white text-xs px-2 py-1 rounded">
-                          Current image
+                      <div className="mt-4">
+                        <div className="relative inline-block">
+                          <img
+                            src={imageUrl}
+                            alt="Current event image"
+                            className="w-32 h-32 object-cover rounded border"
+                          />
+                          <div className="absolute bottom-1 left-1 bg-black/70 text-white text-xs px-2 py-1 rounded">
+                            Current image
+                          </div>
                         </div>
                       </div>
                     )}

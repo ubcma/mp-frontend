@@ -33,10 +33,10 @@ export function EventCard({ event }: { event: EventDetails }) {
               <div className="rounded-t-[10px] bg-ma-red px-2 py-1 text-xs text-center uppercase font-medium text-white w-full">
                 {month}
               </div>
-              <p className="font-semibold text-foreground mt-0.5 -mb-0.5">
+              <p className="font-semibold text-black mt-0.5 -mb-0.5">
                 {dayOfTheMonth}
               </p>
-              <p className="text-xs font-normal text-muted-foreground">
+              <p className="text-xs font-normal text-[#888888]">
                 {dayOfTheWeek}
               </p>
             </div>

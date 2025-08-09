@@ -119,12 +119,14 @@ const EventImageUpload = forwardRef<EventImageUploadRef, Props>(({
   };
 
   return (
-    <div className="space-y-3">
+    <div className="w-full">
+      {/* Button aligned with other form fields */}
       <Button 
         onClick={pickFile} 
         disabled={uploading || processing} 
         variant={pendingFile ? "secondary" : "outline"}
         type="button"
+        className="w-full sm:w-auto"
       >
         {getButtonIcon()}
         {getButtonText()}
@@ -138,27 +140,29 @@ const EventImageUpload = forwardRef<EventImageUploadRef, Props>(({
         className="hidden"
       />
 
-      {/* Preview of pending file */}
+      {/* Preview of pending file - appears below button with spacing */}
       {previewUrl && (
-        <div className="relative inline-block">
-          <Image
-            src={previewUrl}
-            alt="Event preview"
-            width={128}
-            height={128}
-            className="object-cover rounded border"
-          />
-          <Button
-            onClick={removePendingFile}
-            variant="destructive"
-            size="sm"
-            className="absolute -top-2 -right-2 rounded-full w-6 h-6 p-0"
-            type="button"
-          >
-            <X className="w-3 h-3" />
-          </Button>
-          <div className="absolute bottom-1 left-1 bg-black/70 text-white text-xs px-2 py-1 rounded">
-            Ready to upload
+        <div className="mt-4">
+          <div className="relative inline-block">
+            <Image
+              src={previewUrl}
+              alt="Event preview"
+              width={128}
+              height={128}
+              className="object-cover rounded border"
+            />
+            <Button
+              onClick={removePendingFile}
+              variant="destructive"
+              size="sm"
+              className="absolute -top-2 -right-2 rounded-full w-6 h-6 p-0"
+              type="button"
+            >
+              <X className="w-3 h-3" />
+            </Button>
+            <div className="absolute bottom-1 left-1 bg-black/70 text-white text-xs px-2 py-1 rounded">
+              Ready to upload
+            </div>
           </div>
         </div>
       )}
