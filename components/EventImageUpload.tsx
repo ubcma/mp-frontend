@@ -1,37 +1,68 @@
 // components/EventImageUpload.tsx
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useImperativeHandle, forwardRef } from 'react';
 import { Button } from '@/components/ui/button';
-import { Upload } from 'lucide-react';
+import { Upload, X, Check } from 'lucide-react';
 import { useUploadThing } from '@/helpers/uploadThing';
 import { handleClientError } from '@/lib/error/handleClient';
 import { processImageFile } from '@/lib/utils';
+import Image from 'next/image';
 
 interface Props {
-  onImageUpload: (url: string) => void;
+  onImageSelect: (hasFile: boolean) => void;
   maxFileSizeMB?: number;
 }
 
-export default function EventImageUpload({
-  onImageUpload,
+export interface EventImageUploadRef {
+  uploadPendingFile: () => Promise<string | null>;
+  hasPendingFile: () => boolean;
+  clearPendingFile: () => void;
+  isUploading: () => boolean;
+}
+
+const EventImageUpload = forwardRef<EventImageUploadRef, Props>(({
+  onImageSelect,
   maxFileSizeMB = 5,
-}: Props) {
+}, ref) => {
   const [uploading, setUploading] = useState(false);
+  const [processing, setProcessing] = useState(false);
+  const [pendingFile, setPendingFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const fileInput = useRef<HTMLInputElement>(null);
   
-  const { startUpload } = useUploadThing("imageUploader", {
-    onClientUploadComplete: (res) => {
-      if (res && res[0]?.url) {
-        onImageUpload(res[0].url);
+  const { startUpload } = useUploadThing("imageUploader");
+
+  // Expose methods to parent component
+  useImperativeHandle(ref, () => ({
+    uploadPendingFile: async () => {
+      if (!pendingFile) return null;
+      
+      setUploading(true);
+      try {
+        const result = await startUpload([pendingFile]);
+        if (result && result[0]?.url) {
+          setUploading(false);
+          return result[0].url;
+        }
+        throw new Error('Upload failed');
+      } catch (error) {
+        setUploading(false);
+        handleClientError("File upload failed, please contact our team.", error as Error);
+        throw error;
       }
-      setUploading(false);
     },
-    onUploadError: () => {
-      handleClientError("File upload failed, please contact our team.", new Error());
-      setUploading(false);
+    hasPendingFile: () => !!pendingFile,
+    clearPendingFile: () => {
+      setPendingFile(null);
+      setPreviewUrl(null);
+      onImageSelect(false);
+      if (fileInput.current) {
+        fileInput.current.value = '';
+      }
     },
-  });
+    isUploading: () => uploading,
+  }));
 
   const pickFile = () => fileInput.current?.click();
 
@@ -39,10 +70,10 @@ export default function EventImageUpload({
     const file = e.target.files?.[0];
     if (!file) return;
 
-    setUploading(true);
+    setProcessing(true);
 
     try {
-      const { compressedFile } = await processImageFile(file, {
+      const { compressedFile, previewUrl: preview } = await processImageFile(file, {
         validation: {
           maxFileSizeMB: maxFileSizeMB,
           acceptedTypes: ['image/']
@@ -52,21 +83,53 @@ export default function EventImageUpload({
           maxWidthOrHeight: 1920,
           useWebWorker: true
         },
-        createPreview: false
+        createPreview: true
       });
 
-      startUpload([compressedFile]);
+      setPendingFile(compressedFile);
+      setPreviewUrl(preview!);
+      onImageSelect(true);
+      setProcessing(false);
     } catch (error) {
-      setUploading(false);
+      setProcessing(false);
       // Error is already handled in processImageFile
     }
   };
 
+  const removePendingFile = () => {
+    setPendingFile(null);
+    setPreviewUrl(null);
+    onImageSelect(false);
+    if (fileInput.current) {
+      fileInput.current.value = '';
+    }
+  };
+
+  const getButtonText = () => {
+    if (uploading) return "Uploading…";
+    if (processing) return "Processing…";
+    if (pendingFile) return "File Ready";
+    return "Upload Event Image";
+  };
+
+  const getButtonIcon = () => {
+    if (uploading || processing) return null;
+    if (pendingFile) return <Check className="mr-2 w-4 h-4" />;
+    return <Upload className="mr-2 w-4 h-4" />;
+  };
+
   return (
-    <>
-      <Button onClick={pickFile} disabled={uploading} variant="outline">
-        {uploading ? "Uploading…" : <><Upload className="mr-2" /> Upload Event Image</>}
+    <div className="space-y-3">
+      <Button 
+        onClick={pickFile} 
+        disabled={uploading || processing} 
+        variant={pendingFile ? "secondary" : "outline"}
+        type="button"
+      >
+        {getButtonIcon()}
+        {getButtonText()}
       </Button>
+      
       <input
         ref={fileInput}
         type="file"
@@ -74,6 +137,35 @@ export default function EventImageUpload({
         onChange={handleFile}
         className="hidden"
       />
-    </>
+
+      {/* Preview of pending file */}
+      {previewUrl && (
+        <div className="relative inline-block">
+          <Image
+            src={previewUrl}
+            alt="Event preview"
+            width={128}
+            height={128}
+            className="object-cover rounded border"
+          />
+          <Button
+            onClick={removePendingFile}
+            variant="destructive"
+            size="sm"
+            className="absolute -top-2 -right-2 rounded-full w-6 h-6 p-0"
+            type="button"
+          >
+            <X className="w-3 h-3" />
+          </Button>
+          <div className="absolute bottom-1 left-1 bg-black/70 text-white text-xs px-2 py-1 rounded">
+            Ready to upload
+          </div>
+        </div>
+      )}
+    </div>
   );
-}
+});
+
+EventImageUpload.displayName = 'EventImageUpload';
+
+export default EventImageUpload;

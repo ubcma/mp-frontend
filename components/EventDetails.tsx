@@ -11,7 +11,8 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Calendar, MapPin, Shirt } from 'lucide-react';
 import { EventDetails, EventQuestion} from '@/lib/types';
-import TagPill from './TagPill'; // Adjust the import path as needed
+import DynamicFormField from '@/components/forms/DynamicFormField'; // Adjust path as needed
+import TagPill from '@/components/TagPill'; // Adjust the import path as needed
 
 interface EventDetailsProps {
   event: EventDetails;
@@ -34,7 +35,22 @@ const RenderEventDetails: React.FC<EventDetailsProps> = ({
   };
 
   const isFormValid = questions.every(
-    (q) => !q.isRequired || (responses[q.id] && responses[q.id].trim() !== '')
+    (q) => {
+      if (!q.isRequired) return true;
+      
+      const response = responses[q.id];
+      
+      // Handle different response types
+      if (Array.isArray(response)) {
+        return response.length > 0;
+      }
+      
+      if (typeof response === 'string') {
+        return response.trim() !== '';
+      }
+      
+      return response !== null && response !== undefined && response !== '';
+    }
   );
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -129,6 +145,15 @@ const RenderEventDetails: React.FC<EventDetailsProps> = ({
               bgColor="#dbccff"
             />
           )}
+          
+          {dressCode && (
+            <TagPill
+              icon={Shirt}
+              text={dressCode}
+              textColor="#b14aca"
+              bgColor="#fbccff"
+            />
+          )}
         </div>
       </div>
 
@@ -140,44 +165,19 @@ const RenderEventDetails: React.FC<EventDetailsProps> = ({
           </h2>
           <form onSubmit={handleSubmit} className="space-y-6">
             {questions.map((q) => (
-              <div key={q.id} className="space-y-2">
-                <Label className="block text-[#09090b] font-medium">
-                  {q.label}
-                  {q.isRequired && <span className="text-red-500"> *</span>}
-                </Label>
-
-                {(q.type === 'ShortText' ||
-                  q.type === 'LongText' ||
-                  q.type === 'Email' ||
-                  q.type === 'Number' ||
-                  q.type === 'Date' ||
-                  q.type === 'Time') && (
-                  <Input
-                    placeholder={q.placeholder || ''}
-                    required={q.isRequired}
-                    value={responses[q.id] || ''}
-                    onChange={(e) => handleChange(q.id, e.target.value)}
-                  />
-                )}
-
-                {q.type === 'Select' && q.options && (
-                  <Select
-                    value={responses[q.id] || ''}
-                    onValueChange={(value) => handleChange(q.id, value)}
-                  >
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder={q.placeholder || 'Select...'} />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {q.options.map((opt, i) => (
-                        <SelectItem key={i} value={opt}>
-                          {opt}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                )}
-              </div>
+              <DynamicFormField
+                key={q.id}
+                question={q}
+                value={responses[q.id]}
+                onChange={(value) => handleChange(q.id, value)}
+                error={
+                  q.isRequired && (!responses[q.id] || 
+                    (Array.isArray(responses[q.id]) && responses[q.id].length === 0) ||
+                    (typeof responses[q.id] === 'string' && responses[q.id].trim() === ''))
+                    ? `${q.label} is required.`
+                    : undefined
+                }
+              />
             ))}
 
             <Button

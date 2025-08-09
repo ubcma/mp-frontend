@@ -30,9 +30,9 @@ import {
 } from '@dnd-kit/sortable';
 import { nanoid } from 'nanoid';
 import { Plus } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { generateSlug } from '@/lib/utils';
-import EventImageUpload from '../EventImageUpload';
+import EventImageUpload, { EventImageUploadRef } from '../EventImageUpload';
 import { Switch } from '../ui/switch';
 import { Label } from '../ui/label';
 
@@ -49,6 +49,8 @@ export default function EventForm({
 }: EventFormProps) {
   const [hasManuallyEditedSlug, setHasManuallyEditedSlug] = useState(false);
   const [questions, setQuestions] = useState<QuestionInput[]>([]);
+  const [hasSelectedImage, setHasSelectedImage] = useState(false);
+  const eventImageUploadRef = useRef<EventImageUploadRef>(null);
 
   const sensors = useSensors(useSensor(PointerSensor));
 
@@ -113,10 +115,26 @@ export default function EventForm({
       endsAt: initialValues?.endsAt ?? '',
     },
     onSubmit: async ({ value }) => {
+      let imageUrl = value.imageUrl;
+
+      // Upload pending image file if exists
+      if (eventImageUploadRef.current?.hasPendingFile()) {
+        try {
+          const uploadedUrl = await eventImageUploadRef.current.uploadPendingFile();
+          if (uploadedUrl) {
+            imageUrl = uploadedUrl;
+          }
+        } catch (error) {
+          // Upload failed, don't proceed with form submission
+          return;
+        }
+      }
+
       const formattedData: EventPayload =
         mode === 'create'
           ? {
               ...value,
+              imageUrl,
               startsAt: new Date(value.startsAt),
               endsAt: new Date(value.endsAt),
               isVisible: value.isVisible,
@@ -136,6 +154,7 @@ export default function EventForm({
             }
           : {
               ...value,
+              imageUrl,
               startsAt: new Date(value.startsAt),
               endsAt: new Date(value.endsAt),
             };
@@ -148,6 +167,19 @@ export default function EventForm({
     onChange: ({ value }: { value: EventQuestionResponse }) =>
       !value ? `${fieldName} is required.` : undefined,
   });
+
+  // Custom image validation that considers both existing URL and selected file
+  const imageValidator = {
+    onChange: ({ value }: { value: string }) => {
+      const hasExistingImage = !!value;
+      const hasPendingFile = eventImageUploadRef.current?.hasPendingFile() ?? false;
+      
+      if (!hasExistingImage && !hasPendingFile) {
+        return 'Image is required.';
+      }
+      return undefined;
+    }
+  };
 
   return (
     <div className="flex flex-col gap-8 h-full justify-center">
@@ -202,36 +234,42 @@ export default function EventForm({
             </form.Field>
             <form.Field
               name="imageUrl"
-              validators={requiredValidator('Image')}
+              validators={imageValidator}
             >
               {(field) => {
-                // pull value & error from FieldApi
                 const imageUrl = field.state.value as string;
                 const error = field.state.meta.errors?.[0];
 
                 return (
                   <div className="flex flex-col gap-2">
-                    {/* Label */}
                     <label htmlFor="imageUrl" className="text-sm font-medium">
                       Image
                     </label>
 
-                    {/* Upload button */}
                     <EventImageUpload
-                      onImageUpload={(url) => field.handleChange(url)}
+                      ref={eventImageUploadRef}
+                      onImageSelect={(hasFile) => {
+                        setHasSelectedImage(hasFile);
+                        // Trigger validation when file selection changes
+                        field.validate('change');
+                      }}
                       maxFileSizeMB={10}
                     />
 
-                    {/* Preview */}
-                    {imageUrl && (
-                      <img
-                        src={imageUrl}
-                        alt="Event preview"
-                        className="mt-2 w-32 h-32 object-cover rounded"
-                      />
+                    {/* Show existing image if no pending file */}
+                    {imageUrl && !eventImageUploadRef.current?.hasPendingFile() && (
+                      <div className="relative inline-block">
+                        <img
+                          src={imageUrl}
+                          alt="Current event image"
+                          className="w-32 h-32 object-cover rounded border"
+                        />
+                        <div className="absolute bottom-1 left-1 bg-black/70 text-white text-xs px-2 py-1 rounded">
+                          Current image
+                        </div>
+                      </div>
                     )}
 
-                    {/* Validation error */}
                     {error && (
                       <p className="text-xs text-red-500 mt-1">{error}</p>
                     )}
@@ -354,27 +392,31 @@ export default function EventForm({
 
         <form.Subscribe
           selector={(state) => [state.canSubmit, state.isSubmitting]}
-          children={([canSubmit, isSubmitting]) => (
-            <Button
-              className="cursor-pointer font-regular bg-ma-red"
-              variant="ma"
-              type="submit"
-              disabled={!canSubmit}
-            >
-              {isSubmitting ? (
-                <>
-                  <Spinner />
-                  <div>
-                    {mode === 'create'
-                      ? 'Creating Event...'
-                      : 'Saving Changes...'}
-                  </div>
-                </>
-              ) : (
-                <div>{mode === 'create' ? 'Create Event' : 'Update Event'}</div>
-              )}
-            </Button>
-          )}
+          children={([canSubmit, isSubmitting]) => {
+            const isImageUploading = eventImageUploadRef.current?.isUploading() ?? false;
+            const isFormSubmitting = isSubmitting || isImageUploading;
+            
+            return (
+              <Button
+                className="cursor-pointer font-regular bg-ma-red"
+                variant="ma"
+                type="submit"
+                disabled={!canSubmit || isFormSubmitting}
+              >
+                {isFormSubmitting ? (
+                  <>
+                    <Spinner />
+                    <div>
+                      {isImageUploading ? 'Uploading Image...' : 
+                       mode === 'create' ? 'Creating Event...' : 'Saving Changes...'}
+                    </div>
+                  </>
+                ) : (
+                  <div>{mode === 'create' ? 'Create Event' : 'Update Event'}</div>
+                )}
+              </Button>
+            );
+          }}
         />
       </form>
     </div>
