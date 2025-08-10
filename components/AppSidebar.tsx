@@ -2,12 +2,12 @@
 import Link from 'next/link';
 import {
   LayoutDashboard,
-  Network,
   PlusCircle,
   Calendar,
   Users,
   Home,
   LogOut,
+  CalendarCog,
 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
@@ -23,30 +23,33 @@ import {
   SidebarRail,
   useSidebar,
 } from '@/components/ui/sidebar';
-import { redirect, usePathname, useRouter } from 'next/navigation';
-import { getInitials } from '@/helpers/getInitials';
+import { usePathname, useRouter } from 'next/navigation';
+import { getInitials } from '@/lib/utils';
 import { useUserQuery } from '@/lib/queries/user';
 import { Skeleton } from './ui/skeleton';
 import { signOut } from '@/lib/better-auth/sign-out';
 import { useState } from 'react';
-import Spinner from './Spinner';
+import Spinner from './common/Spinner';
+import { ThemeToggle } from './ThemeToggle';
+import { useIsMobile } from '@/hooks/use-mobile';
+import Image from 'next/image';
 
 export function AppSidebar() {
   const {
     state,
-    open,
-    setOpen,
-    openMobile,
-    setOpenMobile,
-    isMobile,
-    toggleSidebar,
+    // open,
+    // setOpen,
+    // openMobile,
+    // setOpenMobile,
+    // isMobile,
+    // toggleSidebar,
   } = useSidebar();
 
   const router = useRouter();
 
   const pathname = usePathname();
 
-  const { data: user, isLoading, isError } = useUserQuery();
+  const { data: user, isLoading } = useUserQuery();
 
   const [isSignOutLoading, setIsSignOutLoading] = useState(false);
 
@@ -67,12 +70,6 @@ export function AppSidebar() {
 
   const adminMenu = [
     {
-      href: '/manage-members',
-      icon: Users,
-      label: 'Manage Members',
-      disabled: false,
-    },
-    {
       href: '/admin-dashboard',
       icon: LayoutDashboard,
       label: 'Admin Dashboard',
@@ -84,7 +81,21 @@ export function AppSidebar() {
       label: 'Create New Event',
       disabled: false,
     },
+    {
+      href: '/manage-events',
+      icon: CalendarCog,
+      label: 'Manage Events',
+      disabled: false,
+    },
+    {
+      href: '/manage-members',
+      icon: Users,
+      label: 'Manage Members',
+      disabled: false,
+    },
   ];
+
+  const isMobile = useIsMobile();
 
   const handleSignOut = async () => {
     try {
@@ -98,18 +109,22 @@ export function AppSidebar() {
   };
 
   return (
-    <Sidebar collapsible="icon">
+    <Sidebar collapsible="icon" side={isMobile ? 'right' : 'left'}>
       <SidebarHeader className="p-2 pt-4">
-        <Link href="/home" className="flex items-center">
-          <img
-            src={`${
-              state === 'collapsed'
-                ? '/logos/logo_red.svg'
-                : '/logos/portal_logo_red.svg'
-            }`}
+        <Link href="/home" className="flex items-center" prefetch={true}>
+          <Image
+            src={`${'/logos/logo_red.svg'}`}
+            width={128}
+            height={96}
             alt="UBCMA Logo"
-            className={`${state === 'collapsed' ? 'h-8' : 'h-[64px]'}`}
+            className={`w-fit ${state === 'collapsed' ? 'h-8' : 'h-[64px] mr-2'}`}
           />
+          {state === 'expanded' && (
+            <div className="text-[#f03050] text-nowrap">
+              <p className="font-semibold text-lg -mb-1">UBCMA</p>
+              <p className="font-medium text-xs">Membership Portal</p>
+            </div>
+          )}
         </Link>
       </SidebarHeader>
       <SidebarContent>
@@ -129,15 +144,16 @@ export function AppSidebar() {
               className={`flex items-center gap-3 transition-all duration-300 ease-in-out hover:opacity-70 ${
                 state === 'collapsed' ? 'p-0' : 'p-2'
               }`}
+              prefetch={true}
             >
               <Avatar
                 className={`rounded-md ${
                   state === 'collapsed' ? 'h-8 w-8' : 'h-10 w-10'
                 }`}
               >
-                {user?.avatarUrl ? (
+                {user?.avatar ? (
                   <AvatarImage
-                    src={user.avatarUrl}
+                    src={user.avatar}
                     alt="Profile Image"
                     className="object-cover w-full h-full rounded-md"
                   />
@@ -148,8 +164,7 @@ export function AppSidebar() {
               <div>
                 <h3 className="font-medium text-nowrap">{user?.name}</h3>
                 <p className="text-xs text-muted-foreground text-nowrap">
-                  {user.onboardingComplete &&
-                    `Year ${user.yearLevel} // ${user.major}`}
+                  {user?.role}
                 </p>
               </div>
             </Link>
@@ -163,13 +178,17 @@ export function AppSidebar() {
             <SidebarMenu>
               {memberMenu.map((item) => (
                 <SidebarMenuItem key={item.href}>
-                  <SidebarMenuButton asChild isActive={pathname === item.href}>
+                  <SidebarMenuButton
+                    asChild
+                    isActive={pathname.startsWith(item.href)}
+                  >
                     <Link
                       href={item.href}
                       aria-disabled={item.disabled}
                       {...(item.href.startsWith('http')
                         ? { target: '_blank', rel: 'noopener noreferrer' }
                         : {})}
+                      prefetch={true}
                     >
                       <item.icon className="h-4 w-4" />
                       <span>{item.label}</span>
@@ -182,29 +201,35 @@ export function AppSidebar() {
         </SidebarGroup>
 
         {/* Admin Section */}
-        {user?.role === "Admin" && <SidebarGroup>
-          <SidebarGroupLabel>Admin</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {adminMenu.map((item) => (
-                <SidebarMenuItem key={item.href}>
-                  <SidebarMenuButton asChild isActive={pathname === item.href}>
-                    <Link
-                      href={item.href}
-                      aria-disabled={item.disabled}
-                      {...(item.href.startsWith('http')
-                        ? { target: '_blank', rel: 'noopener noreferrer' }
-                        : {})}
+        {user?.role === 'Admin' && (
+          <SidebarGroup>
+            <SidebarGroupLabel>Admin</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {adminMenu.map((item) => (
+                  <SidebarMenuItem key={item.href}>
+                    <SidebarMenuButton
+                      asChild
+                      isActive={pathname === item.href}
                     >
-                      <item.icon className="h-4 w-4" />
-                      <span>{item.label}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>}
+                      <Link
+                        href={item.href}
+                        aria-disabled={item.disabled}
+                        {...(item.href.startsWith('http')
+                          ? { target: '_blank', rel: 'noopener noreferrer' }
+                          : {})}
+                        prefetch={true}
+                      >
+                        <item.icon className="h-4 w-4" />
+                        <span>{item.label}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
 
         {/* Logout */}
         <SidebarGroup className="mt-auto">
@@ -215,7 +240,7 @@ export function AppSidebar() {
                   <button onClick={handleSignOut} className="cursor-pointer">
                     {isSignOutLoading ? (
                       <>
-                        <Spinner color="blue-500" />
+                        <Spinner color="blue-500" size={4} />
                         <span> Signing out... </span>
                       </>
                     ) : (

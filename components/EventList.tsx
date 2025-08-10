@@ -1,7 +1,7 @@
 'use client';
 
 import { Skeleton } from '@/components/ui/skeleton';
-import { Event } from '@/lib/types';
+import { EventDetails } from '@/lib/types';
 import { EventCard } from './EventCard';
 import { useEventContext } from '@/context/EventContext';
 
@@ -28,16 +28,15 @@ export function EventList() {
         />
         <h3 className='text-lg font-semibold'>No events found.</h3>
         <p className='text-muted-foreground text-sm max-w-96'>
-          We couldn't find anything matching your search criteria.
-          Try adjusting your filters or search terms.
+          {"We couldn't find anything matching your search criteria. Try adjusting your filters or search terms"}
         </p>
       </div>
     );
   }
 
   return (
-    <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-      {filteredEvents?.map((event: Event) => (
+    <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 w-full">
+      {filteredEvents?.map((event: EventDetails) => (
         <EventCard key={event.id} event={event} />
       ))}
     </div>

@@ -6,11 +6,15 @@ import { Button } from '@/components/ui/button';
 import { CreditCardIcon } from 'lucide-react';
 import Link from 'next/link';
 import { toast } from 'sonner';
-import Spinner from '../Spinner';
+import Spinner from '../common/Spinner';
 import { RenderInputField } from './FormComponents';
 import { signUpWithEmail } from '@/lib/better-auth/sign-up';
+import { handleClientError } from '@/lib/error/handleClient';
+import { useRouter } from 'next/navigation';
 
 export default function SignUpForm() {
+
+  const router = useRouter();
   const form = useForm({
     defaultValues: {
       firstName: '',
@@ -21,9 +25,15 @@ export default function SignUpForm() {
     onSubmit: async ({ value }) => {
       try {
         const fullName = `${value.firstName} ${value.lastName}`;
-        await signUpWithEmail(fullName, value.email, value.password);
+        const data = await signUpWithEmail(fullName, value.email, value.password);
+
+        if (data?.user) {
+          toast.success('Sign up successful! Please check your email for verification.');
+          router.push('/sign-in');
+        }
+        
       } catch (error) {
-        toast.error(String(error));
+        handleClientError('Sign Up Error', error);
       }
     },
   });
@@ -111,8 +121,7 @@ export default function SignUpForm() {
                 <>
                   <CreditCardIcon />
                   <div>
-                    {' '}
-                    Continue to payment with <b>Stripe</b>{' '}
+                    {' '} Create Account {' '}
                   </div>
                 </>
               )}

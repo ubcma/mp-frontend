@@ -1,3 +1,4 @@
+// components/forms/FormComponents.tsx (Extended version)
 import { AnyFieldApi } from '@tanstack/react-form';
 import { Label } from '../ui/label';
 import { Input } from '../ui/input';
@@ -18,11 +19,13 @@ import {
   CommandList,
 } from '../ui/command';
 import { Button } from '../ui/button';
-import { Check, ChevronsUpDown } from 'lucide-react';
+import { ChevronsUpDown } from 'lucide-react';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { Textarea } from '../ui/textarea';
 import { DateTimePicker } from '../DateTimePicker';
+import { Checkbox } from '../ui/checkbox';
+import { RadioGroup, RadioGroupItem } from '../ui/radio-group';
 
 export function FieldInfo({ field }: { field: AnyFieldApi }) {
   return (
@@ -48,7 +51,7 @@ export function RenderInputField({
 }: {
   type?: string;
   placeholder?: string;
-  label: string;  
+  label: string;
   field: AnyFieldApi;
   onChange?: (value: string) => void;
 }) {
@@ -61,7 +64,9 @@ export function RenderInputField({
         value={field.state.value}
         onBlur={field.handleBlur}
         onChange={(e) =>
-          onChange ? onChange(e.target.value) : field.handleChange(e.target.value)
+          onChange
+            ? onChange(e.target.value)
+            : field.handleChange(e.target.value)
         }
         type={type}
         placeholder={placeholder ?? label}
@@ -96,7 +101,6 @@ export function RenderTextArea({
   );
 }
 
-
 export function RenderSelectField({
   options,
   placeholder,
@@ -118,7 +122,7 @@ export function RenderSelectField({
         onValueChange={(value) => field.handleChange(value)}
         disabled={disabled}
       >
-        <SelectTrigger>
+        <SelectTrigger className='w-full'>
           <SelectValue
             placeholder={placeholder || 'Select'}
             defaultValue={field.state.value}
@@ -164,7 +168,7 @@ export function RenderComboBoxField({
     <div className="flex flex-col gap-2 w-full">
       <Label htmlFor={field.name}>{label}</Label>
       <Popover open={open} onOpenChange={setOpen}>
-        <PopoverTrigger asChild>
+        <PopoverTrigger asChild disabled={disabled}>
           <Button
             variant="outline"
             role="combobox"
@@ -225,7 +229,7 @@ export function RenderComboBoxField({
                       setOpen(false);
                     }}
                   >
-                    Choose "{inputValue}"
+                    {`Choose "${inputValue}"`}
                   </CommandItem>
                 )}
               </CommandGroup>
@@ -237,7 +241,6 @@ export function RenderComboBoxField({
     </div>
   );
 }
-
 
 export function RenderDateTimeField({
   label,
@@ -254,6 +257,255 @@ export function RenderDateTimeField({
         onChange={(date) => field.handleChange(date)}
         onBlur={field.handleBlur}
       />
+      <FieldInfo field={field} />
+    </div>
+  );
+}
+
+// NEW COMPONENTS FOR EVENT REGISTRATION FORMS
+
+export function RenderDateField({
+  label,
+  field,
+  placeholder,
+}: {
+  label: string;
+  field: AnyFieldApi;
+  placeholder?: string;
+}) {
+  return (
+    <div className="flex flex-col gap-2">
+      <Label htmlFor={field.name}>{label}</Label>
+      <Input
+        id={field.name}
+        name={field.name}
+        type="date"
+        value={field.state.value || ''}
+        onBlur={field.handleBlur}
+        onChange={(e) => field.handleChange(e.target.value)}
+        placeholder={placeholder}
+      />
+      <FieldInfo field={field} />
+    </div>
+  );
+}
+
+export function RenderTimeField({
+  label,
+  field,
+  placeholder,
+}: {
+  label: string;
+  field: AnyFieldApi;
+  placeholder?: string;
+}) {
+  return (
+    <div className="flex flex-col gap-2">
+      <Label htmlFor={field.name}>{label}</Label>
+      <Input
+        id={field.name}
+        name={field.name}
+        type="time"
+        value={field.state.value || ''}
+        onBlur={field.handleBlur}
+        onChange={(e) => field.handleChange(e.target.value)}
+        placeholder={placeholder}
+      />
+      <FieldInfo field={field} />
+    </div>
+  );
+}
+
+export function RenderNumberField({
+  label,
+  field,
+  placeholder,
+  min,
+  max,
+  step,
+}: {
+  label: string;
+  field: AnyFieldApi;
+  placeholder?: string;
+  min?: number;
+  max?: number;
+  step?: number;
+}) {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    // Allow empty string for clearing the field
+    if (value === '') {
+      field.handleChange('');
+      return;
+    }
+    
+    const numValue = parseFloat(value);
+    if (!isNaN(numValue)) {
+      field.handleChange(numValue);
+    }
+  };
+
+  return (
+    <div className="flex flex-col gap-2">
+      <Label htmlFor={field.name}>{label}</Label>
+      <Input
+        id={field.name}
+        name={field.name}
+        type="number"
+        value={field.state.value === 0 ? '0' : field.state.value || ''}
+        onBlur={field.handleBlur}
+        onChange={handleChange}
+        placeholder={placeholder}
+        min={min}
+        max={max}
+        step={step}
+      />
+      <FieldInfo field={field} />
+    </div>
+  );
+}
+
+export function RenderEmailField({
+  label,
+  field,
+  placeholder,
+}: {
+  label: string;
+  field: AnyFieldApi;
+  placeholder?: string;
+}) {
+  return (
+    <div className="flex flex-col gap-2">
+      <Label htmlFor={field.name}>{label}</Label>
+      <Input
+        id={field.name}
+        name={field.name}
+        type="email"
+        value={field.state.value || ''}
+        onBlur={field.handleBlur}
+        onChange={(e) => field.handleChange(e.target.value)}
+        placeholder={placeholder || 'Enter your email'}
+      />
+      <FieldInfo field={field} />
+    </div>
+  );
+}
+
+export function RenderCheckboxField({
+  label,
+  field,
+  options,
+}: {
+  label: string;
+  field: AnyFieldApi;
+  options: string[];
+}) {
+  const currentValues = Array.isArray(field.state.value) ? field.state.value : [];
+
+  const handleCheckboxChange = (option: string, checked: boolean) => {
+    let newValues;
+    if (checked) {
+      newValues = [...currentValues, option];
+    } else {
+      newValues = currentValues.filter((value: string) => value !== option);
+    }
+    field.handleChange(newValues);
+  };
+
+  return (
+    <div className="flex flex-col gap-2">
+      <Label>{label}</Label>
+      <div className="space-y-2">
+        {options.map((option, index) => (
+          <div key={index} className="flex items-center space-x-2">
+            <Checkbox
+              id={`${field.name}-${index}`}
+              checked={currentValues.includes(option)}
+              onCheckedChange={(checked) => handleCheckboxChange(option, !!checked)}
+            />
+            <Label 
+              htmlFor={`${field.name}-${index}`}
+              className="text-sm font-normal cursor-pointer"
+            >
+              {option}
+            </Label>
+          </div>
+        ))}
+      </div>
+      <FieldInfo field={field} />
+    </div>
+  );
+}
+
+export function RenderRadioField({
+  label,
+  field,
+  options,
+}: {
+  label: string;
+  field: AnyFieldApi;
+  options: string[];
+}) {
+  return (
+    <div className="flex flex-col gap-2">
+      <Label>{label}</Label>
+      <RadioGroup
+        value={field.state.value || ''}
+        onValueChange={field.handleChange}
+      >
+        {options.map((option, index) => (
+          <div key={index} className="flex items-center space-x-2">
+            <RadioGroupItem 
+              value={option} 
+              id={`${field.name}-${index}`}
+            />
+            <Label 
+              htmlFor={`${field.name}-${index}`}
+              className="text-sm font-normal cursor-pointer"
+            >
+              {option}
+            </Label>
+          </div>
+        ))}
+      </RadioGroup>
+      <FieldInfo field={field} />
+    </div>
+  );
+}
+
+export function RenderYesNoField({
+  label,
+  field,
+}: {
+  label: string;
+  field: AnyFieldApi;
+}) {
+  return (
+    <div className="flex flex-col gap-2">
+      <Label>{label}</Label>
+      <RadioGroup
+        value={field.state.value || ''}
+        onValueChange={field.handleChange}
+      >
+        <div className="flex items-center space-x-2">
+          <RadioGroupItem value="yes" id={`${field.name}-yes`} />
+          <Label 
+            htmlFor={`${field.name}-yes`}
+            className="text-sm font-normal cursor-pointer"
+          >
+            Yes
+          </Label>
+        </div>
+        <div className="flex items-center space-x-2">
+          <RadioGroupItem value="no" id={`${field.name}-no`} />
+          <Label 
+            htmlFor={`${field.name}-no`}
+            className="text-sm font-normal cursor-pointer"
+          >
+            No
+          </Label>
+        </div>
+      </RadioGroup>
       <FieldInfo field={field} />
     </div>
   );

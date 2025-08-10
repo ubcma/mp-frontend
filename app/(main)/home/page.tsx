@@ -5,12 +5,12 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useUserQuery } from '@/lib/queries/user';
 
 export default function Home() {
-  const { data: user, isLoading, isError } = useUserQuery();
+  const { data: user} = useUserQuery();
 
   const userFirstName = user?.name.split(' ')[0];
 
   return (
-    <div className="flex flex-col justify-center w-full h-full">
+    <div className="flex flex-col justify-center w-full">
       {!user?.onboardingComplete && <OnboardingModal />}
 
       <div className="flex flex-col gap-2">

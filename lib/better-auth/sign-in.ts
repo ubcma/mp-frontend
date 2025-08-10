@@ -1,25 +1,30 @@
 import { authClient } from '@/lib/auth-client';
 import { toast } from 'sonner';
+import { handleServerError } from '../error/handleServer';
 
 export const signInWithGoogle = async () => {
-  const frontendBaseURL =
-    process.env.NODE_ENV === 'development'
-      ? 'http://localhost:3000'
-      : 'https://membership.ubcma.ca';
+  const frontendBaseURL = process.env.NEXT_PUBLIC_FRONTEND_URL;
 
-  const response = await authClient.signIn.social({
-    provider: 'google',
-    callbackURL: `${frontendBaseURL}/home`,
-    errorCallbackURL: `${frontendBaseURL}/error`,
-    newUserCallbackURL: `${frontendBaseURL}/home`,
-  });
+  const response = await authClient.signIn.social(
+    {
+      provider: 'google',
+      callbackURL: `${frontendBaseURL}/home`,
+      errorCallbackURL: `${frontendBaseURL}/error`,
+      newUserCallbackURL: `${frontendBaseURL}/home`,
+    }
+  );
 
   if (response.error) {
-    console.error('Error signing in with Google:', response.error);
-    throw new Error(response.error.message);
+    handleServerError('Error signing in with Google:', response.error);
   }
 
-  return response;
+  const redirectUrl = response.data?.url;
+  if (redirectUrl) {
+    window.location.href = redirectUrl;
+  } else {
+    throw new Error("Google OAuth redirect URL not found in response.");
+  }
+
 };
 
 export const signInWithEmail = async (email: string, password: string) => {
@@ -31,13 +36,13 @@ export const signInWithEmail = async (email: string, password: string) => {
       rememberMe: true,
     },
     {
-      //callbacks
+      onSuccess(ctx) {
+        toast.success('Sign in successful!');
+      },
     }
   );
   if (response.error) {
-    console.error('Error signing in with email:', response.error.message);
-    toast.error(response.error.message);
-    throw new Error(response.error.message);
+    handleServerError('Error', response.error.message);
   }
   return response;
 };

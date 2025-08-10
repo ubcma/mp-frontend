@@ -19,12 +19,11 @@ import {
   RenderInputField,
   RenderSelectField,
 } from './forms/FormComponents';
-import Spinner from './Spinner';
+import Spinner from './common/Spinner';
 import {
   DIETARY_RESTRICTIONS,
   FACULTIES,
   Faculty,
-  FacultyMajors,
   getMajorsForFaculty,
   INTEREST_OPTIONS,
   YEAR_OPTIONS,
@@ -37,6 +36,9 @@ import {
   UserRoundPen,
   Vegan,
 } from 'lucide-react';
+import { fetchFromAPI } from '@/lib/httpHandlers';
+import { UserProfileData } from '@/lib/types';
+import { Select } from './ui/select';
 
 const steps = [
   {
@@ -80,8 +82,16 @@ export default function OnboardingModal() {
 
   useEffect(() => {
     const fetchProfile = async () => {
-      const res = await fetch('/api/me');
-      const data = await res.json();
+      const res = await fetchFromAPI('/api/me', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+      });
+
+      const data = (await res.json()) as UserProfileData;
+
       if (!data.onboardingComplete) {
         setOpen(true);
       }
@@ -108,9 +118,9 @@ export default function OnboardingModal() {
       onboardingComplete: true,
     },
     onSubmit: async ({ value }) => {
-      await fetch('/api/me/', {
+      await fetchFromAPI('/api/me/', {
         method: 'POST',
-        body: JSON.stringify(value),
+        body: value,
       });
       setStep((s) => s + 1);
     },
@@ -213,7 +223,7 @@ export default function OnboardingModal() {
                               !value ? 'Faculty is required.' : undefined,
                           }}
                           children={(field) => (
-                            <RenderComboBoxField
+                            <RenderSelectField
                               options={FACULTIES}
                               label="Faculty"
                               field={field}
@@ -234,7 +244,6 @@ export default function OnboardingModal() {
                                 options={majors}
                                 label="Major"
                                 field={field}
-                                disabled={!selectedFaculty}
                               />
                             );
                           }}
@@ -456,7 +465,7 @@ export default function OnboardingModal() {
                     transition={{ duration: 0.3 }}
                     className="text-center space-y-6 w-full"
                   >
-                    <p className="text-muted-foreground">You're all set!</p>
+                    <p className="text-muted-foreground">{"You're all set!"}</p>
                     <Button onClick={() => setOpen(false)}>Go to Home</Button>
                   </motion.div>
                 )}

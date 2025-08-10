@@ -1,4 +1,4 @@
-import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 import { authClient } from '../auth-client';
 
 export const signOut = async () => {
@@ -6,7 +6,7 @@ export const signOut = async () => {
   const response = await authClient.signOut({
     fetchOptions: {
       onSuccess: () => {
-        
+        toast.success('Signed out successfully!');
       },
     },
   });
