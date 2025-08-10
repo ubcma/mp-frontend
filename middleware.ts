@@ -46,7 +46,7 @@ export function middleware(request: NextRequest) {
     pathname.startsWith('/sign-up') ||
     pathname.startsWith('/forgot-password');
 
-  const isPublicPage = pathname === '/'; // Add other public pages here
+  const isPublicPage = false // pathname === '/'; Add other public pages here
 
   // If no session and trying to access protected route
   if (!hasSession && !isAuthPage && !isPublicPage) {
