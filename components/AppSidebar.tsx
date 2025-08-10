@@ -29,9 +29,10 @@ import { useUserQuery } from '@/lib/queries/user';
 import { Skeleton } from './ui/skeleton';
 import { signOut } from '@/lib/better-auth/sign-out';
 import { useState } from 'react';
-import Spinner from './Spinner';
+import Spinner from './common/Spinner';
 import { ThemeToggle } from './ThemeToggle';
 import { useIsMobile } from '@/hooks/use-mobile';
+import Image from 'next/image';
 
 export function AppSidebar() {
   const {
@@ -108,18 +109,22 @@ export function AppSidebar() {
   };
 
   return (
-    <Sidebar collapsible="icon" side={isMobile ? "right" : "left"}>
+    <Sidebar collapsible="icon" side={isMobile ? 'right' : 'left'}>
       <SidebarHeader className="p-2 pt-4">
         <Link href="/home" className="flex items-center" prefetch={true}>
-          <img
-            src={`${
-              state === 'collapsed'
-                ? '/logos/logo_red.svg'
-                : '/logos/portal_logo_red.svg'
-            }`}
+          <Image
+            src={`${'/logos/logo_red.svg'}`}
+            width={128}
+            height={96}
             alt="UBCMA Logo"
-            className={`${state === 'collapsed' ? 'h-8' : 'h-[64px]'}`}
+            className={`w-fit ${state === 'collapsed' ? 'h-8' : 'h-[64px] mr-2'}`}
           />
+          {state === 'expanded' && (
+            <div className="text-[#f03050] text-nowrap">
+              <p className="font-semibold text-lg -mb-1">UBCMA</p>
+              <p className="font-medium text-xs">Membership Portal</p>
+            </div>
+          )}
         </Link>
       </SidebarHeader>
       <SidebarContent>
@@ -235,7 +240,7 @@ export function AppSidebar() {
                   <button onClick={handleSignOut} className="cursor-pointer">
                     {isSignOutLoading ? (
                       <>
-                        <Spinner color="blue-500" size={4}/>
+                        <Spinner color="blue-500" size={4} />
                         <span> Signing out... </span>
                       </>
                     ) : (

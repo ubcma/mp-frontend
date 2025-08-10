@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { CreditCardIcon } from 'lucide-react';
 import Link from 'next/link';
 import { toast } from 'sonner';
-import Spinner from '../Spinner';
+import Spinner from '../common/Spinner';
 import { RenderInputField } from './FormComponents';
 import { signUpWithEmail } from '@/lib/better-auth/sign-up';
 import { handleClientError } from '@/lib/error/handleClient';

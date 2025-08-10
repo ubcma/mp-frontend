@@ -19,7 +19,7 @@ import {
   RenderInputField,
   RenderSelectField,
 } from './forms/FormComponents';
-import Spinner from './Spinner';
+import Spinner from './common/Spinner';
 import {
   DIETARY_RESTRICTIONS,
   FACULTIES,

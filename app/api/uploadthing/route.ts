@@ -10,8 +10,6 @@ const ourFileRouter = {
       return {};
     })
     .onUploadComplete(async ({ metadata, file }) => {
-      console.log("Upload successful. URL: ", file.ufsUrl);
-      
       return { url: file.ufsUrl };
     }),
 } satisfies FileRouter;

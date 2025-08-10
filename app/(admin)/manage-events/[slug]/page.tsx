@@ -4,7 +4,7 @@ import { useGetEventQuery } from '@/lib/queries/event';
 import { useParams } from 'next/navigation';
 import EventForm from '@/components/forms/EventForm';
 import { toast } from 'sonner';
-import Spinner from '@/components/Spinner';
+import Spinner from '@/components/common/Spinner';
 import { fetchFromAPI } from '@/lib/httpHandlers';
 import { handleClientError } from '@/lib/error/handleClient';
 

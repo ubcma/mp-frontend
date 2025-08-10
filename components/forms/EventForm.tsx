@@ -2,7 +2,7 @@
 
 import { useForm } from '@tanstack/react-form';
 import { Button } from '@/components/ui/button';
-import Spinner from '../Spinner';
+import Spinner from '../common/Spinner';
 import {
   RenderDateTimeField,
   RenderInputField,
@@ -35,6 +35,9 @@ import { generateSlug } from '@/lib/utils';
 import EventImageUpload, { EventImageUploadRef } from '../EventImageUpload';
 import { Switch } from '../ui/switch';
 import { Label } from '../ui/label';
+import { toast } from 'sonner';
+import { redirect } from 'next/navigation';
+import { useQueryClient } from '@tanstack/react-query';
 
 type EventFormProps = {
   mode: 'create' | 'update';
@@ -53,6 +56,8 @@ export default function EventForm({
   const eventImageUploadRef = useRef<EventImageUploadRef>(null);
 
   const sensors = useSensors(useSensor(PointerSensor));
+
+  const queryClient = useQueryClient();
 
   const addQuestion = () => {
     setQuestions((prev) => [
@@ -120,7 +125,8 @@ export default function EventForm({
       // Upload pending image file if exists
       if (eventImageUploadRef.current?.hasPendingFile()) {
         try {
-          const uploadedUrl = await eventImageUploadRef.current.uploadPendingFile();
+          const uploadedUrl =
+            await eventImageUploadRef.current.uploadPendingFile();
           if (uploadedUrl) {
             imageUrl = uploadedUrl;
           }
@@ -159,7 +165,11 @@ export default function EventForm({
               endsAt: new Date(value.endsAt),
             };
 
-      await onSubmit(formattedData);
+      const response = await onSubmit(formattedData);
+
+      toast.success(mode === 'create' ? 'Event created!' : 'Event updated!');
+      queryClient.invalidateQueries({ queryKey: ['events'] });
+      redirect('/events');
     },
   });
 
@@ -168,17 +178,27 @@ export default function EventForm({
       !value ? `${fieldName} is required.` : undefined,
   });
 
+  const endDateValidator = (fieldName: string) => ({
+    onChange: ({ value }: { value: EventQuestionResponse }) =>
+      !value
+        ? `${fieldName} is required.`
+        : value <= form.getFieldValue('startsAt')
+          ? 'End date must be after start date.'
+          : undefined,
+  });
+
   // Custom image validation that considers both existing URL and selected file
   const imageValidator = {
     onChange: ({ value }: { value: string }) => {
       const hasExistingImage = !!value;
-      const hasPendingFile = eventImageUploadRef.current?.hasPendingFile() ?? false;
-      
+      const hasPendingFile =
+        eventImageUploadRef.current?.hasPendingFile() ?? false;
+
       if (!hasExistingImage && !hasPendingFile) {
         return 'Image is required.';
       }
       return undefined;
-    }
+    },
   };
 
   return (
@@ -203,7 +223,35 @@ export default function EventForm({
         className="flex flex-col gap-4"
       >
         <div className="flex flex-col gap-4">
-          <div className="grid md:grid-cols-3 grid-cols-1 gap-4">
+          <form.Field name="imageUrl" validators={imageValidator}>
+            {(field) => {
+              const imageUrl = field.state.value as string;
+              const error = field.state.meta.errors?.[0];
+
+              return (
+                <div className="flex flex-col gap-2 w-full">
+                  <label htmlFor="imageUrl" className="text-sm font-medium">
+                    Image
+                  </label>
+
+                  <EventImageUpload
+                    ref={eventImageUploadRef}
+                    existingImageUrl={imageUrl}
+                    onImageSelect={(hasFile) => {
+                      setHasSelectedImage(hasFile);
+                      field.validate('change');
+                    }}
+                    maxFileSizeMB={10}
+                  />
+
+                  {error && (
+                    <p className="text-xs text-red-500 mt-1">{error}</p>
+                  )}
+                </div>
+              );
+            }}
+          </form.Field>
+          <div className="grid md:grid-cols-3 grid-cols-1 gap-4 mt-4">
             <form.Field name="title" validators={requiredValidator('Title')}>
               {(field) => (
                 <RenderInputField
@@ -232,64 +280,7 @@ export default function EventForm({
                 />
               )}
             </form.Field>
-            <form.Field
-              name="imageUrl"
-              validators={imageValidator}
-            >
-              {(field) => {
-                const imageUrl = field.state.value as string;
-                const error = field.state.meta.errors?.[0];
 
-                return (
-                  <div className="flex flex-col gap-2 w-full">
-                    <label htmlFor="imageUrl" className="text-sm font-medium">
-                      Image
-                    </label>
-
-                    <EventImageUpload
-                      ref={eventImageUploadRef}
-                      onImageSelect={(hasFile) => {
-                        setHasSelectedImage(hasFile);
-                        // Trigger validation when file selection changes
-                        field.validate('change');
-                      }}
-                      maxFileSizeMB={10}
-                    />
-
-                    {/* Show existing image if no pending file - appears below upload component */}
-                    {imageUrl && !eventImageUploadRef.current?.hasPendingFile() && (
-                      <div className="mt-4">
-                        <div className="relative inline-block">
-                          <img
-                            src={imageUrl}
-                            alt="Current event image"
-                            className="w-32 h-32 object-cover rounded border"
-                          />
-                          <div className="absolute bottom-1 left-1 bg-black/70 text-white text-xs px-2 py-1 rounded">
-                            Current image
-                          </div>
-                        </div>
-                      </div>
-                    )}
-
-                    {error && (
-                      <p className="text-xs text-red-500 mt-1">{error}</p>
-                    )}
-                  </div>
-                );
-              }}
-            </form.Field>
-          </div>
-
-          <form.Field
-            name="description"
-            validators={requiredValidator('Description')}
-            children={(fieldApi) => (
-              <RenderTextArea label="Description" field={fieldApi} />
-            )}
-          />
-
-          <div className="grid md:grid-cols-4 grid-cols-1 gap-4">
             <form.Field
               name="price"
               validators={requiredValidator('Price')}
@@ -301,6 +292,17 @@ export default function EventForm({
                 />
               )}
             />
+          </div>
+
+          <form.Field
+            name="description"
+            validators={requiredValidator('Description')}
+            children={(fieldApi) => (
+              <RenderTextArea label="Description" field={fieldApi} />
+            )}
+          />
+
+          <div className="grid md:grid-cols-3 grid-cols-1 gap-4">
             <form.Field
               name="location"
               validators={requiredValidator('Location')}
@@ -324,7 +326,7 @@ export default function EventForm({
             />
             <form.Field
               name="endsAt"
-              validators={requiredValidator('End Date & Time')}
+              validators={endDateValidator('End Date & Time')}
               children={(fieldApi) => (
                 <RenderDateTimeField label="End Date & Time" field={fieldApi} />
               )}
@@ -395,9 +397,10 @@ export default function EventForm({
         <form.Subscribe
           selector={(state) => [state.canSubmit, state.isSubmitting]}
           children={([canSubmit, isSubmitting]) => {
-            const isImageUploading = eventImageUploadRef.current?.isUploading() ?? false;
+            const isImageUploading =
+              eventImageUploadRef.current?.isUploading() ?? false;
             const isFormSubmitting = isSubmitting || isImageUploading;
-            
+
             return (
               <Button
                 className="cursor-pointer font-regular bg-ma-red"
@@ -409,12 +412,17 @@ export default function EventForm({
                   <>
                     <Spinner />
                     <div>
-                      {isImageUploading ? 'Uploading Image...' : 
-                       mode === 'create' ? 'Creating Event...' : 'Saving Changes...'}
+                      {isImageUploading
+                        ? 'Uploading Image...'
+                        : mode === 'create'
+                          ? 'Creating Event...'
+                          : 'Saving Changes...'}
                     </div>
                   </>
                 ) : (
-                  <div>{mode === 'create' ? 'Create Event' : 'Update Event'}</div>
+                  <div>
+                    {mode === 'create' ? 'Create Event' : 'Update Event'}
+                  </div>
                 )}
               </Button>
             );

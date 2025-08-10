@@ -7,7 +7,7 @@ import { Camera, Upload, X } from 'lucide-react';
 import { useUploadThing } from '@/helpers/uploadThing';
 import Image from 'next/image';
 import { handleClientError } from '@/lib/error/handleClient';
-import { processImageFile } from '@/lib/utils';
+import { processImageFile } from '@/lib/uploadthing';
 
 interface ImageUploadProps {
   currentImageUrl?: string;
@@ -59,7 +59,7 @@ export default function ImageUpload({
           acceptedTypes: ['image/']
         },
         compression: {
-          maxSizeMB: 0.5,
+          maxSizeMB: 0.25,
           maxWidthOrHeight: 1920,
           useWebWorker: true
         },

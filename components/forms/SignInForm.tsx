@@ -4,7 +4,7 @@ import { useForm } from '@tanstack/react-form';
 import { Button } from '@/components/ui/button';
 import { LogIn } from 'lucide-react';
 import Link from 'next/link';
-import Spinner from '../Spinner';
+import Spinner from '../common/Spinner';
 import { RenderInputField } from './FormComponents';
 import { GoogleSignInButton } from '../GoogleSignInButton';
 import { signInWithEmail } from '@/lib/better-auth/sign-in';

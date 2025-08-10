@@ -8,9 +8,15 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Calendar, MapPin, Shirt } from 'lucide-react';
-import { EventDetails, EventQuestion} from '@/lib/types';
+import { EventDetails, EventQuestion } from '@/lib/types';
 import DynamicFormField from '@/components/forms/DynamicFormField'; // Adjust path as needed
 import TagPill from '@/components/TagPill'; // Adjust the import path as needed
 
@@ -21,11 +27,11 @@ interface EventDetailsProps {
   dressCode?: string; // Optional dress code
 }
 
-const RenderEventDetails: React.FC<EventDetailsProps> = ({ 
-  event, 
-  questions, 
+const RenderEventDetails: React.FC<EventDetailsProps> = ({
+  event,
+  questions,
   memberPrice,
-  dressCode 
+  dressCode,
 }) => {
   const [responses, setResponses] = useState<{ [key: number]: string }>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -34,24 +40,22 @@ const RenderEventDetails: React.FC<EventDetailsProps> = ({
     setResponses((prev) => ({ ...prev, [questionId]: value }));
   };
 
-  const isFormValid = questions.every(
-    (q) => {
-      if (!q.isRequired) return true;
-      
-      const response = responses[q.id];
-      
-      // Handle different response types
-      if (Array.isArray(response)) {
-        return response.length > 0;
-      }
-      
-      if (typeof response === 'string') {
-        return response.trim() !== '';
-      }
-      
-      return response !== null && response !== undefined && response !== '';
+  const isFormValid = questions.every((q) => {
+    if (!q.isRequired) return true;
+
+    const response = responses[q.id];
+
+    // Handle different response types
+    if (Array.isArray(response)) {
+      return response.length > 0;
     }
-  );
+
+    if (typeof response === 'string') {
+      return response.trim() !== '';
+    }
+
+    return response !== null && response !== undefined && response !== '';
+  });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -76,7 +80,7 @@ const RenderEventDetails: React.FC<EventDetailsProps> = ({
   const formatEventDate = () => {
     const startDate = new Date(event.startsAt);
     const endDate = new Date(event.endsAt);
-    
+
     // If same day, show date with time range
     if (startDate.toDateString() === endDate.toDateString()) {
       return `${format(startDate, 'EEEE, MMMM d')} @ ${format(startDate, 'h:mm a')} - ${format(endDate, 'h:mm a')}`;
@@ -87,10 +91,10 @@ const RenderEventDetails: React.FC<EventDetailsProps> = ({
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       {/* Hero Image */}
       {event.imageUrl && (
-        <div className="relative w-full h-64 rounded-lg overflow-hidden">
+        <div className="relative w-full h-80 rounded-lg overflow-hidden">
           <Image
             src={event.imageUrl}
             alt={event.title}
@@ -101,11 +105,11 @@ const RenderEventDetails: React.FC<EventDetailsProps> = ({
       )}
 
       {/* Event Info Section */}
-      <div className="space-y-4">
-        <h1 className="text-3xl font-bold">{event.title}</h1>
+      <div className="space-y-1">
+        <h1 className="text-3xl font-semibold">{event.title}</h1>
 
         {/* Dynamic pricing display */}
-        <div className="text-base mt-1">
+        <div className="text-base text-muted-foreground">
           {memberPrice ? (
             <p>
               ${memberPrice.toFixed(2)} for members (
@@ -115,28 +119,19 @@ const RenderEventDetails: React.FC<EventDetailsProps> = ({
               )
             </p>
           ) : (
-            <p className="font-medium">
-              ${Number(event.price).toFixed(2)}
-            </p>
+            <p className="font-medium">${Number(event.price).toFixed(2)}</p>
           )}
         </div>
 
-        {/* Dynamic Description */}
-        {event.description && (
-          <p className="text-sm mt-2">
-            {event.description}
-          </p>
-        )}
-
         {/* Tag pills using the reusable component */}
-        <div className="flex flex-wrap gap-3 mt-4">
+        <div className="flex flex-wrap gap-3 mt-2">
           <TagPill
             icon={Calendar}
             text={formatEventDate()}
             textColor="#4a7dca"
             bgColor="#cce0ff"
           />
-          
+
           {event.location && (
             <TagPill
               icon={MapPin}
@@ -145,7 +140,7 @@ const RenderEventDetails: React.FC<EventDetailsProps> = ({
               bgColor="#dbccff"
             />
           )}
-          
+
           {dressCode && (
             <TagPill
               icon={Shirt}
@@ -156,6 +151,15 @@ const RenderEventDetails: React.FC<EventDetailsProps> = ({
           )}
         </div>
       </div>
+
+
+
+        {/* Dynamic Description */}
+        {event.description && (
+          <p className="text-sm text-muted-foreground">
+            {event.description}
+          </p>
+        )}
 
       {/* Registration Form */}
       <Card>
@@ -171,9 +175,12 @@ const RenderEventDetails: React.FC<EventDetailsProps> = ({
                 value={responses[q.id]}
                 onChange={(value) => handleChange(q.id, value)}
                 error={
-                  q.isRequired && (!responses[q.id] || 
-                    (Array.isArray(responses[q.id]) && responses[q.id].length === 0) ||
-                    (typeof responses[q.id] === 'string' && responses[q.id].trim() === ''))
+                  q.isRequired &&
+                  (!responses[q.id] ||
+                    (Array.isArray(responses[q.id]) &&
+                      responses[q.id].length === 0) ||
+                    (typeof responses[q.id] === 'string' &&
+                      responses[q.id].trim() === ''))
                     ? `${q.label} is required.`
                     : undefined
                 }

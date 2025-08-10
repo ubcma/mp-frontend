@@ -7,12 +7,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import {
-  MoreHorizontal,
-  Calendar,
-  Tag,
-  MapPin,
-} from 'lucide-react';
+import { MoreHorizontal, Calendar, Tag, MapPin } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { EventDetails } from '@/lib/types';
@@ -21,7 +16,8 @@ import { toast } from 'sonner';
 import { fetchFromAPI } from '@/lib/httpHandlers';
 import dayjs from 'dayjs';
 import { handleClientError } from '@/lib/error/handleClient';
-import { isValidImageUrl } from '@/lib/utils';
+import { isValidImageUrl } from '@/lib/uploadthing';
+import { useQueryClient } from '@tanstack/react-query';
 
 interface AdminEventCardProps {
   event: EventDetails;
@@ -29,26 +25,27 @@ interface AdminEventCardProps {
 }
 
 export function AdminEventCard({ event, onEdit }: AdminEventCardProps) {
+  const queryClient = useQueryClient();
+
   const eventStartsAt = dayjs(event.startsAt).format('MMMM D, YYYY');
 
   async function deleteEventById() {
-    const {id} = event;
+    const { id } = event;
 
     try {
-              
       const res = await fetchFromAPI('/api/events/delete', {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
         body: { id: id },
-      })
+      });
 
       if (!res) {
         throw new Error('Failed to delete event');
       } else {
         toast.success('Event deleted!');
+        queryClient.invalidateQueries({ queryKey: ['events'] });
       }
-
     } catch (err: unknown) {
       handleClientError('Error', err);
     }
@@ -58,11 +55,15 @@ export function AdminEventCard({ event, onEdit }: AdminEventCardProps) {
     <Card className="flex overflow-hidden mb-2 p-0">
       <div className="flex flex-1 p-4">
         <Image
-          src={isValidImageUrl(event.imageUrl) ? event.imageUrl! : '/no-event-image.png'}
+          src={
+            isValidImageUrl(event.imageUrl)
+              ? event.imageUrl!
+              : '/no-event-image.png'
+          }
           alt={event.title}
           width={128}
-          height={48}
-          className='rounded-md mr-4'
+          height={64}
+          className="rounded-md mr-4 aspect-[5/4] object-cover"
         />
         <div className="flex-1">
           <div className="flex items-center gap-2 mb-1">
@@ -72,7 +73,7 @@ export function AdminEventCard({ event, onEdit }: AdminEventCardProps) {
           <div className="space-y-1 text-sm text-muted-foreground">
             <div className="flex items-center gap-2">
               <Calendar className="h-4 w-4 flex-shrink-0" />
-              <div>{eventStartsAt}</div>
+              <div className="line-clamp-1">{eventStartsAt}</div>
             </div>
 
             <div className="flex items-center gap-2">
@@ -95,16 +96,28 @@ export function AdminEventCard({ event, onEdit }: AdminEventCardProps) {
                 <span className="sr-only">Open menu</span>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => onEdit?.(event.slug)}>
+                <DropdownMenuItem
+                  className="cursor-pointer"
+                  onClick={() => onEdit?.(event.slug)}
+                >
                   Edit event
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link href={`/events/${event.slug}`} prefetch={true}>View public page</Link>
+                  <Link
+                    className="cursor-pointer"
+                    href={`/events/${event.slug}`}
+                    prefetch={true}
+                  >
+                    View public page
+                  </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Button variant='destructive' onClick={deleteEventById}>
+                  <button
+                    className="w-full text-ma-red transition-all duration-200 cursor-pointer"
+                    onClick={deleteEventById}
+                  >
                     Delete Event
-                  </Button>
+                  </button>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

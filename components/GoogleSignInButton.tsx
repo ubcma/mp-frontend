@@ -3,7 +3,7 @@
 import { signInWithGoogle } from '@/lib/better-auth/sign-in';
 import { Button } from './ui/button';
 import { useState } from 'react';
-import Spinner from './Spinner';
+import Spinner from './common/Spinner';
 
 export const GoogleSignInButton = () => {
   const [isLoading, setIsLoading] = useState(false);

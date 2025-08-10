@@ -1,6 +1,7 @@
 import { AlertBanner } from '@/components/AlertBanner';
 import { AppSidebar } from '@/components/AppSidebar';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
+import MobileNav from '@/components/layouts/MobileNav';
 import ProtectedLayout from '@/components/layouts/ProtectedLayout';
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { getUserRole } from '@/lib/queries/userRole';
@@ -22,19 +23,9 @@ export default async function Layout({
   return (
     <SidebarProvider>
       <ProtectedLayout>
+        <MobileNav/>
         <AppSidebar />
         <main className="w-full">
-          <div className="md:hidden fixed w-full flex flex-row justify-between items-center px-6 py-2 bg-white border-b-gray-200 border-b">
-            <Link href="/" prefetch={true}>
-              <Image
-                src="/logos/logo_red.svg"
-                alt="Logo"
-                width={48}
-                height={48}
-              />
-            </Link>
-            <SidebarTrigger />
-          </div>
           <div className="m-6 lg:m-12 mt-24">
             {showBanner ? (
               <div className="mb-8">

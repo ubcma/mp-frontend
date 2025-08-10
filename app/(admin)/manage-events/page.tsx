@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useGetEventsQuery } from '@/lib/queries/events';
 import { EventDetails } from '@/lib/types';
 import { AdminEventCard } from '@/components/AdminEventCard';
-import Spinner from '@/components/Spinner';
+import Spinner from '@/components/common/Spinner';
 import Link from 'next/link';
 
 export default function Home() {
