@@ -3,18 +3,17 @@ import type { NextRequest } from 'next/server';
 
 export function middleware(request: NextRequest) {
   const accessCode = request.cookies.get('access_code')?.value;
-  const sessionCookie = request.cookies.get(
-    'membership-portal.session_token'
-  )?.value;
   const expectedCode = process.env.ACCESS_CODE;
   const { pathname } = request.nextUrl;
 
+  // Static assets and API routes
   const allowlist = [
     '/maintenance',
     '/favicon.ico',
     '/robots.txt',
     '/_next',
     '/api',
+    '/logos', // Add your static assets
   ];
 
   const isStaticAsset = pathname.match(
@@ -28,27 +27,39 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
+  // Access code check first
+  if (accessCode !== expectedCode) {
+    return NextResponse.redirect(new URL('/maintenance', request.url));
+  }
+
+  // Check for session cookies (try multiple possible names)
+  const sessionCookies = [
+    request.cookies.get('membership-portal.session_token')?.value,
+    request.cookies.get('__Secure-membership-portal.session_token')?.value,
+    request.cookies.get('membership-portal.session')?.value,
+  ];
+  
+  const hasSession = sessionCookies.some(cookie => cookie);
+
   const isAuthPage =
     pathname.startsWith('/sign-in') ||
     pathname.startsWith('/sign-up') ||
     pathname.startsWith('/forgot-password');
 
-  const isMaintenance = pathname.startsWith('/maintenance');
+  const isPublicPage = pathname === '/'; // Add other public pages here
 
-  if (accessCode !== expectedCode) {
-    return NextResponse.redirect(new URL('/maintenance', request.url));
-  }
-
-  if (!sessionCookie) {
-    if (isAuthPage) return NextResponse.next();
+  // If no session and trying to access protected route
+  if (!hasSession && !isAuthPage && !isPublicPage) {
     return NextResponse.redirect(new URL('/sign-in', request.url));
   }
 
-  if (pathname === '/') {
+  // If has session and on auth page, redirect to home
+  if (hasSession && isAuthPage) {
     return NextResponse.redirect(new URL('/home', request.url));
   }
 
-  if (isAuthPage || isMaintenance) {
+  // Root redirect
+  if (pathname === '/' && hasSession) {
     return NextResponse.redirect(new URL('/home', request.url));
   }
 
@@ -56,5 +67,7 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/', '/:path*'],
+  matcher: [
+    '/((?!_next/static|_next/image|favicon.ico|robots.txt).*)',
+  ],
 };
