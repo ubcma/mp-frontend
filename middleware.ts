@@ -32,34 +32,32 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/maintenance', request.url));
   }
 
+  const isMaintenance = pathname.startsWith('/maintenance');
+
   // Check for session cookies (try multiple possible names)
-  const sessionCookies = [
-    request.cookies.get('membership-portal.session_token')?.value,
-    request.cookies.get('__Secure-membership-portal.session_token')?.value,
-    request.cookies.get('membership-portal.session')?.value,
-  ];
-  
-  const hasSession = sessionCookies.some(cookie => cookie);
+  const sessionCookie = request.cookies.get(
+    process.env.NODE_ENV === 'production'
+      ? '__Secure-membership-portal.session_token'
+      : 'membership-portal.session_token'
+  )?.value;
+
+  console.log('Session cookie:', sessionCookie);
 
   const isAuthPage =
     pathname.startsWith('/sign-in') ||
     pathname.startsWith('/sign-up') ||
     pathname.startsWith('/forgot-password');
 
-  const isPublicPage = false // pathname === '/'; Add other public pages here
-
-  // If no session and trying to access protected route
-  if (!hasSession && !isAuthPage && !isPublicPage) {
+  if (!sessionCookie) {
+    if (isAuthPage) return NextResponse.next();
     return NextResponse.redirect(new URL('/sign-in', request.url));
   }
 
-  // If has session and on auth page, redirect to home
-  if (hasSession && isAuthPage) {
+  if (pathname === '/') {
     return NextResponse.redirect(new URL('/home', request.url));
   }
 
-  // Root redirect
-  if (pathname === '/' && hasSession) {
+  if (isAuthPage || isMaintenance) {
     return NextResponse.redirect(new URL('/home', request.url));
   }
 
@@ -67,7 +65,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: [
-    '/((?!_next/static|_next/image|favicon.ico|robots.txt).*)',
-  ],
+  matcher: ['/((?!_next/static|_next/image|favicon.ico|robots.txt).*)'],
 };
