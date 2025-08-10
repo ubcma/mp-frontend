@@ -355,7 +355,7 @@ export default function EventForm({
             <div>
               <div className="text-md font-medium"> Questions </div>
               <div className="text-xs text-muted-foreground">
-                Note: Cannot questions cannot be edited later - ensure there are
+                Note: Questions cannot be edited later - ensure there are
                 no spelling mistakes.
               </div>
             </div>

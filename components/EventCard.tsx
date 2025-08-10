@@ -69,13 +69,14 @@ export function EventCard({ event }: { event: EventDetails }) {
               {status === 'Upcoming' ? (
                 <Button
                   onClick={() => router.push(`/events/${event.title}`)}
-                  className="w-full bg-ma-red group-hover:bg-rose-700 hover:bg-rose-700 text-white"
+                  variant="ma" 
+                  className="w-full group-hover:brightness-80 text-white"
                 >
                   Register for this event!
                   <ArrowUpRight className="h-4 w-4 group-hover:rotate-45 transition-transform duration-200 ease-in-out" />
                 </Button>
               ) : (
-                <Button className="w-full bg-ma-red/60 text-white" disabled>
+                <Button variant="ma" className="w-full text-white" disabled>
                   Registration has passed.
                 </Button>
               )}
