@@ -46,7 +46,7 @@ export default function PurchasePage() {
   if (isUserLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <p className="text-center text-gray-600">
+        <p className="text-center text-neutral-600">
           Checking your membership status…
         </p>
       </div>
@@ -56,14 +56,14 @@ export default function PurchasePage() {
   if (isClientSecretLoading || !stripePromise || !clientSecret) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <p className="text-center text-gray-600">Loading payment form…</p>
+        <p className="text-center text-neutral-600">Loading payment form…</p>
       </div>
     );
   }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-white py-12">
-      <Link className="absolute flex items-center gap-2 text-sm top-8 left-8 text-gray-500 hover:text-neutral-700 transition-colors" href="/home">
+      <Link className="absolute flex items-center gap-2 text-sm top-8 left-8 text-neutral-500 hover:text-neutral-700 transition-colors" href="/home">
         <ChevronLeft className="w-4 h-4" />
         <span>Back to Home</span>
       </Link>

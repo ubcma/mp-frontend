@@ -28,6 +28,7 @@ export const signUpWithEmail = async (
 
   if (error) {
     handleServerError('Error signing up with email', error);
+    throw new Error(error.message);
   }
   
   return data;

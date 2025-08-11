@@ -156,7 +156,7 @@ export function DraggableCard({
               {question.options?.map((option, optIndex) => (
                 <div
                   key={optIndex}
-                  className="flex items-center gap-1 px-3 py-1 bg-gray-200 rounded-full text-sm"
+                  className="flex items-center gap-1 px-3 py-1 bg-neutral-200 rounded-full text-sm"
                 >
                   {option}
                   <button

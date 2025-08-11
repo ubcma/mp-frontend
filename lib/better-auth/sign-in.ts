@@ -16,6 +16,7 @@ export const signInWithGoogle = async () => {
 
   if (response.error) {
     handleServerError('Error signing in with Google:', response.error);
+    throw new Error(response.error.message);
   }
 
   const redirectUrl = response.data?.url;
@@ -42,7 +43,7 @@ export const signInWithEmail = async (email: string, password: string) => {
     }
   );
   if (response.error) {
-    handleServerError('Error', response.error.message);
+    throw new Error(response.error.message);
   }
   return response;
 };

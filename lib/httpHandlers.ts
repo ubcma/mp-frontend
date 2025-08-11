@@ -1,4 +1,4 @@
-import { handleServerError } from "./error/handleServer";
+import { handleServerError } from './error/handleServer';
 
 type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE';
 
@@ -13,14 +13,20 @@ export async function fetchFromAPI(
   endpoint: string,
   options: FetchOptions = {}
 ): Promise<Response> {
-
-  const { method = 'GET', body, credentials, headers: customHeaders = {} } = options;
+  const {
+    method = 'GET',
+    body,
+    credentials,
+    headers: customHeaders = {},
+  } = options;
 
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
     Accept: 'application/json',
     ...customHeaders,
   };
+
+  console.log('API Endpoint hit:', endpoint);
 
   const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}${endpoint}`, {
     method,
@@ -38,6 +44,12 @@ export async function fetchFromAPI(
       errorMessage = errorJson.message || errorMessage;
     } catch {
       console.warn('Failed to parse error response as JSON');
+    }
+
+    if (res.status === 429) {
+      throw new Error(
+        'Too many attempts. Please wait 10 minutes before trying again.'
+      );
     }
 
     handleServerError('Error', errorMessage);
