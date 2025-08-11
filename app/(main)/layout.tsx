@@ -1,5 +1,6 @@
 import { AlertBanner } from '@/components/AlertBanner';
 import { AppSidebar } from '@/components/AppSidebar';
+import { MainDashboardGradient } from '@/components/BackgroundGradients';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
 import MobileNav from '@/components/layouts/MobileNav';
 import ProtectedLayout from '@/components/layouts/ProtectedLayout';
@@ -23,6 +24,7 @@ export default async function Layout({
   return (
     <SidebarProvider>
       <ProtectedLayout>
+        {/* <MainDashboardGradient/> */}
         <MobileNav/>
         <AppSidebar />
         <main className="w-full">

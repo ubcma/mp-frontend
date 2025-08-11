@@ -1,4 +1,5 @@
-import Image from "next/image";
+import { AuthPageGradient } from '@/components/BackgroundGradients';
+import Image from 'next/image';
 
 export default function Layout({
   children,
@@ -6,24 +7,15 @@ export default function Layout({
   children: React.ReactNode;
 }>) {
   return (
-    <div className="relative flex flex-row min-h-screen bg-ma-red dark:bg-background/20">
-      <div className="hidden fixed left-0 top-0 bottom-0 w-1/2 p-8 lg:flex flex-col justify-between">
-        <Image
-          src="/logos/logo_white.svg"
-          width={128}
-          height={128}
-          alt="UBC MA Logo"
-        />
-        <div>
-          <h2 className="font-medium text-md text-white">Membership Portal</h2>
-          <p className="text-xs text-white">
-            {"UBC's Only Marketing-Focused Club"}
-          </p>
-        </div>
-      </div>
+    <div className="flex items-center justify-center min-h-screen">
+      {/* Background Gradient */}
+      <AuthPageGradient/>
 
       {/* Right Content Panel */}
-      <div className="w-full lg:w-1/2 lg:ml-[50%] px-16 py-24 bg-white dark:bg-[#101010] lg:m-4 lg:rounded-lg shadow-[inset_4_4px_8px_rgba(0,0,0,0.25)]">
+      <div
+        className="w-full md:w-fit place-self-center flex flex-col justify-center items-center h-screen md:h-fit md:px-12 px-8 py-12 bg-background/60 bg-blend-hard-light backdrop-blur-xl md:border border-background/80 md:m-4 md:rounded-md
+      shadow-[inset_0px_0px_80px_20px_rgba(255,255,255,0.1)] dark:shadow-[inset_0px_0px_80px_20px_rgba(0,0,0,0.1)]"
+      >
         {children}
       </div>
     </div>

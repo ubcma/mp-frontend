@@ -1,36 +1,42 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# UBCMA Membership Portal
 
 ## Getting Started
 
-First, run the development server:
+1. Install dependencies and retrieve appropriate environment variables from our documentation archive
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
+pnpm install
 pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Run the backend repository, which should be hosted at [http://localhost:8080](http://localhost:8080).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+3. Open [http://localhost:3000](http://localhost:3000) in your browser. Happy coding!
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+--- 
 
-## Learn More
+## **Project Summary**
+The UBCMA Membership Portal is a centralized web application designed to streamline the membership experience for students affiliated with UBC's Marketing Association (UBCMA). It serves as the digital hub for club members, providing access to events, networking opportunities, job postings, and exclusive perks. The platform also empowers club executives with tools to manage events, track engagement, and oversee operations efficiently.
 
-To learn more about Next.js, take a look at the following resources:
+## **Core Objectives**
+- **Seamless Membership Management**: Create a secure and intuitive portal for students to manage their UBCMA membership.
+- **Exclusive Benefits**: Offer unique perks such as event access, discounts, and private job postings based on membership tiers (basic, member, admin).
+- **Admin Tools**: Provide club executives with dashboards to manage events, analyze revenue, and track member engagement.
+- **Community Building**: Foster a sense of belonging and connection among members through centralized access to resources and opportunities.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
-## Deploy on Vercel
+## **Technologies Used**
+- **Frontend**: React, Next.js, Tailwind CSS, ShadCN
+- **Backend**: Express, PostgreSQL, Redis
+- **Hosting**: Railway, Vercel
+- **Payments**: Stripe SDK
+- **Authentication**: Better Auth
+- **Project Management**: Linear
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+---
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## **About UBCMA**
+UBCMA is UBC's only marketing-focused club, offering students opportunities to connect, learn, and grow in the field of marketing. Traditionally, the club relied on third-party platforms like Showpass for event management, which had limited features. The UBCMA Membership Portal was developed to replace this process, reducing costs, streamlining workflows, and fostering a stronger community.
+
+Vist [ubcma.ca](https://ubcma.ca) for more details.

@@ -19,7 +19,7 @@ export const GoogleSignInButton = () => {
   };
 
   return (
-    <Button onClick={handleGoogleSignIn} disabled={isLoading} className='bg-background/20 text-foreground border-neutral-150 border hover:bg-foreground/10'>
+    <Button onClick={handleGoogleSignIn} disabled={isLoading} className='bg-background/80 dark:bg-input/30 text-foreground border-neutral-150 border hover:bg-background/50 dark:hover:bg-input/40'>
       {isLoading ? (
         <>
           <Spinner color="blue-500"/> 
