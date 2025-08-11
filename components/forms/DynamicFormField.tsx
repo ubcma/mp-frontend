@@ -43,7 +43,7 @@ const DynamicFormField: React.FC<DynamicFormFieldProps> = ({
     },
     handleChange: onChange,
     handleBlur: onBlur || (() => {}),
-  } as FieldApi<any, any, any, any, any, any, any, any, any, any, any, any, any, any, any, any, any, any, any>; // Type assertion
+  } as any; // Type assertion
 
   const renderField = () => {
     switch (question.type) {
