@@ -1,9 +1,10 @@
 'use client';
-import { useTransactionQuery } from '@/lib/queries/transactions';
-import { useUserQuery } from '@/lib/queries/user';
+
+import { useTransactionsQuery } from '@/lib/queries/transactions';
+import clsx from 'clsx';
 
 export default function AdminTransactionPage() {
-  const { data: transactions, isLoading, isError } = useTransactionQuery();
+  const { data: transactions, isLoading, isError } = useTransactionsQuery();
 
   if (isLoading) return <div>Loading transactions...</div>;
   if (isError || !transactions) return <div>Failed to load transactions.</div>;

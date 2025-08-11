@@ -12,19 +12,23 @@ type Transaction = {
   paidAt: string;
 };
 
-export function useTransactionQuery() {
-  return useQuery<Transaction[], Error>({
-    queryKey: ['transactions'], // plural for clarity and consistency
+import { fetchFromAPI } from '../httpHandlers';
+
+export function useTransactionsQuery() {
+  return useQuery<Transaction[]>({
+    queryKey: ['transactions'],
     queryFn: async () => {
-      const res = await fetch('/api/transactions'); // FIX: plural endpoint
+      const res = await fetchFromAPI('/api/transactions', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+      });
 
-      if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.error || 'Failed to fetch transactions');
-      }
+      const data = (await res.json()) as Transaction[];
 
-      const data = await res.json();
-      return data as Transaction[];
+      return data;
     },
     retry: 1,
     staleTime: 5 * 60 * 1000,
