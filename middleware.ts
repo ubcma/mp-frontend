@@ -41,8 +41,6 @@ export function middleware(request: NextRequest) {
       : 'membership-portal.session_token'
   )?.value;
 
-  console.log('Session cookie:', sessionCookie);
-
   const isAuthPage =
     pathname.startsWith('/sign-in') ||
     pathname.startsWith('/sign-up') ||

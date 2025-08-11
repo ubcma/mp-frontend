@@ -8,6 +8,7 @@ import {
   Home,
   LogOut,
   CalendarCog,
+  BadgeDollarSign,
 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
@@ -91,6 +92,12 @@ export function AppSidebar() {
       href: '/manage-members',
       icon: Users,
       label: 'Manage Members',
+      disabled: false,
+    },
+    {
+      href: '/admin-transactions',
+      icon: BadgeDollarSign,
+      label: 'Transactions',
       disabled: false,
     },
   ];
