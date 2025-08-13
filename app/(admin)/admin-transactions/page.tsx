@@ -10,7 +10,7 @@ export default function AdminTransactionPage() {
   if (isError || !transactions) return <div className="p-6 text-red-600">Failed to load transactions.</div>;
 
   return (
-    <div className="p-6">
+    <div>
       <div className="mb-6">
         <h1 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-rose-500 via-red-500 to-yellow-500">
           UBCMA Payment Dashboard

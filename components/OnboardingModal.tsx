@@ -447,7 +447,7 @@ export default function OnboardingModal() {
                                 <div>Loading</div>
                               </>
                             ) : (
-                              <div>Complete Profile</div>
+                              <div>Next Step</div>
                             )}
                           </Button>
                         </div>

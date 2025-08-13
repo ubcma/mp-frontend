@@ -10,9 +10,13 @@ import { getClientSecret } from '@/lib/queries/stripe';
 import Image from 'next/image';
 import { ChevronLeft } from 'lucide-react';
 import Link from 'next/link';
+import { useQueryClient } from '@tanstack/react-query';
 
 export default function PurchasePage() {
   const router = useRouter();
+  const queryClient = useQueryClient();
+
+  queryClient.invalidateQueries({ queryKey: ['user'] })
 
   const {
     data: user,

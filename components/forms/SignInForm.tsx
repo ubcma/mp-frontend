@@ -126,7 +126,7 @@ export default function SignInForm() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
             >
-              <AuthCardHeader heading="Welcome to your MA Portal" subheading="Enter your email to sign in" />
+              <AuthCardHeader heading="Welcome to the MA Portal" subheading="Enter your email to sign in" />
             </motion.div>
 
             <form
@@ -146,7 +146,7 @@ export default function SignInForm() {
                 <emailForm.Field
                   name="email"
                   validators={{
-                    onChange: ({ value }) =>
+                    onBlur: ({ value }) =>
                       !value
                         ? 'Email is required.'
                         : !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(
@@ -194,7 +194,7 @@ export default function SignInForm() {
             >
               <div className="flex items-center justify-between">
                 <hr className="w-full border-foreground/20" />
-                <span className="mx-2 text-foreground/40 font-light">OR</span>
+                <span className="mx-2 text-muted-foreground font-regular text-xs">OR</span>
                 <hr className="w-full border-foreground/20" />
               </div>
               <GoogleSignInButton />
@@ -345,10 +345,11 @@ export default function SignInForm() {
               transition={{ delay: 0.3 }}
             >
               <h1 className="font-normal text-sm">
-                Want to create a new account?{' '}
-                <Link href="/sign-up" className="text-ma-red font-semibold">
-                  Sign Up
-                </Link>
+                Or
+                <span onClick={() => setStep('password')} className="text-ma-red font-semibold cursor-pointer">
+                  {' '}click here{' '}
+                </span>
+                to continue with email
               </h1>
             </motion.div>
           </motion.div>
