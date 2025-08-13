@@ -26,8 +26,8 @@ export function HighlightCarousel({ cards }: HighlightCarouselProps) {
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-row justify-between items-center">
-        <h2 className="text-lg font-semibold text-muted-foreground">
+      <div className="flex flex-row justify-between items-end">
+        <h2 className="text-lg font-medium text-muted-foreground">
           The latest at MA
         </h2>
         <div className="flex gap-2">
