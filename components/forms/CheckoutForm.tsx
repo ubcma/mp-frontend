@@ -12,12 +12,17 @@ import { Lock, CreditCard, Zap, Check } from 'lucide-react';
 import { MEMBERSHIP_PRICE } from '@/lib/constants';
 import { Button } from '../ui/button';
 
-export default function CheckoutForm({ clientSecret }: { clientSecret: string }) {
+export default function CheckoutForm({
+  clientSecret,
+}: {
+  clientSecret: string;
+}) {
   const stripe = useStripe();
   const elements = useElements();
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
-  const [paymentRequest, setPaymentRequest] = useState<StripePaymentRequest | null>(null);
+  const [paymentRequest, setPaymentRequest] =
+    useState<StripePaymentRequest | null>(null);
 
   useEffect(() => {
     if (!stripe || !clientSecret) return;
@@ -42,16 +47,19 @@ export default function CheckoutForm({ clientSecret }: { clientSecret: string })
     if (!paymentRequest || !stripe || !clientSecret) return;
 
     paymentRequest.on('paymentmethod', async (ev) => {
-      const { error } = await stripe.confirmCardPayment(clientSecret, {
-        payment_method: ev.paymentMethod.id,
-      });
+      const { paymentIntent, error } = await stripe.confirmCardPayment(
+        clientSecret,
+        {
+          payment_method: ev.paymentMethod.id,
+        }
+      );
 
       if (error) {
         ev.complete('fail');
         console.error('Payment failed:', error);
       } else {
         ev.complete('success');
-        window.location.href = '/success';
+        window.location.href = `/success?payment_intent=${paymentIntent.id}&redirect_status=${paymentIntent.status}`;
       }
     });
   }, [paymentRequest, stripe, clientSecret]);
@@ -80,16 +88,20 @@ export default function CheckoutForm({ clientSecret }: { clientSecret: string })
       className="w-full space-y-6 rounded-2xl bg-white p-6 shadow-xl border border-neutral-200"
     >
       <div className="space-y-4 bg-rose-50 border border-rose-200 rounded-xl p-5 shadow-md hover:shadow-lg transition-shadow">
-        <h2 className="text-2xl font-bold text-neutral-900">UBCMA Annual Membership</h2>
+        <h2 className="text-2xl font-bold text-neutral-900">
+          UBCMA Annual Membership
+        </h2>
 
         <div className="flex items-center gap-2 text-ma-red">
-          <span className="text-xl font-semibold">${(MEMBERSHIP_PRICE/100).toFixed(2)} CAD</span>
-          <span className="text-xs rounded-full border border-ma-red bg-ma-red/10 p-1 px-2">Valid until April 2026</span>
+          <span className="text-xl font-semibold">
+            ${(MEMBERSHIP_PRICE / 100).toFixed(2)} CAD
+          </span>
+          <span className="text-xs rounded-full border border-ma-red bg-ma-red/10 p-1 px-2">
+            Valid until April 2026
+          </span>
         </div>
 
-        <p className="text-sm text-neutral-800">
-          Your membership includes:
-        </p>
+        <p className="text-sm text-neutral-800">Your membership includes:</p>
 
         <ul className="space-y-2">
           {[
@@ -97,7 +109,10 @@ export default function CheckoutForm({ clientSecret }: { clientSecret: string })
             'A curated marketing job board',
             'Exclusive networking opportunities with professionals & alumni',
           ].map((item, idx) => (
-            <li key={idx} className="flex items-start gap-2 text-sm text-neutral-800">
+            <li
+              key={idx}
+              className="flex items-start gap-2 text-sm text-neutral-800"
+            >
               <Check className="w-4 h-4 text-ma-red mt-0.5" />
               <span>{item}</span>
             </li>
@@ -105,18 +120,20 @@ export default function CheckoutForm({ clientSecret }: { clientSecret: string })
         </ul>
       </div>
 
-
       {/* Payment Options */}
       <div className="space-y-4">
         <div className="flex items-center gap-2">
           <Zap className="w-4 h-4 text-green-600" />
-          <h4 className="text-sm font-medium text-neutral-800">Automatic Payment Methods</h4>
+          <h4 className="text-sm font-medium text-neutral-800">
+            Automatic Payment Methods
+          </h4>
         </div>
         {paymentRequest ? (
           <PaymentRequestButtonElement options={{ paymentRequest }} />
         ) : (
           <p className="text-xs text-neutral-500">
-            Automatic Payment Methods are not available on this device or browser.
+            Automatic Payment Methods are not available on this device or
+            browser.
           </p>
         )}
       </div>
@@ -148,8 +165,7 @@ export default function CheckoutForm({ clientSecret }: { clientSecret: string })
         type="submit"
         disabled={!stripe || isLoading}
         className={`w-full flex items-center justify-center gap-2 rounded-md px-4 py-2 font-semibold text-white transition duration-200 ${
-          isLoading || !stripe
-            && 'bg-neutral-300 cursor-not-allowed'
+          isLoading || (!stripe && 'bg-neutral-300 cursor-not-allowed')
         }`}
         variant="ma"
       >
@@ -159,7 +175,7 @@ export default function CheckoutForm({ clientSecret }: { clientSecret: string })
             Processing...
           </>
         ) : (
-          <>Pay ${(MEMBERSHIP_PRICE/100).toFixed(2)}</>
+          <>Pay ${(MEMBERSHIP_PRICE / 100).toFixed(2)}</>
         )}
       </Button>
 
