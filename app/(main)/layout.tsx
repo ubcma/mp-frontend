@@ -27,7 +27,7 @@ export default async function Layout({
         {/* <MainDashboardGradient/> */}
         <MobileNav/>
         <AppSidebar />
-        <main className="w-full">
+        <main className="flex-1 min-w-0">
           <div className="m-6 lg:m-12 mt-24">
             {showBanner ? (
               <div className="mb-8">

@@ -21,8 +21,8 @@ export function EventList() {
   };
 
   const itemVariants = {
-    hidden: { 
-      opacity: 0, 
+    hidden: {
+      opacity: 0,
       y: 20,
       scale: 0.95,
     },
@@ -47,8 +47,8 @@ export function EventList() {
   };
 
   const noResultsVariants = {
-    hidden: { 
-      opacity: 0, 
+    hidden: {
+      opacity: 0,
       y: 30,
       scale: 0.9,
     },
@@ -67,7 +67,7 @@ export function EventList() {
 
   if (isLoading) {
     return (
-      <motion.div 
+      <motion.div
         className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
         variants={containerVariants}
         initial="hidden"
@@ -84,7 +84,7 @@ export function EventList() {
 
   if (filteredEvents?.length === 0) {
     return (
-      <motion.div 
+      <motion.div
         className="flex flex-col justify-center items-center w-full h-[50vh] text-center"
         variants={noResultsVariants}
         initial="hidden"
@@ -96,55 +96,57 @@ export function EventList() {
           className="w-24 h-24 mb-4"
           initial={{ scale: 0, rotate: -10 }}
           animate={{ scale: 1, rotate: 0 }}
-          transition={{ 
+          transition={{
             type: 'spring',
             stiffness: 300,
             damping: 20,
             delay: 0.3,
           }}
         />
-        <motion.h3 
-          className='text-lg font-semibold'
+        <motion.h3
+          className="text-lg font-semibold"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
         >
           No events found.
         </motion.h3>
-        <motion.p 
-          className='text-muted-foreground text-sm max-w-96'
+        <motion.p
+          className="text-muted-foreground text-sm max-w-96"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
         >
-          {"We couldn't find anything matching your search criteria. Try adjusting your filters or search terms"}
+          {
+            "We couldn't find anything matching your search criteria. Try adjusting your filters or search terms"
+          }
         </motion.p>
       </motion.div>
     );
   }
 
-return (
-  <motion.div 
-    className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 w-full"
-    variants={containerVariants}
-    initial="hidden"
-    animate="visible"
-    layout // Add this to the container
-  >
-    <AnimatePresence>
-      {filteredEvents?.map((event: EventDetails) => (
-        <motion.div
-          key={event.id}
-          variants={itemVariants}
-          layout // This helps with repositioning
-          initial="hidden"
-          animate="visible"
-          exit="exit"
-        >
-          <EventCard event={event} />
-        </motion.div>
-      ))}
-    </AnimatePresence>
-  </motion.div>
-);
+  return (
+    <motion.div
+      key="event-list"
+      className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 w-full"
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
+    >
+      <AnimatePresence>
+        {filteredEvents?.map((event: EventDetails) => (
+          <motion.div
+            key={event.id}
+            variants={itemVariants}
+            layout
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+          >
+            <EventCard event={event} />
+          </motion.div>
+        ))}
+      </AnimatePresence>
+    </motion.div>
+  );
 }

@@ -202,3 +202,24 @@
     radial-gradient(circle at 0% 120%, #f23955 0%, transparent 50%),
     #0a0a0a;
 }
+
+/* Chrome, Safari, Edge */
+.scrollbar-styled::-webkit-scrollbar {
+  height: 8px; /* horizontal scrollbar height */
+}
+.scrollbar-styled::-webkit-scrollbar-track {
+  background: transparent;
+}
+.scrollbar-styled::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.3);
+  border-radius: 4px;
+}
+.scrollbar-styled::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+/* Firefox */
+.scrollbar-styled {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+}

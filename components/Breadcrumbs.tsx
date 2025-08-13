@@ -52,7 +52,7 @@ export function Breadcrumbs() {
       });
 
   return (
-    <Breadcrumb className="mb-8 opacity-0 md:opacity-100">
+    <Breadcrumb className="mb-8 hidden md:block">
       <BreadcrumbList>
         <BreadcrumbItem>
           {isAtHomePage ? (

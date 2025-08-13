@@ -39,10 +39,10 @@ export function AppSidebar() {
   const {
     state,
     // open,
-    // setOpen,
+    setOpen,
     // openMobile,
-    // setOpenMobile,
-    // isMobile,
+    setOpenMobile,
+    isMobile,
     // toggleSidebar,
   } = useSidebar();
 
@@ -102,8 +102,6 @@ export function AppSidebar() {
     },
   ];
 
-  const isMobile = useIsMobile();
-
   const handleSignOut = async () => {
     try {
       setIsSignOutLoading(true);
@@ -124,7 +122,8 @@ export function AppSidebar() {
             width={128}
             height={96}
             alt="UBCMA Logo"
-            className={`w-fit ${state === 'collapsed' ? 'h-8' : 'h-[64px] mr-2'}`}
+            onClick={() => setOpenMobile(false)}
+            className={`w-fit ${state === 'collapsed' && !isMobile ? 'h-8' : 'h-[64px] mr-2'}`}
           />
           {state === 'expanded' && (
             <div className="text-[#f03050] text-nowrap">
@@ -149,13 +148,12 @@ export function AppSidebar() {
             <Link
               href="/profile"
               className={`flex items-center gap-3 transition-all duration-300 ease-in-out hover:opacity-70 ${
-                state === 'collapsed' ? 'p-0' : 'p-2'
+                state === 'collapsed' && !isMobile ? 'p-0' : 'p-2'
               }`}
-              prefetch={true}
             >
               <Avatar
                 className={`rounded-md ${
-                  state === 'collapsed' ? 'h-8 w-8' : 'h-10 w-10'
+                  state === 'collapsed' && !isMobile ? 'h-8 w-8' : 'h-10 w-10'
                 }`}
               >
                 {user?.avatar ? (
@@ -192,6 +190,7 @@ export function AppSidebar() {
                     <Link
                       href={item.href}
                       aria-disabled={item.disabled}
+                      onClick={() => setOpenMobile(false)}
                       {...(item.href.startsWith('http')
                         ? { target: '_blank', rel: 'noopener noreferrer' }
                         : {})}
@@ -222,6 +221,7 @@ export function AppSidebar() {
                       <Link
                         href={item.href}
                         aria-disabled={item.disabled}
+                        onClick={() => setOpenMobile(false)}
                         {...(item.href.startsWith('http')
                           ? { target: '_blank', rel: 'noopener noreferrer' }
                           : {})}
