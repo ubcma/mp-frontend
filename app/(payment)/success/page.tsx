@@ -24,25 +24,30 @@ export default function SuccessPage() {
 
     if (paymentIntent) {
       setPaymentIntentId(paymentIntent);
+    } else {
+      router.push('/home')
     }
 
     if (redirectStatus === 'succeeded') {
       window.history.replaceState({}, '', window.location.pathname);
-      setShowConfetti(true);
     }
   }, []);
 
-  const { data, isLoading, isError, error } = verifyUserPayment({ paymentIntentId: paymentIntentId!, enabled: !!paymentIntentId, })
+  const { data, isLoading, isError, error } = verifyUserPayment({
+    paymentIntentId: paymentIntentId!,
+    enabled: !!paymentIntentId,
+  });
 
   useEffect(() => {
-    if (!isLoading && !data) {
-      router.push('/payment/not-found');
+    if (data?.verified === true) {
+      setShowConfetti(true);
+    } else if (data?.verified === false) {
+      router.push('/payment/not-found')
     }
-  }, [isLoading, data, router]);
+  }, [data]);
 
   return (
     <div className="h-screen flex flex-col items-center justify-center relative">
-
       {/* Confetti Effect */}
       {data?.verified && showConfetti && (
         <div className="fixed inset-0 z-50 pointer-events-none">
@@ -70,51 +75,52 @@ export default function SuccessPage() {
         </div>
       )}
 
-      {(data?.verified || data?.paymentIntent?.status === 'succeeded') && !isLoading && (
-        <div className="mx-4 md:w-2xl flex flex-col items-center place-items-center">
-          <Image
-            src="/logos/MA_mascot.png"
-            alt="UBCMA Mascot"
-            className='self-center place-self-center justify-self-center -mb-16 z-10'
-            width={256}
-            height={256}
-          />
-          <div className="flex flex-col items-center bg-rose-50 border border-rose-200 rounded-2xl shadow-lg px-4 p-8 md:p-10 pb-6 text-center space-y-4 animate-fade-in">
-            <h2 className="text-4xl font-bold text-black">
-              🎉 Payment successful!
-            </h2>
+      {(data?.verified || data?.paymentIntent?.status === 'succeeded') &&
+        !isLoading && (
+          <div className="mx-4 md:w-2xl flex flex-col items-center place-items-center">
+            <Image
+              src="/logos/MA_mascot.png"
+              alt="UBCMA Mascot"
+              className="self-center place-self-center justify-self-center -mb-16 z-10"
+              width={256}
+              height={256}
+            />
+            <div className="flex flex-col items-center bg-rose-50 border border-rose-200 rounded-2xl shadow-lg px-4 p-8 md:p-10 text-center space-y-4 animate-fade-in">
+              <h2 className="text-4xl font-bold text-black">
+                🎉 Payment successful!
+              </h2>
 
+              <p className="text-xl text-black/80 font-semibold">
+                Welcome to <span className="text-maRed">UBCMA</span> — you're
+                all set!
+              </p>
 
-            <p className="text-xl text-black/80 font-semibold">
-              Welcome to <span className="text-maRed">UBCMA</span> — you're all
-              set!
-            </p>
-
-            <p className="text-base text-black/80">
-              You now have full access to events, job postings, and exclusive
-              member perks.
-            </p>
-            <Link href="/home">
-              <Button variant="ma" size="lg">
-                {' '}
-                Return to Home{' '}
-              </Button>
-            </Link>
+              <p className="text-base text-black/80">
+                You now have full access to events, job postings, and exclusive
+                member perks.
+              </p>
+              <Link href="/home">
+                <Button variant="ma" size="lg">
+                  Get started!
+                </Button>
+              </Link>
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
       {/* NOT VERIFIED */}
       {data && !data.verified && (
         <div className="text-center p-8 text-red-600">
-          ⚠️ Your payment could not be verified. Please try again or contact support.
+          ⚠️ Your payment could not be verified. Please try again or contact
+          support.
         </div>
       )}
 
       {/* ERROR */}
       {isError && (
         <div className="text-center p-8 text-red-600">
-          ⚠️ Payment confirmed but status not updated yet. Please refresh or contact support.
+          ⚠️ Payment confirmed but status not updated yet. Please refresh or
+          contact support.
           <div>
             Error: {error.name} {error.message}
           </div>

@@ -124,8 +124,8 @@ export default function Home() {
 
         {/* Action Buttons */}
         <motion.div variants={itemVariants} className="space-y-4">
-          <h2 className="text-lg font-semibold text-muted-foreground">
-            Get started
+          <h2 className="text-lg font-medium text-muted-foreground">
+            Explore the portal
           </h2>
           <ActionButtons />
         </motion.div>
