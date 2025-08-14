@@ -1,3 +1,5 @@
+export const MEMBERSHIP_PRICE = 1060; // in cents
+
 export const INTEREST_OPTIONS = [
   'Digital Marketing',
   'Brand Management',

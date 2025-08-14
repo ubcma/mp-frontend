@@ -1,10 +1,11 @@
 import { AlertBanner } from '@/components/AlertBanner';
 import { AppSidebar } from '@/components/AppSidebar';
+import { MainDashboardGradient } from '@/components/BackgroundGradients';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
 import MobileNav from '@/components/layouts/MobileNav';
 import ProtectedLayout from '@/components/layouts/ProtectedLayout';
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
-import { getUserRole } from '@/lib/queries/userRole';
+import { getUserRole } from '@/lib/queries/server/userRole';
 import { PanelLeftIcon } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -23,9 +24,10 @@ export default async function Layout({
   return (
     <SidebarProvider>
       <ProtectedLayout>
+        {/* <MainDashboardGradient/> */}
         <MobileNav/>
         <AppSidebar />
-        <main className="w-full">
+        <main className="flex-1 min-w-0">
           <div className="m-6 lg:m-12 mt-24">
             {showBanner ? (
               <div className="mb-8">
@@ -33,7 +35,7 @@ export default async function Layout({
                   <div>
                     Looks like you're not a member yet!{' '}
                     <a
-                      href="/membership"
+                      href="/purchase-membership"
                       className="underline underline-offset-2 font-semibold hover:opacity-80 transition"
                     >
                       Purchase a membership

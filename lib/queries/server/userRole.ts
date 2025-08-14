@@ -1,7 +1,7 @@
 import { cookies } from 'next/headers';
-import { fetchFromAPI } from '../httpHandlers';
-import { UserProfileData } from '../types';
-import { handleServerError } from '../error/handleServer';
+import { fetchFromAPI } from '../../httpHandlers';
+import { UserProfileData } from '../../types';
+import { handleServerError } from '../../error/handleServer';
 
 export async function getUserRole() {
   try {

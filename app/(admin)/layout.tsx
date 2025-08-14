@@ -3,7 +3,7 @@ import { Breadcrumbs } from '@/components/Breadcrumbs';
 import MobileNav from '@/components/layouts/MobileNav';
 import ProtectedLayout from '@/components/layouts/ProtectedLayout';
 import { SidebarProvider } from '@/components/ui/sidebar';
-import { getUserRole } from '@/lib/queries/userRole';
+import { getUserRole } from '@/lib/queries/server/userRole';
 import { redirect } from 'next/navigation';
 
 export const dynamic = 'force-dynamic';

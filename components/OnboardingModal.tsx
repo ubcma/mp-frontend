@@ -362,7 +362,7 @@ export default function OnboardingModal() {
                                   .map((allergy: string) => (
                                     <div
                                       key={allergy}
-                                      className="flex items-center gap-1 px-3 py-1 bg-gray-200 rounded-full text-sm"
+                                      className="flex items-center gap-1 px-3 py-1 bg-neutral-200 rounded-full text-sm"
                                     >
                                       {allergy}
                                       <button
@@ -447,7 +447,7 @@ export default function OnboardingModal() {
                                 <div>Loading</div>
                               </>
                             ) : (
-                              <div>Complete Profile</div>
+                              <div>Next Step</div>
                             )}
                           </Button>
                         </div>
@@ -457,6 +457,49 @@ export default function OnboardingModal() {
                 )}
 
                 {step === 5 && (
+                  <motion.div
+                    key="step5"
+                    initial={{ opacity: 0, x: 50 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -50 }}
+                    transition={{ duration: 0.3 }}
+                    className="space-y-6 w-full text-center"
+                  >
+                    <p className="text-sm text-muted-foreground max-w-lg mx-auto">
+                      Unlock the full UBCMA experience! Gain access to members-only events, hands-on workshops, and a regularly updated marketing job board tailored to your career goals.
+                    </p>
+
+                    <div className="text-left text-sm text-neutral-700 bg-rose-50 border border-rose-200 rounded-xl p-4 space-y-2 max-w-lg mx-auto">
+                      <h3 className="text-base font-semibold text-neutral-900 mb-1">🎁 Member Perks</h3>
+                      <ul className="list-disc pl-5 space-y-1">
+                        <li>Unlimited access to all UBCMA events</li>
+                        <li>A curated marketing job board</li>
+                        <li>Exclusive networking with professionals & alumni</li>
+                      </ul>
+                    </div>
+
+                    <div className="flex justify-center gap-4 mt-4">
+                      <Button
+                        variant="outline"
+                        onClick={() => setStep((s) => s + 1)}
+                      >
+                        Continue without membership
+                      </Button>
+
+                      <Button
+                        className="bg-ma-red text-white font-semibold"
+                        onClick={() => {
+                          window.location.href = '/purchase-membership';
+                        }}
+                      >
+                        Purchase Membership
+                      </Button>
+                    </div>
+                  </motion.div>
+                )}
+
+
+                {step === 6 && (
                   <motion.div
                     key="step5"
                     initial={{ opacity: 0, x: 50 }}

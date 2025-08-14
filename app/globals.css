@@ -70,7 +70,7 @@
   --chart-3: oklch(0.398 0.07 227.392);
   --chart-4: oklch(0.828 0.189 84.429);
   --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.985 0 0);
+  --sidebar: oklch(99% 0 0 / 0.95);
   --sidebar-foreground: oklch(0.145 0 0);
   --sidebar-primary: oklch(0.205 0 0);
   --sidebar-primary-foreground: oklch(0.985 0 0);
@@ -81,7 +81,7 @@
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
+  --background: #0a0a0a;
   --foreground: oklch(0.985 0 0);
   --card: oklch(0.205 0 0);
   --card-foreground: oklch(0.985 0 0);
@@ -143,4 +143,83 @@
     --chart-4: oklch(0.627 0.265 303.9);
     --chart-5: oklch(0.645 0.246 16.439);
   }
+}
+
+@layer utilities {
+  .touch-hitbox {
+    position: relative;
+  }
+  
+  .touch-hitbox::before {
+    content: "";
+    position: absolute;
+    display: block;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    height: 100%;
+    min-height: 44px;
+    min-width: 44px;
+    z-index: 9999;
+  }
+}
+
+.bg-auth-background {
+    background-size: 200% 200%;
+    background: 
+    radial-gradient(circle at 20% 80%, #fff 0%, transparent 50%),
+    radial-gradient(circle at 140% 0%, #f23955 0%, transparent 50%),
+    radial-gradient(circle at 40% 40%, #f1bcce 0%, transparent 50%),
+    radial-gradient(circle at 0% 120%, #f23955 0%, transparent 50%),
+    #fff;
+}
+
+.dark .bg-auth-background {
+    background: 
+    radial-gradient(circle at 20% 80%, #0a0a0a 0%, transparent 50%),
+    radial-gradient(circle at 140% 0%, #f23955 0%, transparent 50%),
+    radial-gradient(circle at 40% 40%, #1d010a 0%, transparent 50%),
+    radial-gradient(circle at 0% 120%, #f23955 0%, transparent 50%),
+    #0a0a0a;
+}
+
+.bg-main-background {
+    background-size: 200% 200%;
+    background: 
+    radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.03) 0%, transparent 50%),
+    radial-gradient(circle at 140% 0%, rgba(242, 57, 85, 0.03) 0%, transparent 50%),
+    radial-gradient(circle at 40% 40%, rgba(241, 188, 206, 0.03) 0%, transparent 50%),
+    radial-gradient(circle at 0% 120%, rgba(242, 57, 85, 0.03) 0%, transparent 50%),
+    #fff;
+}
+
+.dark .bg-main-background {
+    background: 
+    radial-gradient(circle at 20% 80%, #0a0a0a 0%, transparent 50%),
+    radial-gradient(circle at 140% 0%, #f23955 0%, transparent 50%),
+    radial-gradient(circle at 40% 40%, #1d010a 0%, transparent 50%),
+    radial-gradient(circle at 0% 120%, #f23955 0%, transparent 50%),
+    #0a0a0a;
+}
+
+/* Chrome, Safari, Edge */
+.scrollbar-styled::-webkit-scrollbar {
+  height: 8px; /* horizontal scrollbar height */
+}
+.scrollbar-styled::-webkit-scrollbar-track {
+  background: transparent;
+}
+.scrollbar-styled::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.3);
+  border-radius: 4px;
+}
+.scrollbar-styled::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+/* Firefox */
+.scrollbar-styled {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
 }

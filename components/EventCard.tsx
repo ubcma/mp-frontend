@@ -35,7 +35,7 @@ export function EventCard({ event }: { event: EventDetails }) {
       >
         <CardContent className="p-0 flex-1 flex flex-col relative">
           <div className="relative h-96">
-            <div className="absolute top-4 left-4 bg-white p-[2px] pb-1 rounded-[12px] place-items-center w-16 h-fit z-10">
+            <div className="absolute flex flex-col items-center top-4 left-4 bg-white p-0.5 pb-1 rounded-[12px] w-16 h-fit z-10">
               <div className="rounded-t-[10px] bg-ma-red px-2 py-1 text-xs text-center uppercase font-medium text-white w-full">
                 {month}
               </div>
