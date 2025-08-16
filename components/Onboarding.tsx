@@ -31,6 +31,7 @@ import {
   Vegan,
 } from 'lucide-react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 
 const steps = [
   {
@@ -69,6 +70,7 @@ export default function OnboardingModal() {
   const [showConfetti, setShowConfetti] = useState(false);
   const [step, setStep] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
 
   const { width, height } = useWindowSize();
 
@@ -134,7 +136,6 @@ export default function OnboardingModal() {
         method: 'POST',
         body: JSON.stringify(value),
       });
-      sessionStorage.removeItem('onboarding_skipped');
       setStep(5);
       scrollToStep(5);
     },
@@ -202,9 +203,8 @@ export default function OnboardingModal() {
           <Button
             variant="ghost"
             onClick={() => {
-              // Set session flag to indicate onboarding was skipped
-              sessionStorage.setItem('onboarding_skipped', 'true');
-              window.location.href = '/home';
+              document.cookie = "onboarding_skipped=true; path=/; max-age=86400";
+              router.push('/home')
             }}
             className="text-white hover:text-white hover:bg-white/10"
           >

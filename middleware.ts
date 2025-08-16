@@ -1,13 +1,17 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import { getOnboardingStatus } from './lib/queries/onboardingStatus';
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const accessCode = request.cookies.get('access_code')?.value;
   const sessionCookie = request.cookies.get(
     'membership-portal.session_token'
   )?.value;
   const expectedCode = process.env.ACCESS_CODE;
   const { pathname } = request.nextUrl;
+
+  const skipOnboarding = request.cookies.get('onboarding_skipped')?.value ?? '';
+  const onboardingComplete = await getOnboardingStatus();
 
   const allowlist = [
     '/maintenance',
@@ -44,7 +48,12 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/sign-in', request.url));
   }
 
+  if (!onboardingComplete && pathname !== '/onboarding' && !skipOnboarding) {
+    return NextResponse.redirect(new URL('/onboarding', request.url));
+  }
+
   if (pathname === '/') {
+    console.log("TEST")
     return NextResponse.redirect(new URL('/home', request.url));
   }
 
