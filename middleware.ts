@@ -10,7 +10,18 @@ export async function middleware(request: NextRequest) {
   const expectedCode = process.env.ACCESS_CODE;
   const { pathname } = request.nextUrl;
 
-  const skipOnboarding = request.cookies.get('onboarding_skipped')?.value ?? '';
+  let skipOnboarding = request.cookies.get('onboarding_skipped')?.value;
+
+  if (!skipOnboarding) {
+    const response = NextResponse.next();
+    response.cookies.set('onboarding_skipped', 'false', {
+      path: '/',
+      maxAge: 60 * 60 * 24 * 7,
+    });
+    skipOnboarding = 'false'
+    return response;
+  }
+
   const onboardingComplete = await getOnboardingStatus();
 
   const allowlist = [
@@ -48,12 +59,16 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/sign-in', request.url));
   }
 
-  if (!onboardingComplete && pathname !== '/onboarding' && !skipOnboarding) {
+  if (
+    !onboardingComplete &&
+    pathname !== '/onboarding' &&
+    skipOnboarding === 'false'
+  ) {
     return NextResponse.redirect(new URL('/onboarding', request.url));
   }
 
   if (pathname === '/') {
-    console.log("TEST")
+    console.log('TEST');
     return NextResponse.redirect(new URL('/home', request.url));
   }
 
