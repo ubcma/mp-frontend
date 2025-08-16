@@ -3,26 +3,7 @@ import type { NextRequest } from 'next/server';
 import { getOnboardingStatus } from './lib/queries/onboardingStatus';
 
 export async function middleware(request: NextRequest) {
-  const accessCode = request.cookies.get('access_code')?.value;
-  const sessionCookie = request.cookies.get(
-    'membership-portal.session_token'
-  )?.value;
-  const expectedCode = process.env.ACCESS_CODE;
-  const { pathname } = request.nextUrl;
-
-  let skipOnboarding = request.cookies.get('onboarding_skipped')?.value;
-
-  if (!skipOnboarding) {
-    const response = NextResponse.next();
-    response.cookies.set('onboarding_skipped', 'false', {
-      path: '/',
-      maxAge: 60 * 60 * 24 * 7,
-    });
-    skipOnboarding = 'false'
-    return response;
-  }
-
-  const onboardingComplete = await getOnboardingStatus();
+    const { pathname } = request.nextUrl;
 
   const allowlist = [
     '/maintenance',
@@ -41,6 +22,30 @@ export async function middleware(request: NextRequest) {
 
   if (isAllowlisted) {
     return NextResponse.next();
+  }
+
+  const accessCode = request.cookies.get('access_code')?.value;
+  const sessionCookie = request.cookies.get(
+    'membership-portal.session_token'
+  )?.value;
+  const expectedCode = process.env.ACCESS_CODE;
+
+  let skipOnboarding = request.cookies.get('onboarding_skipped')?.value;
+
+  if (!skipOnboarding) {
+    const response = NextResponse.next();
+    response.cookies.set('onboarding_skipped', 'false', {
+      path: '/',
+      maxAge: 60 * 60 * 24 * 7,
+    });
+    skipOnboarding = 'false'
+    return response;
+  }
+
+  let onboardingComplete: boolean | undefined = false;
+
+  if (sessionCookie) {
+    onboardingComplete = await getOnboardingStatus();
   }
 
   const isAuthPage =
