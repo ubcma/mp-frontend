@@ -32,9 +32,9 @@ export function getClientSecret({ body }: { body: Record<string, any> }) {
 
       const user = (await userRoleResponse.json()) as UserProfileData;
 
-      if (user.role === 'Member') {
-        throw new Error('User is already a member');
-      }
+      // if (user.role === 'Member') {
+      //   throw new Error('User is already a member');
+      // }
 
       const res = await fetchFromAPI('/api/stripe/create-payment-intent', {
         method: 'POST',

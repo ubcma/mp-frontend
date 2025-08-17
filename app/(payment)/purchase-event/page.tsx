@@ -2,8 +2,8 @@
 
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements } from '@stripe/react-stripe-js';
-import CheckoutForm from '@/components/forms/CheckoutForm';
-import { MEMBERSHIP_PRICE } from '@/lib/constants';
+import CheckoutEventForm from '@/components/forms/CheckoutEventForm';
+import { MEMBERSHIP_PRICE } from '@/lib/constants'
 import { useUserQuery } from '@/lib/queries/user';
 import { useRouter } from 'next/navigation';
 import { getClientSecret } from '@/lib/queries/stripe';
@@ -18,21 +18,12 @@ export default function PurchaseEventPage() {
   const router = useRouter();
   const queryClient = useQueryClient();
 
-  queryClient.invalidateQueries({ queryKey: ['user'] });
-
-  const {
-    data: user,
-    isLoading: isUserLoading,
-    isError: isUserError,
-  } = useUserQuery();
-
-  const userRole = user?.role;
-
   useEffect(() => {
-    if (userRole === 'Member' || userRole === 'Admin') {
-      router.push('/home');
-    }
-  }, [userRole, router]);
+    queryClient.invalidateQueries({ queryKey: ['user'] });
+  }, [queryClient]);
+
+  const { data: user, isLoading: isUserLoading } = useUserQuery();
+  const userRole = user?.role;
 
   const key = process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY!;
   const stripePromise = loadStripe(key);
@@ -40,31 +31,20 @@ export default function PurchaseEventPage() {
   const {
     data: clientSecretData,
     isLoading: isClientSecretLoading,
-    isError: isClientSecretError,
   } = getClientSecret({
     body: {
-      purchaseType: 'membership',
-      amount: MEMBERSHIP_PRICE,
+      purchaseType: 'event',
+      amount: 10000,
       currency: 'cad',
+      eventId: 21
     },
   });
 
   const clientSecret = clientSecretData?.clientSecret;
 
-  if (isUserLoading || userRole !== 'Basic') {
-    return (
-      <div className="min-h-screen flex flex-col gap-2 items-center justify-center">
-        <Spinner />
-        <p className="text-center text-muted-foreground">
-          Checking your membership status…
-        </p>
-      </div>
-    );
-  }
-
   if (isClientSecretLoading || !stripePromise || !clientSecret) {
     return (
-      <div className="min-h-screen flex flex-col gap-2  items-center justify-center">
+      <div className="min-h-screen flex flex-col gap-2 items-center justify-center">
         <Spinner />
         <p className="text-center text-muted-foreground">
           Loading payment form…
@@ -84,14 +64,8 @@ export default function PurchaseEventPage() {
       </Link>
       <Elements stripe={stripePromise} options={{ clientSecret }}>
         <div className="w-full flex flex-col items-center max-w-2xl space-y-10 px-6">
-          <Image
-            src="/logos/logo_red.svg"
-            alt="UBCMA Logo"
-            height={128}
-            width={128}
-          />
-
-          <CheckoutForm clientSecret={clientSecret} />
+          <Image src="/logos/logo_red.svg" alt="UBCMA Logo" height={128} width={128} />
+          <CheckoutEventForm clientSecret={clientSecret} />
         </div>
       </Elements>
     </div>

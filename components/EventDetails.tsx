@@ -3,28 +3,19 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import { format } from 'date-fns';
-import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { Calendar, MapPin, Shirt } from 'lucide-react';
 import { EventDetails, EventQuestion } from '@/lib/types';
-import DynamicFormField from '@/components/forms/DynamicFormField'; // Adjust path as needed
-import TagPill from '@/components/TagPill'; // Adjust the import path as needed
+import DynamicFormField from '@/components/forms/DynamicFormField';
+import TagPill from '@/components/TagPill';
+import { useRouter } from 'next/navigation';
 
 interface EventDetailsProps {
   event: EventDetails;
   questions: EventQuestion[];
-  memberPrice?: number; // Optional member pricing
-  dressCode?: string; // Optional dress code
+  memberPrice?: number;
+  dressCode?: string;
 }
 
 const RenderEventDetails: React.FC<EventDetailsProps> = ({
@@ -35,6 +26,7 @@ const RenderEventDetails: React.FC<EventDetailsProps> = ({
 }) => {
   const [responses, setResponses] = useState<{ [key: number]: string }>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const router = useRouter();
 
   const handleChange = (questionId: number, value: string) => {
     setResponses((prev) => ({ ...prev, [questionId]: value }));
@@ -42,18 +34,9 @@ const RenderEventDetails: React.FC<EventDetailsProps> = ({
 
   const isFormValid = questions.every((q) => {
     if (!q.isRequired) return true;
-
     const response = responses[q.id];
-
-    // Handle different response types
-    if (Array.isArray(response)) {
-      return response.length > 0;
-    }
-
-    if (typeof response === 'string') {
-      return response.trim() !== '';
-    }
-
+    if (Array.isArray(response)) return response.length > 0;
+    if (typeof response === 'string') return response.trim() !== '';
     return response !== null && response !== undefined && response !== '';
   });
 
@@ -63,30 +46,23 @@ const RenderEventDetails: React.FC<EventDetailsProps> = ({
 
     setIsSubmitting(true);
 
-    const dummyStripeData = {
-      checkoutUrl: 'https://dummy.stripe.com/checkout/session',
-      checkoutSessionId: 'dummy_session_id',
-    };
-
-    console.log('Signup Details:', {
-      responses,
-      stripe: dummyStripeData,
-    });
-
-    setIsSubmitting(false);
+    // Just redirect to another page — pass event ID or anything needed
+    router.push(`/purchase-event?eventId=${event.id}`);
   };
 
-  // Format the event date range
   const formatEventDate = () => {
     const startDate = new Date(event.startsAt);
     const endDate = new Date(event.endsAt);
-
-    // If same day, show date with time range
     if (startDate.toDateString() === endDate.toDateString()) {
-      return `${format(startDate, 'EEEE, MMMM d')} @ ${format(startDate, 'h:mm a')} - ${format(endDate, 'h:mm a')}`;
+      return `${format(startDate, 'EEEE, MMMM d')} @ ${format(
+        startDate,
+        'h:mm a'
+      )} - ${format(endDate, 'h:mm a')}`;
     } else {
-      // If different days, show full date range
-      return `${format(startDate, 'MMM d, h:mm a')} - ${format(endDate, 'MMM d, h:mm a')}`;
+      return `${format(startDate, 'MMM d, h:mm a')} - ${format(
+        endDate,
+        'MMM d, h:mm a'
+      )}`;
     }
   };
 
@@ -104,11 +80,9 @@ const RenderEventDetails: React.FC<EventDetailsProps> = ({
         </div>
       )}
 
-      {/* Event Info Section */}
+      {/* Event Info */}
       <div className="space-y-1">
         <h1 className="text-3xl font-semibold">{event.title}</h1>
-
-        {/* Dynamic pricing display */}
         <div className="text-base text-muted-foreground">
           {memberPrice ? (
             <p>
@@ -122,8 +96,6 @@ const RenderEventDetails: React.FC<EventDetailsProps> = ({
             <p className="font-medium">${Number(event.price).toFixed(2)}</p>
           )}
         </div>
-
-        {/* Tag pills using the reusable component */}
         <div className="flex flex-wrap gap-3 mt-2">
           <TagPill
             icon={Calendar}
@@ -131,7 +103,6 @@ const RenderEventDetails: React.FC<EventDetailsProps> = ({
             textColor="#4a7dca"
             bgColor="#cce0ff"
           />
-
           {event.location && (
             <TagPill
               icon={MapPin}
@@ -140,7 +111,6 @@ const RenderEventDetails: React.FC<EventDetailsProps> = ({
               bgColor="#dbccff"
             />
           )}
-
           {dressCode && (
             <TagPill
               icon={Shirt}
@@ -152,21 +122,15 @@ const RenderEventDetails: React.FC<EventDetailsProps> = ({
         </div>
       </div>
 
-
-
-        {/* Dynamic Description */}
-        {event.description && (
-          <p className="text-sm text-muted-foreground">
-            {event.description}
-          </p>
-        )}
+      {/* Description */}
+      {event.description && (
+        <p className="text-sm text-muted-foreground">{event.description}</p>
+      )}
 
       {/* Registration Form */}
       <Card>
         <CardContent className="p-6">
-          <h2 className="text-xl font-semibold mb-6">
-            Event Registration Form
-          </h2>
+          <h2 className="text-xl font-semibold mb-6">Event Registration</h2>
           <form onSubmit={handleSubmit} className="space-y-6">
             {questions.map((q) => (
               <DynamicFormField
@@ -194,7 +158,7 @@ const RenderEventDetails: React.FC<EventDetailsProps> = ({
             >
               {isSubmitting
                 ? 'Submitting...'
-                : `Continue with Purchase ($${Number(event.price).toFixed(2)})`}
+                : `Continue to Purchase ($${Number(event.price).toFixed(2)})`}
             </Button>
           </form>
         </CardContent>
