@@ -15,6 +15,7 @@ import {
   UserCircle2,
   Settings2,
   BadgeCheck,
+  ChevronDown,
 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
@@ -173,7 +174,7 @@ export function AppSidebar() {
           isMobile={isMobile}
         />
 
-        <div className=''>
+        <div className="">
           <SidebarSection
             label="Explore"
             menuItems={publicMenu}
@@ -259,8 +260,8 @@ export function SidebarSection({
   if (!isVisible) return null;
 
   return (
-    <SidebarGroup className='py-1'>
-      <SidebarGroupLabel className='font-normal'>{label}</SidebarGroupLabel>
+    <SidebarGroup className="py-1">
+      <SidebarGroupLabel className="font-normal">{label}</SidebarGroupLabel>
       <SidebarGroupContent>
         <SidebarMenu>
           {menuItems.map((item) => {
@@ -345,10 +346,13 @@ export function ProfilePopover({
                 )}
               </Avatar>
               {state !== 'collapsed' && (
-                <div className="text-left">
-                  <h3 className="text-lg md:text-md font-medium text-nowrap">
-                    {user?.name}
-                  </h3>
+                <div className="text-left w-full">
+                  <div className="flex flex-row items-center justify-between max-w-full md:max-w-[170px]">
+                    <h3 className="text-lg md:text-md font-medium overflow-hidden truncate">
+                      {user?.name} Hansen
+                    </h3>
+                    <ChevronDown className="text-neutral-500 w-4 h-4" />
+                  </div>
                   <p className="text-sm md:text-xs text-muted-foreground text-nowrap">
                     {user?.role}
                   </p>

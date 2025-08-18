@@ -3,7 +3,7 @@
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements } from '@stripe/react-stripe-js';
 import { useUserQuery } from '@/lib/queries/user';
-import { useRouter } from 'next/navigation';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { getClientSecret } from '@/lib/queries/stripe';
 import Image from 'next/image';
 import { ChevronLeft } from 'lucide-react';
@@ -13,10 +13,16 @@ import { useEffect } from 'react';
 import Spinner from '@/components/common/Spinner';
 import CheckoutEventForm from '@/components/forms/CheckoutEventForm';
 import { EventDetails } from '@/lib/types';
+import { useGetEventQuery } from '@/lib/queries/event';
 
 export default function PurchaseEventPage() {
   const router = useRouter();
   const queryClient = useQueryClient();
+
+    const searchParams = useSearchParams();
+    const eventSlug = searchParams.get('eventSlug');
+    const { data, isLoading: isEventLoading, isError } = useGetEventQuery({ eventSlug: eventSlug! });
+    const event = data?.event;
 
   useEffect(() => {
     queryClient.invalidateQueries({ queryKey: ['user'] });
@@ -36,7 +42,7 @@ export default function PurchaseEventPage() {
       purchaseType: 'event',
       amount: 10000,
       currency: 'cad',
-      eventId: 21
+      eventId: event?.id
     },
   });
 
