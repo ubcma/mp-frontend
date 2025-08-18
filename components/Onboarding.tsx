@@ -31,6 +31,7 @@ import {
 } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import { fetchFromAPI } from '@/lib/httpHandlers';
 
 const steps = [
   {
@@ -139,13 +140,17 @@ export default function OnboardingModal() {
       onboardingComplete: true,
     },
     onSubmit: async ({ value }) => {
-      // Submit the form data to the API
-      await fetch('/api/me/', {
+      try {
+        // Submit the form data to the API
+        await fetchFromAPI('/api/me/', {
         method: 'POST',
-        body: JSON.stringify(value),
+        body: value,
       });
       setStep(5);
       scrollToStep(5);
+    } catch (error) {
+      console.error('Failed to submit onboarding form data:', error);
+    }
     },
   });
 
