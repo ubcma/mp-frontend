@@ -10,7 +10,7 @@ import type { PaymentRequest as StripePaymentRequest } from '@stripe/stripe-js';
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useGetEventQuery } from '@/lib/queries/event';
-import { Lock, CreditCard, Zap } from 'lucide-react';
+import { Lock, CreditCard, Zap, ShieldCheck, Calendar } from 'lucide-react';
 import { Button } from '../ui/button';
 import Spinner from '../common/Spinner';
 
@@ -27,9 +27,8 @@ export default function CheckoutEventForm({ clientSecret }: { clientSecret: stri
   const { data, isLoading: isEventLoading, isError } = useGetEventQuery({ eventSlug: eventSlug! });
 
   const event = data?.event;
-  const questions = data?.questions || [];
 
-
+  // Setup Payment Request (Apple/Google Pay)
   useEffect(() => {
     if (!stripe || !clientSecret || !event) return;
 
@@ -38,7 +37,7 @@ export default function CheckoutEventForm({ clientSecret }: { clientSecret: stri
       currency: 'cad',
       total: {
         label: event.title,
-        amount: event.price, // in cents
+        amount: event.price,
       },
       requestPayerName: true,
       requestPayerEmail: true,
@@ -49,7 +48,7 @@ export default function CheckoutEventForm({ clientSecret }: { clientSecret: stri
     });
   }, [stripe, clientSecret, event]);
 
-
+  // Handle PaymentRequest events
   useEffect(() => {
     if (!paymentRequest || !stripe || !clientSecret) return;
 
@@ -68,7 +67,7 @@ export default function CheckoutEventForm({ clientSecret }: { clientSecret: stri
     });
   }, [paymentRequest, stripe, clientSecret]);
 
-
+  // Handle manual card submission
   const handleSubmit = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     if (!stripe || !elements) return;
@@ -77,7 +76,7 @@ export default function CheckoutEventForm({ clientSecret }: { clientSecret: stri
     const { error } = await stripe.confirmPayment({
       elements,
       confirmParams: {
-        return_url: `${window.location.origin}/success`,
+        return_url: `${window.location.origin}/event-purchase-success`,
       },
     });
 
@@ -89,7 +88,7 @@ export default function CheckoutEventForm({ clientSecret }: { clientSecret: stri
 
   if (isEventLoading) {
     return (
-      <div className="flex flex-col items-center gap-2">
+      <div className="flex flex-col items-center gap-2 py-12">
         <Spinner />
         <p className="text-sm text-muted-foreground">Loading event details…</p>
       </div>
@@ -103,37 +102,44 @@ export default function CheckoutEventForm({ clientSecret }: { clientSecret: stri
   return (
     <form
       onSubmit={handleSubmit}
-      className="w-full space-y-6 rounded-2xl bg-white p-6 shadow-xl border border-neutral-200"
+      className="max-w-lg w-full mx-auto space-y-8 rounded-2xl bg-white p-8 shadow-2xl border border-neutral-200"
     >
+      {/* Stepper/Header */}
+      <div className="flex items-center justify-center gap-2 text-sm text-neutral-500">
+        <span className="font-semibold text-ma-red">1. Checkout</span>
+        <div className="h-px w-8 bg-neutral-300" />
+        <span className="font-semibold">2. Confirmation</span>
+      </div>
 
-      <div className="space-y-4 bg-rose-50 border border-rose-200 rounded-xl p-5 shadow-md">
-        <h2 className="text-2xl font-bold text-neutral-900">
-          Purchase Ticket – {event.title}
-        </h2>
-
-        <div className="flex items-center gap-2 text-ma-red">
-          <span className="text-xl font-semibold">
+      {/* Event Summary */}
+      <div className="rounded-xl bg-gradient-to-r from-ma-red/10 via-rose-50 to-ma-red/5 border border-rose-200 p-6 shadow-inner">
+        <h2 className="text-2xl font-bold text-neutral-900">{event.title}</h2>
+        <div className="flex items-center gap-3 mt-3">
+          <span className="text-xl font-semibold text-ma-red">
             ${(event.price).toFixed(2)} CAD
           </span>
-          <span className="text-xs rounded-full border border-ma-red bg-ma-red/10 p-1 px-2">
+          <div className="flex items-center gap-1 text-xs bg-white border border-ma-red rounded-full px-2 py-0.5 shadow-sm">
+            <Calendar className="w-3 h-3 text-ma-red" />
             {new Date(event.startsAt).toLocaleDateString()}
-          </span>
+          </div>
         </div>
-
         {event.description && (
-          <p className="text-sm text-neutral-800">{event.description}</p>
+          <p className="text-sm text-neutral-700 mt-2">{event.description}</p>
         )}
       </div>
 
-      <div className="space-y-4">
+      {/* Payment Methods */}
+      <div className="space-y-5">
         <div className="flex items-center gap-2">
           <Zap className="w-4 h-4 text-green-600" />
           <h4 className="text-sm font-medium text-neutral-800">
-            Automatic Payment Methods
+            Quick Pay
           </h4>
         </div>
         {paymentRequest ? (
-          <PaymentRequestButtonElement options={{ paymentRequest }} />
+          <div className="rounded-lg border border-neutral-200 p-3 bg-neutral-50 hover:bg-neutral-100 transition">
+            <PaymentRequestButtonElement options={{ paymentRequest }} />
+          </div>
         ) : (
           <p className="text-xs text-neutral-500">
             Apple Pay / Google Pay not available on this device.
@@ -141,33 +147,36 @@ export default function CheckoutEventForm({ clientSecret }: { clientSecret: stri
         )}
       </div>
 
+      {/* Divider */}
       <div className="flex items-center justify-center gap-2">
         <div className="w-full border-t border-neutral-300" />
         <span className="text-xs text-neutral-500">or</span>
         <div className="w-full border-t border-neutral-300" />
       </div>
 
-
+      {/* Card Payment */}
       <div className="space-y-5">
         <div className="flex items-center gap-2">
           <CreditCard className="w-4 h-4 text-blue-600" />
-          <h4 className="text-sm font-medium text-neutral-800">Card Payment</h4>
+          <h4 className="text-sm font-medium text-neutral-800">Pay with Card</h4>
         </div>
-        <PaymentElement />
+        <div className="rounded-lg border border-neutral-200 p-4 bg-neutral-50 shadow-inner">
+          <PaymentElement />
+        </div>
       </div>
 
-
+      {/* Error Message */}
       {errorMsg && (
-        <div className="text-sm text-red-600 border border-red-200 bg-red-50 p-2 rounded-md">
+        <div className="text-sm text-red-600 border border-red-200 bg-red-50 p-3 rounded-md shadow-sm">
           {errorMsg}
         </div>
       )}
 
-
+      {/* Pay Button */}
       <Button
         type="submit"
         disabled={!stripe || isLoading}
-        className="w-full flex items-center justify-center gap-2 rounded-md px-4 py-2 font-semibold text-white transition duration-200"
+        className="w-full flex items-center justify-center gap-2 rounded-xl px-4 py-3 font-semibold text-white transition duration-200 shadow-md hover:shadow-lg"
         variant="ma"
       >
         {isLoading ? (
@@ -180,10 +189,14 @@ export default function CheckoutEventForm({ clientSecret }: { clientSecret: stri
         )}
       </Button>
 
-      {/* Security Notice */}
-      <div className="flex items-center justify-center gap-1 text-xs text-neutral-500 mt-2">
-        <Lock className="w-3 h-3" />
-        <span>Secure checkout powered by Stripe</span>
+      <div className="flex flex-col items-center gap-2 text-xs text-neutral-500 mt-2">
+        <div className="flex items-center gap-1">
+          <Lock className="w-3 h-3" />
+          <span>Secure checkout powered by Stripe</span>
+        </div>
+        <div className="flex items-center gap-1">
+          <ShieldCheck className="w-3 h-3 text-green-600" />
+        </div>
       </div>
     </form>
   );

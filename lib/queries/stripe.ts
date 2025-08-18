@@ -1,7 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
 import { fetchFromAPI } from '../httpHandlers';
-import { getUserRole } from './server/userRole';
-import { loadStripe } from '@stripe/stripe-js';
 import { UserProfileData } from '../types';
 
 interface PaymentIntentResponse {
