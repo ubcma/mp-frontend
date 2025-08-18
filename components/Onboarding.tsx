@@ -1,6 +1,5 @@
 'use client';
 
-import OnboardingProgressLine from './OnboardingProgressLine';
 import { useState, useEffect, useRef } from 'react';
 import { useForm, useStore } from '@tanstack/react-form';
 import Confetti from 'react-confetti';
@@ -56,7 +55,7 @@ const steps = [
   },
   {
     title: 'What are your interests?',
-    description: `Let us know what fields you're interested in! This will help us plan future events for you.`,
+    description: `Select 3 interests of yours! This will help us plan future events for you.`,
     icon: Shapes,
   },
   {
@@ -65,6 +64,15 @@ const steps = [
     icon: PartyPopper,
   },
 ];
+
+const stepEmojiMap = {
+  0: '👋',
+  1: '🧑‍🎓',
+  2: '📸',
+  3: '🍔',
+  4: '⚽️',
+  5: '🎉', 
+} as const;
 
 export default function OnboardingModal() {
   const [showConfetti, setShowConfetti] = useState(false);
@@ -170,7 +178,14 @@ export default function OnboardingModal() {
       {/* Header - Logo and Stepper */}
       <div className="fixed top-0 left-0 right-0 z-50 flex justify-between items-center px-20 py-8 bg-gradient-to-b from-[#EF3050] to-transparent">
         {/* Logo */}
-        <div className="flex items-center">
+        <motion.div className="flex items-center"
+          initial={{ opacity: 0, scale: 0 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{
+              duration: 0.4,
+              scale: { type: "spring", visualDuration: 0.4, bounce: 0.5, delay: 0.3},
+          }}
+        >
           <Image
             src="/logos/logo_white_icon.svg"
             alt="UBCMA Logo"
@@ -178,7 +193,7 @@ export default function OnboardingModal() {
             height={100}
             className="text-white"
           />
-        </div>
+        </motion.div>
 
         {/* Circular Stepper */}
         {step > 0 && step < steps.length - 1 && (
@@ -199,7 +214,13 @@ export default function OnboardingModal() {
 
       {/* Skip Onboarding Button */}
       {step < steps.length - 1 && (
-        <div className="fixed bottom-0 left-0 z-50 px-20 py-8 bg-gradient-to-t from-[#FF8096] to-transparent">
+        <motion.div className="fixed bottom-0 left-0 z-50 px-20 py-8 bg-gradient-to-t from-[#FF8096] to-transparent"
+          initial={{ opacity: 0, scale: 0 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{
+              duration: 0.4,
+              scale: { type: "spring", visualDuration: 0.4, bounce: 0.5, delay: 0.5},
+          }}>
           <Button
             variant="ghost"
             onClick={() => {
@@ -210,11 +231,12 @@ export default function OnboardingModal() {
           >
             Skip Onboarding
           </Button>
-        </div>
+        </motion.div>
       )}
 
       {/* Scrollable Content Container */}
-      <div className="h-full flex items-center justify-center gap-40">
+      <div className="h-full flex items-center justify-center gap-20">
+        
       <div 
         ref={containerRef}
         className="h-full w-auto max-w-2xl overflow-hidden scroll-smooth"
@@ -324,11 +346,11 @@ export default function OnboardingModal() {
             </form>
             
             {/* Navigation buttons for step 1 */}
-            <div className="flex justify-between pt-6">
+            <div className="flex justify-end pt-6">
               <Button 
                 type="button" 
                 onClick={handleNext}
-                className="bg-white text-[#EF3050] hover:bg-white/90 ml-auto"
+                className="bg-white text-[#EF3050] hover:bg-white/90"
               >
                 Next
               </Button>
@@ -360,15 +382,7 @@ export default function OnboardingModal() {
             />
             
             {/* Navigation buttons for step 2 */}
-            <div className="flex justify-between pt-6">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={handleBack}
-                className="bg-white/20 border-white/30 text-white hover:bg-white/30"
-              >
-                Back
-              </Button>
+            <div className="flex justify-end pt-6">
               <Button 
                 type="button" 
                 onClick={handleNext}
@@ -429,7 +443,7 @@ export default function OnboardingModal() {
                               key={restriction}
                               whileHover={{ scale: 1.05 }}
                               whileTap={{ scale: 0.95 }}
-                              transition={{ duration: 0.2 }}
+                              transition={{ duration: 0.1 }}
                               className={`
                                 cursor-pointer rounded-lg px-4 py-2 text-center font-normal text-sm transition-all duration-200 w-40 h-11 flex items-center justify-center
                                 ${isSelected 
@@ -459,7 +473,7 @@ export default function OnboardingModal() {
                               key={restriction}
                               whileHover={{ scale: 1.05 }}
                               whileTap={{ scale: 0.95 }}
-                              transition={{ duration: 0.2 }}
+                              transition={{ duration: 0.1 }}
                               className={`
                                 cursor-pointer rounded-lg px-4 py-2 text-center font-normal text-sm transition-all duration-200 w-40 h-11 flex items-center justify-center
                                 ${isSelected 
@@ -489,7 +503,7 @@ export default function OnboardingModal() {
                               key={restriction}
                               whileHover={{ scale: 1.05 }}
                               whileTap={{ scale: 0.95 }}
-                              transition={{ duration: 0.2 }}
+                              transition={{ duration: 0.1 }}
                               className={`
                                 cursor-pointer rounded-lg px-4 py-2 text-center font-normal text-sm transition-all duration-200 w-40 h-11 flex items-center justify-center
                                 ${isSelected 
@@ -519,7 +533,7 @@ export default function OnboardingModal() {
                               key={restriction}
                               whileHover={{ scale: 1.05 }}
                               whileTap={{ scale: 0.95 }}
-                              transition={{ duration: 0.2 }}
+                              transition={{ duration: 0.1 }}
                               className={`
                                 cursor-pointer rounded-lg px-4 py-2 text-center font-normal text-sm transition-all duration-200 w-40 h-11 flex items-center justify-center
                                 ${isSelected 
@@ -544,13 +558,13 @@ export default function OnboardingModal() {
                     {/* Dynamic allergy input */}
                     <div className="space-y-2">
                       <label className="block text-sm font-medium text-white">
-                        Other Allergies
+                        Other Allergies 
                       </label>
                       <input
                         type="text"
                         onKeyDown={handleAddAllergy}
                         placeholder="Type and press Enter..."
-                        className="border rounded px-3 py-2 w-full bg-white text-black placeholder-gray-400"
+                        className="border rounded-md px-3 py-2 w-full h-9 bg-white text-black placeholder-gray-400"
                       />
                       {/* Show all selected allergies */}
                       <div className="flex flex-wrap gap-2 mt-2">
@@ -584,23 +598,27 @@ export default function OnboardingModal() {
             />
             
             {/* Navigation buttons for step 3 */}
-            <div className="flex justify-between pt-6">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={handleBack}
-                className="bg-white/20 border-white/30 text-white hover:bg-white/30"
-              >
-                Back
-              </Button>
-              <Button 
-                type="button" 
-                onClick={handleNext}
-                className="bg-white text-[#EF3050] hover:bg-white/90"
-              >
-                Next
-              </Button>
-            </div>
+            <form.Subscribe
+              selector={(state) => [state.values.diet]}
+              children={([diet]) => {
+                const hasDietarySelection = diet && diet.length > 0;
+                
+                return (
+                  <div className="flex justify-end pt-6">
+                    <Button 
+                      type="button" 
+                      onClick={handleNext}
+                      disabled={!hasDietarySelection}
+                      className={`bg-white text-[#EF3050] hover:bg-white/90 ${
+                        !hasDietarySelection ? 'opacity-50 cursor-not-allowed' : ''
+                      }`}
+                    >
+                      Next
+                    </Button>
+                  </div>
+                );
+              }}
+            />
           </div>
         </motion.section>
 
@@ -628,7 +646,7 @@ export default function OnboardingModal() {
                           key={interest}
                           whileHover={{ scale: 1.05 }}
                           whileTap={{ scale: 0.95 }}
-                          transition={{ duration: 0.2 }}
+                          transition={{ duration: 0.1 }}
                           className={`
                             cursor-pointer rounded-lg p-4 text-center font-normal text-sm transition-all duration-200
                             ${isSelected 
@@ -654,51 +672,51 @@ export default function OnboardingModal() {
                 selector={(state) => [
                   state.canSubmit,
                   state.isSubmitting,
+                  state.values.interests,
                 ]}
-                children={([canSubmit, isSubmitting]) => (
-                  <div className="flex justify-between pt-6">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={handleBack}
-                      className="bg-white/20 border-white/30 text-white hover:bg-white/30"
-                    >
-                      Back
-                    </Button>
-                    <Button
-                      className="cursor-pointer font-regular bg-ma-red"
-                      variant="ma"
-                      type="button"
-                      onClick={async (e) => {
-                        e.preventDefault();
-                        
-                        // Check required fields before submission
-                        const formValues = form.store.state.values;
-                        if (!formValues.year || !formValues.faculty || !formValues.major) {
-                          // Trigger validation on all fields to show error messages
-                          form.validateAllFields('submit');
+                children={([canSubmit, isSubmitting, interests]) => {
+                  const hasThreeInterests = Array.isArray(interests) && interests.length >= 3;
+                  
+                  return (
+                    <div className="flex justify-end pt-6">
+                      <Button
+                        className={`cursor-pointer font-regular ${
+                          hasThreeInterests ? 'bg-ma-red' : 'bg-ma-red opacity-50'
+                        }`}
+                        variant="ma"
+                        type="button"
+                        disabled={!hasThreeInterests}
+                        onClick={async (e) => {
+                          e.preventDefault();
                           
-                          // Navigate back to step 1 where required fields are
-                          setStep(1);
-                          scrollToStep(1);
-                          return;
-                        }
-                        
-                        // If all required fields are filled, submit the form
-                        await form.handleSubmit();
-                      }}
-                    >
-                      {isSubmitting ? (
-                        <>
-                          <Spinner />
-                          <div>Loading</div>
-                        </>
-                      ) : (
-                        <div>Complete Profile</div>
-                      )}
-                    </Button>
-                  </div>
-                )}
+                          // Check required fields before submission
+                          const formValues = form.store.state.values;
+                          if (!formValues.year || !formValues.faculty || !formValues.major) {
+                            // Trigger validation on all fields to show error messages
+                            form.validateAllFields('submit');
+                            
+                            // Navigate back to step 1 where required fields are
+                            setStep(1);
+                            scrollToStep(1);
+                            return;
+                          }
+                          
+                          // If all required fields are filled, submit the form
+                          await form.handleSubmit();
+                        }}
+                      >
+                        {isSubmitting ? (
+                          <>
+                            <Spinner />
+                            <div>Loading</div>
+                          </>
+                        ) : (
+                          <div>{hasThreeInterests ? 'Complete Profile' : 'Choose 3 Interests'}</div>
+                        )}
+                      </Button>
+                    </div>
+                  );
+                }}
               />
             </div>
           </div>
@@ -730,7 +748,124 @@ export default function OnboardingModal() {
         </motion.section>
       </div>
       {/* Progress Line */}
-      <OnboardingProgressLine currentStep={step} />
+      <div className="flex w-40 h-full items-center justify-center relative overflow-hidden">
+        <motion.div
+          className="absolute left-1/2 -translate-x-1/2 w-px bg-white"
+          animate={{
+            top: step === 0 ? '50%' : '0%',
+            bottom: step === 5 ? '50%' : '0%',
+            height: step === 0 ? '50%' : step === 5 ? '50%' : '100%'
+          }}
+          transition={{
+            duration: 0.6,
+            ease: "easeInOut",
+          }}
+        />
+        <div className="absolute w-full h-full">
+          {steps.map((_, index) => {
+            // Calculate relative position from current step
+            const relativePosition = index - step;
+            
+            let topPercentage = 50; // Default center
+            let circleSize = 100;
+            let isVisible = false;
+            
+            // Show 3 circles: previous, current, and next
+            if (relativePosition === -1) {
+              // Previous step - top of screen
+              topPercentage = 20;
+              circleSize = 100;
+              isVisible = true;
+            } else if (relativePosition === 0) {
+              // Current step - center of screen, larger size
+              topPercentage = 50;
+              circleSize = 150;
+              isVisible = true;
+            } else if (relativePosition === 1) {
+              // Next step - bottom of screen
+              topPercentage = 80;
+              circleSize = 100;
+              isVisible = true;
+            } else if (relativePosition < -1) {
+              // Steps that are further back - move progressively upward off screen
+              const offsetSteps = Math.abs(relativePosition) - 1;
+              topPercentage = 20 - (offsetSteps * 30); // Move 30% up for each additional step back
+              circleSize = 100;
+              isVisible = topPercentage >= -10; // Fade out when too far up
+            } else if (relativePosition > 1) {
+              // Steps that are further ahead - move progressively downward off screen
+              const offsetSteps = relativePosition - 1;
+              topPercentage = 80 + (offsetSteps * 30); // Move 30% down for each additional step ahead
+              circleSize = 100;
+              isVisible = topPercentage <= 110; // Fade out when too far down
+            }
+            
+            return (
+              <motion.div
+                key={index}
+                className={`absolute left-1/2 rounded-full bg-[#F65772] border-2 border-white flex items-center justify-center ${
+                  relativePosition === -1 ? 'cursor-pointer hover:bg-[#E02040] transition-colors duration-200' : ''
+                }`}
+                onClick={relativePosition === -1 ? handleBack : undefined}
+                initial={{ 
+                  top: `${topPercentage}%`,
+                  translateX: '-50%',
+                  translateY: '-50%',
+                  width: `${circleSize}px`,
+                  height: `${circleSize}px`,
+                  opacity: isVisible ? 1 : 0,
+                  scale: 0
+                }}
+                animate={{ 
+                  top: `${topPercentage}%`,
+                  translateX: '-50%',
+                  translateY: '-50%',
+                  width: `${circleSize}px`,
+                  height: `${circleSize}px`,
+                  opacity: isVisible ? 1 : 0,
+                  scale: isVisible ? 1 : 0
+                }}
+                transition={{ 
+                  duration: 0.4,
+                  opacity: { duration: 0.3 },
+                  scale: { 
+                    type: "spring", 
+                    visualDuration: 0.4, 
+                    bounce: 0.3,
+                  },
+                  top: { 
+                    duration: 0.6,
+                    ease: "easeInOut"
+                  },
+                  width: { 
+                    duration: 0.6,
+                    ease: "easeInOut"
+                  },
+                  height: { 
+                    duration: 0.6,
+                    ease: "easeInOut"
+                  }
+                }}
+              >
+                <motion.span
+                  animate={{
+                    fontSize: `${circleSize * 0.4}px`
+                  }}
+                  transition={{
+                    duration: 0.6,
+                    ease: "easeInOut"
+                  }}
+                  style={{
+                    lineHeight: 1
+                  }}
+                >
+                  {stepEmojiMap[index as keyof typeof stepEmojiMap]}
+                </motion.span>
+              </motion.div>
+            );
+          })}
+        </div>
+      </div>
       </div>
     </div>
   );

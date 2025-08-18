@@ -14,12 +14,12 @@ export const DIETARY_RESTRICTIONS = [
   'Vegan',
   'Pescetarian',
   'Halal',
-  'Kosher',
   'Gluten',
   'Dairy',
   'Peanuts',
   'Nuts',
   'Fish / Shellfish',
+  'None',
 ];
 
 export const YEAR_OPTIONS = [
