@@ -14,11 +14,11 @@ export default function Home() {
   const router = useRouter();
 
   function onEdit(id: string) {
-    router.push(`/manage-events/${id}`);
+    router.push(`/manage-events/${id}/edit`); 
   }
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="grid md:grid-cols-2 grid-cols-1 gap-4 h-full md:mt-0 mt-16">
       {isLoading ? (
         <Spinner />
       ) : events && events.length > 0 ? (

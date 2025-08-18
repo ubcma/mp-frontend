@@ -26,7 +26,7 @@ function ActionButton({ href, children, className, icon }: ActionButtonProps) {
       >
         {children}
         <IconComponent
-          size={isMobile ? 196 : 256}
+          size={isMobile ? 164 : 196}
           className="absolute -top-8 right-8 mix-blend-overlay stroke-2 rotate-12"
         />
       </button>
