@@ -349,7 +349,7 @@ export function ProfilePopover({
                 <div className="text-left w-full">
                   <div className="flex flex-row items-center justify-between max-w-full md:max-w-[170px]">
                     <h3 className="text-lg md:text-md font-medium overflow-hidden truncate">
-                      {user?.name} Hansen
+                      {user?.name}
                     </h3>
                     <ChevronDown className="text-neutral-500 w-4 h-4" />
                   </div>

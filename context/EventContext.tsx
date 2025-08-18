@@ -5,6 +5,7 @@ import { createContext, useContext, useState, useEffect } from 'react';
 import type { EventDetails } from '@/lib/types';
 import { type EventStatus, getEventStatus } from '@/lib/utils';
 import { useGetEventsQuery } from '@/lib/queries/events';
+import { Registration, useGetUserRegistrationsQuery } from '@/lib/queries/registrations';
 
 type EventContextType = {
   filteredEvents: EventDetails[];
@@ -13,7 +14,10 @@ type EventContextType = {
   setSearchTerm: React.Dispatch<React.SetStateAction<string>>;
   activeTab: EventStatus | 'All';
   setActiveTab: React.Dispatch<React.SetStateAction<EventStatus | 'All'>>;
+  registrationFilter: 'All' | 'Registered';
+  setRegistrationFilter: React.Dispatch<React.SetStateAction<'All' | 'Registered'>>;
   isLoading: boolean;
+  registeredEvents: Registration[] | undefined;
 };
 
 const EventContext = createContext<EventContextType | undefined>(undefined);
@@ -32,24 +36,39 @@ export const EventProvider: React.FC<{ children: React.ReactNode }> = ({
   const [filteredEvents, setFilteredEvents] = useState<EventDetails[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [activeTab, setActiveTab] = useState<EventStatus | 'All'>('All');
+  const [registrationFilter, setRegistrationFilter] = useState<'All' | 'Registered'>('All'); // New state
 
   const { data: events, isLoading } = useGetEventsQuery();
+  const { data: registrations } = useGetUserRegistrationsQuery();
+
+  const registeredEvents = registrations?.registrations;
 
   useEffect(() => {
     const filtered = events
-      ?.filter(
-        (event: EventDetails) =>
-          (activeTab === 'All' ||
-            getEventStatus(event.startsAt) === activeTab) &&
-          event.title.toLowerCase().includes(searchTerm.toLowerCase()) &&
-          event.isVisible === true
-      )
+      ?.filter((event: EventDetails) => {
+        const matchesDateTab =
+          activeTab === 'All' ||
+          getEventStatus(event.startsAt) === activeTab;
+
+        const matchesRegistrationTab =
+          registrationFilter === 'All' ||
+          (registrationFilter === 'Registered' &&
+            registeredEvents?.some((regEvent) => regEvent.eventId === event.id));
+
+        const matchesSearch = event.title
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase());
+
+        return (
+          matchesDateTab && matchesRegistrationTab && matchesSearch && event.isVisible === true
+        );
+      })
       .sort((a, b) => {
         return a.startsAt > b.startsAt ? -1 : 1;
       });
 
     setFilteredEvents(filtered ?? []);
-  }, [events, searchTerm, activeTab]);
+  }, [events, searchTerm, activeTab, registrationFilter, registeredEvents]);
 
   return (
     <EventContext.Provider
@@ -61,6 +80,9 @@ export const EventProvider: React.FC<{ children: React.ReactNode }> = ({
         activeTab,
         setActiveTab,
         isLoading,
+        registeredEvents,
+        registrationFilter,
+        setRegistrationFilter, // Expose the new state
       }}
     >
       {children}

@@ -13,6 +13,11 @@ const tabs: { value: EventStatus | "All"; label: string }[] = [
   { value: "Past", label: "Past" },
 ];
 
+const registrationTabs: { value: "All" | "Registered"; label: string }[] = [
+  { value: "All", label: "All Events" },
+  { value: "Registered", label: "Registered Events" },
+];
+
 export default function Home() {
 
   return (
@@ -23,14 +28,15 @@ export default function Home() {
 }
 
 function EventTabs() {
-  const { activeTab, setActiveTab } = useEventContext();
+  const {
+    activeTab,
+    setActiveTab,
+    registrationFilter,
+    setRegistrationFilter,
+  } = useEventContext();
 
   return (
-    <Tabs
-      value={activeTab}
-      onValueChange={(value) => setActiveTab(value as EventStatus | "All")}
-      className="space-y-6 w-full"
-    >
+    <div className="space-y-6 w-full">
       <div>
         <h1 className="text-2xl font-bold">Upcoming Events</h1>
         <p className="text-muted-foreground">
@@ -38,19 +44,41 @@ function EventTabs() {
         </p>
       </div>
 
+      {/* First Tab Group: Date Range */}
       <div className="flex flex-col md:flex-row gap-4 items-start md:items-center">
         <Search />
-        <TabsList>
-          {tabs.map((tab) => (
-            <TabsTrigger key={tab.value} value={tab.value}>
-              {tab.label}
-            </TabsTrigger>
-          ))}
-        </TabsList>
+        <Tabs
+          value={activeTab}
+          onValueChange={(value) =>
+            setActiveTab(value as EventStatus | 'All')
+          }
+        >
+          <TabsList>
+            {tabs.map((tab) => (
+              <TabsTrigger key={tab.value} value={tab.value}>
+                {tab.label}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+        </Tabs>
+
+        <Tabs
+          value={registrationFilter}
+          onValueChange={(value) =>
+            setRegistrationFilter(value as 'All' | 'Registered')
+          }
+        >
+          <TabsList>
+            {registrationTabs.map((tab) => (
+              <TabsTrigger key={tab.value} value={tab.value}>
+                {tab.label}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+        </Tabs>
       </div>
-          
+
       <EventList />
-    </Tabs>
+    </div>
   );
 }
-

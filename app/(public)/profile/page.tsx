@@ -13,9 +13,12 @@ import { fetchFromAPI } from '@/lib/httpHandlers';
 import { handleClientError } from '@/lib/error/handleClient';
 import { useState } from 'react';
 import ProfileEditForm from '@/components/forms/ProfileEditForm';
+import { useGetUserRegistrationsQuery } from '@/lib/queries/registrations';
 
 export default function ProfilePage() {
   const { data: user, isLoading, isError, refetch } = useUserQuery();
+  const { data: registrations, isLoading: registrationsLoading, isError: registrationsError} = useGetUserRegistrationsQuery();
+
   const [isEditMode, setIsEditMode] = useState(false);
 
   // Handle avatar update (existing functionality)
@@ -111,6 +114,8 @@ export default function ProfilePage() {
               )}
             </Button>
           </div>
+
+          {JSON.stringify(registrations)}
 
           {isEditMode ? (
             /* Edit Mode - Show ProfileEditForm */

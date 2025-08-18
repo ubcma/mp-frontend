@@ -5,9 +5,10 @@ import { EventDetails } from '@/lib/types';
 import { EventCard } from './EventCard';
 import { useEventContext } from '@/context/EventContext';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Registration } from '@/lib/queries/registrations';
 
 export function EventList() {
-  const { filteredEvents, isLoading } = useEventContext();
+  const { filteredEvents, registeredEvents, isLoading } = useEventContext();
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -134,18 +135,25 @@ export function EventList() {
       animate="visible"
     >
       <AnimatePresence>
-        {filteredEvents?.map((event: EventDetails) => (
-          <motion.div
-            key={event.id}
-            variants={itemVariants}
-            layout
-            initial="hidden"
-            animate="visible"
-            exit="exit"
-          >
-            <EventCard event={event} />
-          </motion.div>
-        ))}
+        {filteredEvents?.map((event: EventDetails) => {
+          const isEventRegistered = registeredEvents?.some(
+              (registeredEvent) => registeredEvent.eventId === event.id
+            );
+
+
+          return (
+            <motion.div
+              key={event.id}
+              variants={itemVariants}
+              layout
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+            >
+              <EventCard event={event} registered={isEventRegistered} />
+            </motion.div>
+          );
+        })}
       </AnimatePresence>
     </motion.div>
   );

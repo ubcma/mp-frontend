@@ -2,6 +2,23 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { fetchFromAPI } from '../httpHandlers';
 import { EventRegistrationsResponse } from '../types/eventRegistration';
 
+export type Registration = {
+  id: number;
+  eventId: string;
+  status: string;
+  stripeTransactionId: string | null; 
+  registeredAt: string; 
+  eventTitle: string;
+  eventStartsAt: string; 
+  eventEndsAt: string;
+  eventLocation: string;
+  responses: Record<string, string>;
+};
+
+export type RegistrationsResponse = {
+  registrations: Registration[];
+};
+
 export function useGetEventRegistrationsQuery(eventId: string) {
   return useQuery({
     queryKey: ['event-registrations', eventId],
@@ -98,5 +115,30 @@ export function useCreateRegistrationMutation() {
       // Invalidate and refetch event registrations
       queryClient.invalidateQueries({ queryKey: ['event-registrations', eventId] });
     },
+  });
+}
+
+export function useGetUserRegistrationsQuery() {
+  return useQuery<RegistrationsResponse>({
+    queryKey: ['user-registrations'],
+    queryFn: async () => {
+      const res = await fetchFromAPI(`/api/me/registrations`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+      });
+
+      if (!res.ok) {
+        throw new Error('Failed to fetch event registrations');
+      }
+
+      const data = (await res.json()) as RegistrationsResponse;
+      
+      return data;
+    },
+    retry: 1,
+    staleTime: 2 * 60 * 1000, // 2 minutes
   });
 }
