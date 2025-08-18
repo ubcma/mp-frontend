@@ -2,8 +2,6 @@
 
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements } from '@stripe/react-stripe-js';
-import CheckoutEventForm from '@/components/forms/CheckoutEventForm';
-import { MEMBERSHIP_PRICE } from '@/lib/constants'
 import { useUserQuery } from '@/lib/queries/user';
 import { useRouter } from 'next/navigation';
 import { getClientSecret } from '@/lib/queries/stripe';
@@ -13,6 +11,8 @@ import Link from 'next/link';
 import { useQueryClient } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import Spinner from '@/components/common/Spinner';
+import CheckoutEventForm from '@/components/forms/CheckoutEventForm';
+import { EventDetails } from '@/lib/types';
 
 export default function PurchaseEventPage() {
   const router = useRouter();
