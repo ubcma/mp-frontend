@@ -8,15 +8,13 @@ import {
 } from '@stripe/react-stripe-js';
 import type { PaymentRequest as StripePaymentRequest } from '@stripe/stripe-js';
 import { useEffect, useState } from 'react';
-import { Lock, CreditCard, Zap, Check } from 'lucide-react';
-import { MEMBERSHIP_PRICE } from '@/lib/constants';
+import { useSearchParams } from 'next/navigation';
+import { useGetEventQuery } from '@/lib/queries/event';
+import { Lock, CreditCard, Zap } from 'lucide-react';
 import { Button } from '../ui/button';
+import Spinner from '../common/Spinner';
 
-export default function CheckoutEventForm({
-  clientSecret,
-}: {
-  clientSecret: string;
-}) {
+export default function CheckoutEventForm({ clientSecret }: { clientSecret: string }) {
   const stripe = useStripe();
   const elements = useElements();
   const [isLoading, setIsLoading] = useState(false);
@@ -24,15 +22,23 @@ export default function CheckoutEventForm({
   const [paymentRequest, setPaymentRequest] =
     useState<StripePaymentRequest | null>(null);
 
+  const searchParams = useSearchParams();
+  const eventSlug = searchParams.get('eventSlug');
+  const { data, isLoading: isEventLoading, isError } = useGetEventQuery({ eventSlug: eventSlug! });
+
+  const event = data?.event;
+  const questions = data?.questions || [];
+
+
   useEffect(() => {
-    if (!stripe || !clientSecret) return;
+    if (!stripe || !clientSecret || !event) return;
 
     const pr = stripe.paymentRequest({
       country: 'CA',
       currency: 'cad',
       total: {
-        label: 'Test Event',
-        amount: MEMBERSHIP_PRICE
+        label: event.title,
+        amount: event.price, // in cents
       },
       requestPayerName: true,
       requestPayerEmail: true,
@@ -41,28 +47,27 @@ export default function CheckoutEventForm({
     pr.canMakePayment().then((result) => {
       if (result) setPaymentRequest(pr);
     });
-  }, [stripe, clientSecret]);
+  }, [stripe, clientSecret, event]);
+
 
   useEffect(() => {
     if (!paymentRequest || !stripe || !clientSecret) return;
 
     paymentRequest.on('paymentmethod', async (ev) => {
-      const { paymentIntent, error } = await stripe.confirmCardPayment(
-        clientSecret,
-        {
-          payment_method: ev.paymentMethod.id,
-        }
-      );
+      const { paymentIntent, error } = await stripe.confirmCardPayment(clientSecret, {
+        payment_method: ev.paymentMethod.id,
+      });
 
       if (error) {
         ev.complete('fail');
-        console.error('Payment failed:', error);
+        setErrorMsg(error.message || 'Payment failed');
       } else {
         ev.complete('success');
         window.location.href = `/success?payment_intent=${paymentIntent.id}&redirect_status=${paymentIntent.status}`;
       }
     });
   }, [paymentRequest, stripe, clientSecret]);
+
 
   const handleSubmit = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
@@ -82,45 +87,44 @@ export default function CheckoutEventForm({
     }
   };
 
+  if (isEventLoading) {
+    return (
+      <div className="flex flex-col items-center gap-2">
+        <Spinner />
+        <p className="text-sm text-muted-foreground">Loading event details…</p>
+      </div>
+    );
+  }
+
+  if (isError || !event) {
+    return <p className="text-red-500">Could not load event details.</p>;
+  }
+
   return (
     <form
       onSubmit={handleSubmit}
       className="w-full space-y-6 rounded-2xl bg-white p-6 shadow-xl border border-neutral-200"
     >
-      <div className="space-y-4 bg-rose-50 border border-rose-200 rounded-xl p-5 shadow-md hover:shadow-lg transition-shadow">
+
+      <div className="space-y-4 bg-rose-50 border border-rose-200 rounded-xl p-5 shadow-md">
         <h2 className="text-2xl font-bold text-neutral-900">
-          UBCMA Purchase Event
+          Purchase Ticket – {event.title}
         </h2>
 
         <div className="flex items-center gap-2 text-ma-red">
           <span className="text-xl font-semibold">
-            ${(1000 / 100).toFixed(2)} CAD
+            ${(event.price).toFixed(2)} CAD
           </span>
           <span className="text-xs rounded-full border border-ma-red bg-ma-red/10 p-1 px-2">
-            Valid until April 2026
+            {new Date(event.startsAt).toLocaleDateString()}
           </span>
         </div>
 
-        <p className="text-sm text-neutral-800">Your membership includes:</p>
-
-        <ul className="space-y-2">
-          {[
-            'Unlimited access to all UBCMA events',
-            'A curated marketing job board',
-            'Exclusive networking opportunities with professionals & alumni',
-          ].map((item, idx) => (
-            <li
-              key={idx}
-              className="flex items-start gap-2 text-sm text-neutral-800"
-            >
-              <Check className="w-4 h-4 text-ma-red mt-0.5" />
-              <span>{item}</span>
-            </li>
-          ))}
-        </ul>
+        {event.description && (
+          <p className="text-sm text-neutral-800">{event.description}</p>
+        )}
       </div>
 
-      {/* Payment Options */}
       <div className="space-y-4">
         <div className="flex items-center gap-2">
           <Zap className="w-4 h-4 text-green-600" />
@@ -132,8 +136,7 @@ export default function CheckoutEventForm({
           <PaymentRequestButtonElement options={{ paymentRequest }} />
         ) : (
           <p className="text-xs text-neutral-500">
-            Automatic Payment Methods are not available on this device or
-            browser.
+            Apple Pay / Google Pay not available on this device.
           </p>
         )}
       </div>
@@ -144,7 +147,7 @@ export default function CheckoutEventForm({
         <div className="w-full border-t border-neutral-300" />
       </div>
 
-      {/* Card Payment */}
+
       <div className="space-y-5">
         <div className="flex items-center gap-2">
           <CreditCard className="w-4 h-4 text-blue-600" />
@@ -153,20 +156,18 @@ export default function CheckoutEventForm({
         <PaymentElement />
       </div>
 
-      {/* Error Message */}
+
       {errorMsg && (
         <div className="text-sm text-red-600 border border-red-200 bg-red-50 p-2 rounded-md">
           {errorMsg}
         </div>
       )}
 
-      {/* Submit Button */}
+
       <Button
         type="submit"
         disabled={!stripe || isLoading}
-        className={`w-full flex items-center justify-center gap-2 rounded-md px-4 py-2 font-semibold text-white transition duration-200 ${
-          isLoading || (!stripe && 'bg-neutral-300 cursor-not-allowed')
-        }`}
+        className="w-full flex items-center justify-center gap-2 rounded-md px-4 py-2 font-semibold text-white transition duration-200"
         variant="ma"
       >
         {isLoading ? (
@@ -175,7 +176,7 @@ export default function CheckoutEventForm({
             Processing...
           </>
         ) : (
-          <>Pay ${(MEMBERSHIP_PRICE / 100).toFixed(2)}</>
+          <>Pay ${(event.price).toFixed(2)}</>
         )}
       </Button>
 

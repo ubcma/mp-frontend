@@ -46,8 +46,8 @@ const RenderEventDetails: React.FC<EventDetailsProps> = ({
 
     setIsSubmitting(true);
 
-    // Just redirect to another page — pass event ID or anything needed
-    router.push(`/purchase-event?eventId=${event.id}`);
+    // Just redirect to another page — pass event slug instead of the id 
+    router.push(`/purchase-event?eventSlug=${event.slug}`);
   };
 
   const formatEventDate = () => {
