@@ -94,7 +94,6 @@ export default function Home() {
         exit={{ opacity: 0, y: -10 }}
         className="flex flex-col justify-center w-full gap-4"
       >
-        {!user?.onboardingComplete && <OnboardingModal />}
 
         {/* Welcome Section */}
         <motion.div variants={itemVariants} className="flex flex-col gap-2">

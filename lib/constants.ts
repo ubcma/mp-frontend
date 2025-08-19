@@ -22,6 +22,7 @@ export const DIETARY_RESTRICTIONS = [
   'Peanuts',
   'Nuts',
   'Fish / Shellfish',
+  'None'
 ];
 
 export const YEAR_OPTIONS = [

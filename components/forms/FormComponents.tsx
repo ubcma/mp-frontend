@@ -70,6 +70,7 @@ export function RenderInputField({
         }
         type={type}
         placeholder={placeholder ?? label}
+        className='bg-white'
       />
       <FieldInfo field={field} />
     </div>
@@ -122,7 +123,7 @@ export function RenderSelectField({
         onValueChange={(value) => field.handleChange(value)}
         disabled={disabled}
       >
-        <SelectTrigger className='w-full'>
+        <SelectTrigger className='w-full bg-white'>
           <SelectValue
             placeholder={placeholder || 'Select'}
             defaultValue={field.state.value}

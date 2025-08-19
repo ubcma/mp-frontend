@@ -115,8 +115,6 @@ export default function ProfilePage() {
             </Button>
           </div>
 
-          {JSON.stringify(registrations)}
-
           {isEditMode ? (
             /* Edit Mode - Show ProfileEditForm */
             <ProfileEditForm

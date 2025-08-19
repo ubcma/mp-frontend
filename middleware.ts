@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import { getOnboardingStatus } from './lib/queries/server/onboardingStatus';
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const accessCode = request.cookies.get('access_code')?.value;
   const expectedCode = process.env.ACCESS_CODE;
   const { pathname } = request.nextUrl;
@@ -41,6 +42,25 @@ export function middleware(request: NextRequest) {
       : 'membership-portal.session_token'
   )?.value;
 
+
+  let skipOnboarding = request.cookies.get('onboarding_skipped')?.value;
+
+  if (!skipOnboarding) {
+    const response = NextResponse.next();
+    response.cookies.set('onboarding_skipped', 'false', {
+      path: '/',
+      maxAge: 60 * 60 * 24 * 7,
+    });
+    skipOnboarding = 'false'
+    return response;
+  }
+
+  let onboardingComplete: boolean | undefined = false;
+
+  if (sessionCookie) {
+    onboardingComplete = await getOnboardingStatus();
+  }
+
   const isAuthPage =
     pathname.startsWith('/sign-in') ||
     pathname.startsWith('/sign-up') ||
@@ -57,6 +77,14 @@ export function middleware(request: NextRequest) {
 
   if (isAuthPage || isMaintenance) {
     return NextResponse.redirect(new URL('/home', request.url));
+  }
+
+  if (
+    !onboardingComplete &&
+    pathname !== '/onboarding' &&
+    skipOnboarding === 'false'
+  ) {
+    return NextResponse.redirect(new URL('/onboarding', request.url));
   }
 
   return NextResponse.next();
