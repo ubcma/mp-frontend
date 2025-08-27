@@ -22,7 +22,7 @@ export interface HighlightCardProps {
 export function HighlightCard({ image, heading, subheading, url, highlightTags, color }: HighlightCardProps) {
     return (
         <Link href={url} className="block group">
-            <Card className="relative h-72 w-[24rem] md:h-96 md:w-[40rem] duration-200 shadow-md md:py-8 py-4">
+            <Card className="relative h-64 w-[calc(100vw-3rem)] md:h-96 md:w-[40rem] duration-200 shadow-md md:py-8 py-4">
 
                 <div className="absolute inset-0 overflow-hidden rounded-xl">
                     <Image

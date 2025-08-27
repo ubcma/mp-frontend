@@ -397,7 +397,7 @@ export function RenderCheckboxField({
   field,
   options,
 }: {
-  label: string;
+  label?: string;
   field: AnyFieldApi;
   options: string[];
 }) {

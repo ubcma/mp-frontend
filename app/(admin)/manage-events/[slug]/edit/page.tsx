@@ -23,12 +23,16 @@ export default function EventPage() {
           initialValues={data?.event}
           onSubmit={async (data) => {
             try {
+
+              console.log('body: ', data)
               const res = await fetchFromAPI('/api/events/update', {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include',
                 body: data,
               });
+
+              console.log(res);
 
               if (!res) {
                 throw new Error('Failed to update event');

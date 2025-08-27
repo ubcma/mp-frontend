@@ -184,14 +184,14 @@ export function AppSidebar() {
             activeMatch="startsWith"
           />
 
-          <SidebarSection
+          {/* <SidebarSection
             label="Member Apps"
             menuItems={memberMenu}
             pathname={pathname}
             setOpenMobile={setOpenMobile}
             isVisible={user?.role === 'Member' || user?.role === 'Admin'}
             activeMatch="startsWith"
-          />
+          /> */}
 
           <SidebarSection
             label="Admin"
@@ -312,6 +312,8 @@ export function ProfilePopover({
   state,
   isMobile,
 }: ProfilePopoverProps) {
+  const [isPopoverOpen, setPopoverOpen] = useState(false);
+
   return (
     <SidebarGroup>
       {isLoading ? (
@@ -323,7 +325,7 @@ export function ProfilePopover({
           </div>
         </div>
       ) : (
-        <Popover>
+        <Popover open={isPopoverOpen} onOpenChange={setPopoverOpen}>
           <PopoverTrigger asChild>
             <button
               className={`flex w-full items-center gap-4 md:gap-3 transition-all duration-300 ease-in-out hover:opacity-70 focus:outline-none ${
@@ -366,22 +368,17 @@ export function ProfilePopover({
             className={`md:w-[15rem]
                w-[19rem] p-1 md:text-sm text-md`}
           >
-            {/* md:w-[15rem] */}
             <Link
               href="/profile"
               className="block rounded-md p-4 py-3 md:p-2 hover:bg-accent"
+              onClick={() => setPopoverOpen(false)}
             >
               View Profile
             </Link>
             <Link
-              href="/preferences"
-              className="block rounded-md p-4 py-3 md:p-2 hover:bg-accent"
-            >
-              Preferences
-            </Link>
-            <Link
               href="/membership"
               className="block rounded-md p-4 py-3 md:p-2 hover:bg-accent"
+              onClick={() => setPopoverOpen(false)}
             >
               Membership
             </Link>

@@ -28,47 +28,47 @@ const itemVariants: Variants = {
 };
 
 const highlightCards = [
-  {
-    image:
-      'https://gs42emtt45.ufs.sh/f/qeDSywamz1NxH4tQ5JT6W5MP98mJjURL4xkwFTZOQiGbpShA',
-    heading: 'Gateways tickets now available',
-    subheading: "UBCMA's flagship marketing conference",
-    url: '/gateways',
-    color: '#000000',
-    highlightTags: [
-      {
-        icon: Calendar,
-        text: 'Wednesday, November 20 @ 8:00 AM',
-        color: '#9FC5FF',
-      },
-      {
-        icon: MapPin,
-        text: 'AMS Great Hall',
-        color: '#DBCCFF',
-      },
-    ],
-  },
-  {
-    image:
-      'https://gs42emtt45.ufs.sh/f/qeDSywamz1NxnEfYPdoHpX2NmeMbcOv7uC06IdP1w5839oBh',
-    heading: 'Job board now open',
-    subheading: 'Delivering opportunities to your doorstep',
-    url: '/jobs',
-    color: '#202E43',
-    highlightTags: [
-      {
-        icon: Award,
-        text: 'Members only',
-        color: '#FF5370',
-      },
-    ],
-  },
+  // {
+  //   image:
+  //     'https://gs42emtt45.ufs.sh/f/qeDSywamz1NxH4tQ5JT6W5MP98mJjURL4xkwFTZOQiGbpShA',
+  //   heading: 'Gateways tickets now available',
+  //   subheading: "UBCMA's flagship marketing conference",
+  //   url: '/gateways',
+  //   color: '#000000',
+  //   highlightTags: [
+  //     {
+  //       icon: Calendar,
+  //       text: 'Wednesday, November 20 @ 8:00 AM',
+  //       color: '#9FC5FF',
+  //     },
+  //     {
+  //       icon: MapPin,
+  //       text: 'AMS Great Hall',
+  //       color: '#DBCCFF',
+  //     },
+  //   ],
+  // },
+  // {
+  //   image:
+  //     'https://gs42emtt45.ufs.sh/f/qeDSywamz1NxnEfYPdoHpX2NmeMbcOv7uC06IdP1w5839oBh',
+  //   heading: 'Job board now open',
+  //   subheading: 'Delivering opportunities to your doorstep',
+  //   url: '/jobs',
+  //   color: '#202E43',
+  //   highlightTags: [
+  //     {
+  //       icon: Award,
+  //       text: 'Members only',
+  //       color: '#FF5370',
+  //     },
+  //   ],
+  // },
     {
     image:
       'https://gs42emtt45.ufs.sh/f/qeDSywamz1Nx5d0JzlLAyEGpJWNOfhraPBzoqbQT0MFdgi9H',
-    heading: 'Meet the exec team',
-    subheading: 'We are in full swing for 2025-26!',
-    url: '/jobs',
+    heading: 'Check out our new website!',
+    subheading: 'MA is back in full swing for 2025-26.',
+    url: 'https://ubcma.ca',
     color: '#731726',
     highlightTags: [
       {

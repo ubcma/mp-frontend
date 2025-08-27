@@ -8,12 +8,18 @@ import Link from 'next/link';
 import { toast } from 'sonner';
 import { motion } from 'framer-motion';
 import Spinner from '../common/Spinner';
-import { RenderInputField } from './FormComponents';
+import {
+  FieldInfo,
+  RenderCheckboxField,
+  RenderInputField,
+} from './FormComponents';
 import { signUpWithEmail } from '@/lib/better-auth/sign-up';
 import { handleClientError } from '@/lib/error/handleClient';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import AuthCardHeader from '../auth/AuthCardHeader';
+import { Checkbox } from '../ui/checkbox';
+import { Label } from '../ui/label';
 
 export default function SignUpForm() {
   const router = useRouter();
@@ -23,17 +29,23 @@ export default function SignUpForm() {
       lastName: '',
       email: '',
       password: '',
+      agreeToTerms: false,
     },
     onSubmit: async ({ value }) => {
       try {
         const fullName = `${value.firstName} ${value.lastName}`;
-        const data = await signUpWithEmail(fullName, value.email, value.password);
+        const data = await signUpWithEmail(
+          fullName,
+          value.email,
+          value.password
+        );
 
         if (data?.user) {
-          toast.success('Sign up successful! Please check your email for verification.');
+          toast.success(
+            'Sign up successful! Please check your email for verification.'
+          );
           router.push('/sign-in');
         }
-        
       } catch (error) {
         handleClientError('Sign Up Error', error);
       }
@@ -54,13 +66,16 @@ export default function SignUpForm() {
           height={128}
           alt="UBC MA Logo"
         />
-        
+
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
         >
-          <AuthCardHeader heading="Sign Up" subheading="Enter your details to register for an account." />
+          <AuthCardHeader
+            heading="Sign Up"
+            subheading="Enter your details to register for an account."
+          />
         </motion.div>
 
         <form
@@ -132,8 +147,50 @@ export default function SignUpForm() {
                   !value ? 'Password is required.' : undefined,
               }}
               children={(field) => (
-                <RenderInputField type="password" label="Password" field={field} />
+                <RenderInputField
+                  type="password"
+                  label="Password"
+                  field={field}
+                />
               )}
+            />
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+          >
+            <form.Field
+              name="agreeToTerms"
+              validators={{
+                onChange: ({ value }) =>
+                  !value ? 'You must agree to the privacy policy' : undefined,
+              }}
+              children={(field) => {
+                const id = field.name; // unique id for checkbox + label
+
+                return (
+                  <div className="flex flex-col gap-2 text-left mb-4">
+                    <div className="flex flex-row gap-2">
+                      <Checkbox
+                      className='data-[state=checked]:bg-blue-500 data-[state=checked]:border-none'
+                        id={id}
+                        checked={field.state.value}
+                        onCheckedChange={() =>
+                          field.setValue(!field.state.value)
+                        }
+                      />
+                      <Label
+                        className="inline text-xs text-muted-foreground font-normal select-none"
+                      >
+                        By signing up, you are agreeing to our <Link href="/terms-of-service" className='text-blue-500 hover:underline'>terms of service</Link> 
+                        {" and "} <Link href="/privacy-policy" className='text-blue-500 hover:underline'>privacy policy.</Link>
+                      </Label>
+                    </div>
+                  </div>
+                );
+              }}
             />
           </motion.div>
 
@@ -158,7 +215,6 @@ export default function SignUpForm() {
                     </>
                   ) : (
                     <>
-
                       <div>Create Account</div>
                     </>
                   )}

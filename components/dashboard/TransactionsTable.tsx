@@ -120,7 +120,7 @@ export default function TransactionsTable() {
       ) : (
         <div className="rounded-md border">
           <Table>
-            <TableHeader>
+            <TableHeader className='bg-ma-red/20'>
               {table.getHeaderGroups().map((headerGroup) => (
                 <TableRow key={headerGroup.id}>
                   {headerGroup.headers.map((header) => (

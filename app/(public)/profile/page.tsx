@@ -97,7 +97,7 @@ export default function ProfilePage() {
             <h2 className="text-xl font-semibold">Profile</h2>
             <Button
               onClick={() => setIsEditMode(!isEditMode)}
-              variant={isEditMode ? "outline" : "default"}
+              variant='ma'
               size="sm"
               className="flex items-center gap-2"
             >
