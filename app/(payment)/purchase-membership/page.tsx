@@ -6,19 +6,25 @@ import CheckoutForm from '@/components/forms/CheckoutMembershipForm';
 import { MEMBERSHIP_PRICE } from '@/lib/constants';
 import { useUserQuery } from '@/lib/queries/user';
 import { useRouter } from 'next/navigation';
-import { getClientSecret } from '@/lib/queries/stripe';
+import { useClientSecret } from '@/lib/queries/stripe';
 import Image from 'next/image';
 import { ChevronLeft } from 'lucide-react';
 import Link from 'next/link';
 import { useQueryClient } from '@tanstack/react-query';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import Spinner from '@/components/common/Spinner';
+
+// Create the Stripe promise once
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY!);
 
 export default function PurchaseMembershipPage() {
   const router = useRouter();
   const queryClient = useQueryClient();
 
-  queryClient.invalidateQueries({ queryKey: ['user'] });
+  // make sure in useEffect
+  useEffect(() => {
+    queryClient.invalidateQueries({ queryKey: ['user'] });
+  }, [queryClient]);
 
   const {
     data: user,
@@ -28,29 +34,33 @@ export default function PurchaseMembershipPage() {
 
   const userRole = user?.role;
 
+  // Redirect members/admins away
   useEffect(() => {
     if (userRole === 'Member' || userRole === 'Admin') {
       router.push('/home');
     }
   }, [userRole, router]);
 
-  const key = process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY!;
-  const stripePromise = loadStripe(key);
+  // Build the body only when needed
+  const body = useMemo(
+    () => ({
+      purchaseType: 'membership',
+      amount: MEMBERSHIP_PRICE,
+      currency: 'cad',
+    }),
+    []
+  );
 
+  // call hook unconditionally; gate execution with `enabled`
   const {
     data: clientSecretData,
     isLoading: isClientSecretLoading,
     isError: isClientSecretError,
-  } = getClientSecret({
-    body: {
-      purchaseType: 'membership',
-      amount: MEMBERSHIP_PRICE,
-      currency: 'cad',
-    },
-  });
+  } = useClientSecret(body, Boolean(!isUserLoading && userRole === 'Basic'));
 
   const clientSecret = clientSecretData?.clientSecret;
 
+  // Loading states
   if (isUserLoading || userRole !== 'Basic') {
     return (
       <div className="min-h-screen flex flex-col gap-2 items-center justify-center">
@@ -64,11 +74,20 @@ export default function PurchaseMembershipPage() {
 
   if (isClientSecretLoading || !stripePromise || !clientSecret) {
     return (
-      <div className="min-h-screen flex flex-col gap-2  items-center justify-center">
+      <div className="min-h-screen flex flex-col gap-2 items-center justify-center">
         <Spinner />
         <p className="text-center text-muted-foreground">
           Loading payment form…
         </p>
+      </div>
+    );
+  }
+
+  // Error state (optional but helpful)
+  if (isClientSecretError) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-red-600">Unable to initialize payment. Please try again.</p>
       </div>
     );
   }
@@ -82,6 +101,7 @@ export default function PurchaseMembershipPage() {
         <ChevronLeft className="w-4 h-4" />
         <span>Back to Home</span>
       </Link>
+
       <Elements stripe={stripePromise} options={{ clientSecret }}>
         <div className="w-full flex flex-col items-center max-w-2xl space-y-10 px-6">
           <Image
@@ -90,7 +110,6 @@ export default function PurchaseMembershipPage() {
             height={128}
             width={128}
           />
-
           <CheckoutForm clientSecret={clientSecret} />
         </div>
       </Elements>
