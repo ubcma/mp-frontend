@@ -3,7 +3,7 @@
 import { Button } from '@/components/ui/button';
 import { handleClientError } from '@/lib/error/handleClient';
 import { fetchFromAPI } from '@/lib/httpHandlers';
-import { verifyUserPayment } from '@/lib/queries/stripe';
+import { useVerifyUserPayment} from '@/lib/queries/stripe';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -33,10 +33,9 @@ export default function SuccessPage() {
     }
   }, []);
 
-  const { data, isLoading, isError, error } = verifyUserPayment({
-    paymentIntentId: paymentIntentId!,
-    enabled: !!paymentIntentId,
-  });
+const { data, isLoading, isError, error } =
+  useVerifyUserPayment(paymentIntentId, Boolean(paymentIntentId));
+
 
   useEffect(() => {
     if (data?.verified === true) {

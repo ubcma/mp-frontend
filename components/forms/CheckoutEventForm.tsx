@@ -13,19 +13,21 @@ import { useGetEventQuery } from '@/lib/queries/event';
 import { Lock, CreditCard, Zap, ShieldCheck, Calendar } from 'lucide-react';
 import { Button } from '../ui/button';
 import Spinner from '../common/Spinner';
+// ⬇️ adjust the import path to where you placed the component
+import TermsCheckbox from '@/components/forms/TermsCheckbox';
 
 export default function CheckoutEventForm({ clientSecret }: { clientSecret: string }) {
   const stripe = useStripe();
   const elements = useElements();
+
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
-  const [paymentRequest, setPaymentRequest] =
-    useState<StripePaymentRequest | null>(null);
+  const [paymentRequest, setPaymentRequest] = useState<StripePaymentRequest | null>(null);
+  const [agreed, setAgreed] = useState(false); // ✅ TOS state
 
   const searchParams = useSearchParams();
   const eventSlug = searchParams.get('eventSlug');
   const { data, isLoading: isEventLoading, isError } = useGetEventQuery({ eventSlug: eventSlug! });
-
   const event = data?.event;
 
   // Setup Payment Request (Apple/Google Pay)
@@ -37,7 +39,7 @@ export default function CheckoutEventForm({ clientSecret }: { clientSecret: stri
       currency: 'cad',
       total: {
         label: event.title,
-        amount: event.price,
+        amount: Math.round(Number(event.price) * 100), // ✅ cents
       },
       requestPayerName: true,
       requestPayerEmail: true,
@@ -53,6 +55,13 @@ export default function CheckoutEventForm({ clientSecret }: { clientSecret: stri
     if (!paymentRequest || !stripe || !clientSecret) return;
 
     paymentRequest.on('paymentmethod', async (ev) => {
+      if (!agreed) {
+        // Block quick pay if TOS not accepted
+        ev.complete('fail');
+        setErrorMsg('Please accept the Terms before paying.');
+        return;
+      }
+
       const { paymentIntent, error } = await stripe.confirmCardPayment(clientSecret, {
         payment_method: ev.paymentMethod.id,
       });
@@ -62,20 +71,26 @@ export default function CheckoutEventForm({ clientSecret }: { clientSecret: stri
         setErrorMsg(error.message || 'Payment failed');
       } else {
         ev.complete('success');
-        window.location.href = `/success?payment_intent=${paymentIntent.id}&redirect_status=${paymentIntent.status}`;
+        // You can also redirect to /event-purchase-success if that's your convention
+        window.location.href = `/success?payment_intent=${paymentIntent?.id}&redirect_status=${paymentIntent?.status}`;
       }
     });
-  }, [paymentRequest, stripe, clientSecret]);
+  }, [paymentRequest, stripe, clientSecret, agreed]);
 
   // Handle manual card submission
   const handleSubmit = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     if (!stripe || !elements) return;
+    if (!agreed) {
+      setErrorMsg('Please accept the Terms before paying.');
+      return;
+    }
 
     setIsLoading(true);
     const { error } = await stripe.confirmPayment({
       elements,
       confirmParams: {
+        // Stripe will append ?payment_intent & redirect_status
         return_url: `${window.location.origin}/event-purchase-success`,
       },
     });
@@ -99,6 +114,8 @@ export default function CheckoutEventForm({ clientSecret }: { clientSecret: stri
     return <p className="text-red-500">Could not load event details.</p>;
   }
 
+  const priceLabel = `$${Number(event.price).toFixed(2)}`;
+
   return (
     <form
       onSubmit={handleSubmit}
@@ -115,9 +132,7 @@ export default function CheckoutEventForm({ clientSecret }: { clientSecret: stri
       <div className="rounded-xl bg-gradient-to-r from-ma-red/10 via-rose-50 to-ma-red/5 border border-rose-200 p-6 shadow-inner">
         <h2 className="text-2xl font-bold text-neutral-900">{event.title}</h2>
         <div className="flex items-center gap-3 mt-3">
-          <span className="text-xl font-semibold text-ma-red">
-            ${(event.price).toFixed(2)} CAD
-          </span>
+          <span className="text-xl font-semibold text-ma-red">{priceLabel} CAD</span>
           <div className="flex items-center gap-1 text-xs bg-white border border-ma-red rounded-full px-2 py-0.5 shadow-sm">
             <Calendar className="w-3 h-3 text-ma-red" />
             {new Date(event.startsAt).toLocaleDateString()}
@@ -128,21 +143,26 @@ export default function CheckoutEventForm({ clientSecret }: { clientSecret: stri
         )}
       </div>
 
+      {/* Terms & Conditions (must accept before paying) */}
+      <TermsCheckbox onChange={setAgreed} />
+
       {/* Payment Methods */}
       <div className="space-y-5">
         <div className="flex items-center gap-2">
           <Zap className="w-4 h-4 text-green-600" />
-          <h4 className="text-sm font-medium text-neutral-800">
-            Quick Pay
-          </h4>
+          <h4 className="text-sm font-medium text-neutral-800">Quick Pay</h4>
         </div>
-        {paymentRequest ? (
+
+        {/* Only show the PR button if available AND terms accepted */}
+        {paymentRequest && agreed ? (
           <div className="rounded-lg border border-neutral-200 p-3 bg-neutral-50 hover:bg-neutral-100 transition">
             <PaymentRequestButtonElement options={{ paymentRequest }} />
           </div>
         ) : (
           <p className="text-xs text-neutral-500">
-            Apple Pay / Google Pay not available on this device.
+            {paymentRequest
+              ? 'Please accept the Terms to use Apple Pay / Google Pay.'
+              : 'Apple Pay / Google Pay not available on this device.'}
           </p>
         )}
       </div>
@@ -175,8 +195,8 @@ export default function CheckoutEventForm({ clientSecret }: { clientSecret: stri
       {/* Pay Button */}
       <Button
         type="submit"
-        disabled={!stripe || isLoading}
-        className="w-full flex items-center justify-center gap-2 rounded-xl px-4 py-3 font-semibold text-white transition duration-200 shadow-md hover:shadow-lg"
+        disabled={!stripe || isLoading || !agreed} // ✅ disabled until terms accepted
+        className="w-full flex items-center justify-center gap-2 rounded-xl px-4 py-3 font-semibold text-white transition duration-200 shadow-md hover:shadow-lg disabled:opacity-60 disabled:cursor-not-allowed"
         variant="ma"
       >
         {isLoading ? (
@@ -185,7 +205,7 @@ export default function CheckoutEventForm({ clientSecret }: { clientSecret: stri
             Processing...
           </>
         ) : (
-          <>Pay ${(event.price).toFixed(2)}</>
+          <>Pay {priceLabel}</>
         )}
       </Button>
 
