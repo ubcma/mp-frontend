@@ -6,6 +6,7 @@ import {
   PaymentRequestButtonElement,
 } from '@stripe/react-stripe-js';
 import type { PaymentRequest as StripePaymentRequest } from '@stripe/stripe-js';
+import { MEMBERSHIP_PRICE } from '@/lib/constants';
 
 export default function PaymentRequestButton({ clientSecret }: { clientSecret: string }) {
   const stripe = useStripe();
@@ -22,7 +23,7 @@ export default function PaymentRequestButton({ clientSecret }: { clientSecret: s
       currency: 'cad',
       total: {
         label: 'UBCMA Membership',
-        amount: 2000, // in cents
+        amount: MEMBERSHIP_PRICE, // in cents
       },
       requestPayerName: true,
       requestPayerEmail: true,
