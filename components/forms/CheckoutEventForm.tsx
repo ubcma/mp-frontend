@@ -23,7 +23,7 @@ export default function CheckoutEventForm({ clientSecret }: { clientSecret: stri
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [paymentRequest, setPaymentRequest] = useState<StripePaymentRequest | null>(null);
-  const [agreed, setAgreed] = useState(false); // ✅ TOS state
+  const [agreed, setAgreed] = useState(false); // 
 
   const searchParams = useSearchParams();
   const eventSlug = searchParams.get('eventSlug');
@@ -39,7 +39,7 @@ export default function CheckoutEventForm({ clientSecret }: { clientSecret: stri
       currency: 'cad',
       total: {
         label: event.title,
-        amount: Math.round(Number(event.price) * 100), // ✅ cents
+        amount: Math.round(Number(event.price) * 100), //
       },
       requestPayerName: true,
       requestPayerEmail: true,
@@ -195,7 +195,7 @@ export default function CheckoutEventForm({ clientSecret }: { clientSecret: stri
       {/* Pay Button */}
       <Button
         type="submit"
-        disabled={!stripe || isLoading || !agreed} // ✅ disabled until terms accepted
+        disabled={!stripe || isLoading || !agreed} // disabled until terms accepted
         className="w-full flex items-center justify-center gap-2 rounded-xl px-4 py-3 font-semibold text-white transition duration-200 shadow-md hover:shadow-lg disabled:opacity-60 disabled:cursor-not-allowed"
         variant="ma"
       >
