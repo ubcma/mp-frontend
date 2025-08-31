@@ -69,8 +69,8 @@ export default function ResetPasswordForm() {
           transition={{ duration: 0.3 }}
           className="flex flex-col gap-6 place-items-center text-center"
         >
-          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
-            <CheckCircle className="w-8 h-8 text-green-600" />
+          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center">
+            <CheckCircle className="w-8 h-8 text-ma-red" />
           </div>
           
           <div className="space-y-2">
