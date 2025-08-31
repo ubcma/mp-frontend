@@ -265,6 +265,21 @@ export default function SignInForm() {
                 />
               </motion.div>
 
+              {/* Added Forgot Password Link */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.25 }}
+                className="text-right"
+              >
+                <Link 
+                  href="/forgot-password" 
+                  className="text-sm text-ma-red hover:underline"
+                >
+                  Forgot password?
+                </Link>
+              </motion.div>
+
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}

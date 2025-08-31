@@ -64,6 +64,7 @@ export async function middleware(request: NextRequest) {
   const isAuthPage =
     pathname.startsWith('/sign-in') ||
     pathname.startsWith('/sign-up') ||
+    pathname.startsWith('/reset-password') ||
     pathname.startsWith('/forgot-password') ||
     pathname.startsWith('/terms-of-service') ||
     pathname.startsWith('/privacy-policy')
