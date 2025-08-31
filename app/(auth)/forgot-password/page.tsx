@@ -1,9 +1,10 @@
-export default async function ForgotPasswordPage() {
+// app/forgot-password/page.tsx (or pages/forgot-password.tsx)
+import ForgotPasswordForm from '@/components/forms/ForgotPasswordForm';
 
+export default function ForgotPasswordPage() {
   return (
-    <div className="flex flex-col items-center justify-center h-screen">
-      <h1 className="text-2xl font-bold mb-4">Forgot Password Placeholder</h1>
+    <div className="flex flex-col items-center justify-center min-h-screen p-4">
+      <ForgotPasswordForm />
     </div>
-  )
-
+  );
 }

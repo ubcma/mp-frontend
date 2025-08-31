@@ -11,7 +11,7 @@ export const signUpWithEmail = async (
       email,
       password,
       name,
-      callbackURL: '/home',
+      callbackURL: `${process.env.NEXT_PUBLIC_FRONTEND_URL}/home`,
     },
     {
       onRequest: (ctx) => {
