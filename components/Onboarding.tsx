@@ -32,6 +32,8 @@ import {
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { fetchFromAPI } from '@/lib/httpHandlers';
+import { useIsMobile } from '@/hooks/use-mobile';
+import ProgressLineMobile from './ProgressLineMobile';
 
 const steps = [
   {
@@ -78,10 +80,17 @@ const stepEmojiMap = {
 export default function OnboardingModal() {
   const [showConfetti, setShowConfetti] = useState(false);
   const [step, setStep] = useState(0);
+  const [isClient, setIsClient] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
+  const isMobile = useIsMobile();
 
   const { width, height } = useWindowSize();
+
+  // Prevent hydration mismatch by waiting for client-side rendering
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   useEffect(() => {
     if (step === steps.length - 1) {
@@ -92,23 +101,39 @@ export default function OnboardingModal() {
   // Auto-transition from step 0 to step 1 after 2 seconds
   useEffect(() => {
     if (step === 0) {
+      if (isMobile) {
+        setTimeout(() => {
+          scrollToStep(1);
+        }, 1500);
+      }
       const timer = setTimeout(() => {
         handleNext();
       }, 1500);
 
       return () => clearTimeout(timer);
     }
-  }, [step]);
+  }, [step, isMobile]);
 
   // scroll to specific step
   const scrollToStep = (stepIndex: number) => {
     if (containerRef.current) {
       const stepElement = containerRef.current.children[stepIndex] as HTMLElement;
       if (stepElement) {
-        stepElement.scrollIntoView({
-          behavior: 'smooth',
-          block: 'center',
-        });
+        if (isMobile) {
+          // For mobile, scroll horizontally to show full step
+          const scrollLeft = stepElement.offsetLeft;
+          
+          containerRef.current.scrollTo({
+            left: scrollLeft,
+            behavior: 'smooth'
+          });
+        } else {
+          // For desktop, scroll vertically
+          stepElement.scrollIntoView({
+            behavior: 'smooth',
+            block: 'center',
+          });
+        }
       }
     }
   };
@@ -160,6 +185,19 @@ export default function OnboardingModal() {
   ) as Faculty;
   const majors = selectedFaculty ? getMajorsForFaculty(selectedFaculty) : [];
 
+  // Show loading screen until client-side rendering is complete
+  if (!isClient) {
+    return (
+      <div 
+        className="h-screen overflow-hidden fixed inset-0 flex items-center justify-center"
+        style={{
+          background: 'linear-gradient(to bottom, #EF3050, #FF8096)'
+        }}
+      >
+      </div>
+    );
+  }
+
   return (
     <div 
       className="h-screen overflow-hidden fixed inset-0"
@@ -181,7 +219,7 @@ export default function OnboardingModal() {
       )}
 
       {/* Header - Logo and Stepper */}
-      <div className="fixed top-0 left-0 right-0 z-50 flex justify-between items-center px-20 py-8 bg-gradient-to-b from-[#EF3050] to-transparent">
+      <div className={`fixed top-0 left-0 right-0 z-50 flex ${isMobile ? 'justify-center' : 'justify-between'} items-center px-20 py-8 bg-gradient-to-b from-[#EF3050] to-transparent`}>
         {/* Logo */}
         <motion.div className="flex items-center"
           initial={{ opacity: 0, scale: 0 }}
@@ -200,8 +238,8 @@ export default function OnboardingModal() {
           />
         </motion.div>
 
-        {/* Circular Stepper */}
-        {step > 0 && step < steps.length - 1 && (
+        {/* Circular Stepper - Hidden on mobile */}
+        {step > 0 && step < steps.length - 1 && !isMobile && (
           <div className="flex items-center space-x-4">
             {steps.slice(1, -1).map((_, index) => (
               <div
@@ -218,8 +256,13 @@ export default function OnboardingModal() {
       </div>
 
       {/* Skip Onboarding Button */}
-      {step < steps.length - 1 && (
-        <motion.div className="fixed bottom-0 left-0 z-50 px-20 py-8 bg-gradient-to-t from-[#FF8096] to-transparent"
+      {step < steps.length - 1 && step > 0 && (
+        <motion.div 
+          className={`fixed z-50 bg-gradient-to-t from-[#FF8096] to-transparent ${
+            isMobile 
+              ? 'bottom-4 left-1/2 transform -translate-x-1/2 px-4 py-2' 
+              : 'bottom-0 left-0 px-20 py-8'
+          }`}
           initial={{ opacity: 0, scale: 0 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{
@@ -232,7 +275,7 @@ export default function OnboardingModal() {
               document.cookie = "onboarding_skipped=true; path=/; max-age=86400";
               router.push('/home')
             }}
-            className="text-white hover:text-white hover:bg-white/10"
+            className={`text-white hover:text-white hover:bg-white/10 ${isMobile ? 'text-sm' : 'text-lg'}`}
           >
             Skip Onboarding
           </Button>
@@ -240,11 +283,11 @@ export default function OnboardingModal() {
       )}
 
       {/* Scrollable Content Container */}
-      <div className="h-full flex items-center justify-center gap-20">
+    <div className={`h-full flex items-center justify-center ${isMobile ? 'flex-col gap-10' : 'flex-row gap-20'}`}>
         
       <div 
         ref={containerRef}
-        className="h-full w-auto max-w-2xl overflow-hidden scroll-smooth"
+        className={`${isMobile ? 'w-full overflow-hidden flex' : 'h-full w-auto max-w-2xl overflow-hidden scroll-smooth'}`}
         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
       >
         <style jsx>{`
@@ -261,11 +304,11 @@ export default function OnboardingModal() {
                duration: 0.4,
                scale: { type: "spring", visualDuration: 0.4, bounce: 0.5 },
            }}
-          className="h-screen flex flex-col justify-center items-center px-4 pt-32 pb-32"
+          className={`${isMobile ? 'min-w-full h-[500px] flex flex-col justify-center items-center px-4 snap-center' : 'h-screen flex flex-col justify-center items-center px-4 pt-32 pb-32'}`}
         >
           <div className="w-full max-w-2xl text-center">
-            <h1 className="text-8xl font-bold text-white mb-8">{steps[0].title}</h1>
-            <p className="text-white text-lg">{steps[0].description}</p>
+            <h1 className={`font-bold text-white ${isMobile ? 'text-4xl mb-4' : 'text-8xl mb-8'}`}>{steps[0].title}</h1>
+            <p className={`text-white ${isMobile ? 'text-sm' : 'text-lg'}`}>{steps[0].description}</p>
           </div>
         </motion.section>
 
@@ -277,10 +320,10 @@ export default function OnboardingModal() {
               duration: 0.4,
               scale: { type: "spring", visualDuration: 0.4, bounce: 0.3 },
           }}
-          className="h-screen flex flex-col justify-center items-center px-4 pt-32 pb-32"
+          className={`${isMobile ? 'min-w-full h-[500px] flex flex-col justify-center items-center px-8 snap-center' : 'h-screen flex flex-col justify-center items-center px-4 pt-32 pb-32'}`}
         >
           <div className="w-full max-w-2xl">
-            <h1 className="text-6xl font-bold text-white mb-8 text-center">{steps[1].title}</h1>
+            <h1 className={`font-bold text-white text-center ${isMobile ? 'text-3xl mb-4' : 'text-6xl mb-8'}`}>{steps[1].title}</h1>
             <form
               onSubmit={(e) => {
                 e.preventDefault();
@@ -288,8 +331,8 @@ export default function OnboardingModal() {
               }}
               className="space-y-6"
             >
-              <div className="flex gap-4 w-full">
-                <div className="flex-[0_0_10%]">
+              <div className={`flex gap-4 w-full ${isMobile ? 'flex-col' : 'flex-row'}`}>
+                <div className={isMobile ? 'flex-1' : 'flex-[0_0_10%]'}>
                   <form.Field
                     name="year"
                     validators={{
@@ -371,10 +414,10 @@ export default function OnboardingModal() {
               duration: 0.4,
               scale: { type: "spring", visualDuration: 0.4, bounce: 0.3 },
           }}
-          className="h-screen flex flex-col justify-center items-center px-4 pt-32 pb-32"
+          className={`${isMobile ? 'min-w-full h-[500px] flex flex-col justify-center items-center px-8 snap-center' : 'h-screen flex flex-col justify-center items-center px-4 pt-32 pb-32'}`}
         >
           <div className="w-full max-w-2xl">
-            <h1 className="text-6xl font-bold text-white mb-8 text-center">{steps[2].title}</h1>
+            <h1 className={`font-bold text-white text-center ${isMobile ? 'text-3xl mb-4' : 'text-6xl mb-8'}`}>{steps[2].title}</h1>
             <form.Field
               name="avatar"
               children={(field) => (
@@ -407,10 +450,10 @@ export default function OnboardingModal() {
              duration: 0.4,
              scale: { type: "spring", visualDuration: 0.4, bounce: 0.3 },
          }}
-          className="h-screen flex flex-col justify-center items-center px-4 pt-32 pb-32"
+          className={`${isMobile ? 'min-w-full h-[500px] flex flex-col justify-center items-center px-8 snap-center' : 'h-screen flex flex-col justify-center items-center px-4 pt-32 pb-32'}`}
         >
           <div className="w-full max-w-2xl">
-            <h1 className="text-6xl font-bold text-white mb-8 text-center">{steps[3].title}</h1>
+            <h1 className={`font-bold text-white text-center ${isMobile ? 'text-3xl mb-4' : 'text-6xl mb-8'}`}>{steps[3].title}</h1>
             <form.Field
               name="diet"
               children={(field) => {
@@ -450,7 +493,9 @@ export default function OnboardingModal() {
                               whileTap={{ scale: 0.95 }}
                               transition={{ duration: 0.1 }}
                               className={`
-                                cursor-pointer rounded-lg px-4 py-2 text-center font-normal text-sm transition-all duration-200 w-40 h-11 flex items-center justify-center
+                                cursor-pointer rounded-lg py-2 text-center font-normal transition-all duration-200 flex items-center justify-center ${
+                                  isMobile ? 'px-2 text-xs w-28 h-9' : 'px-4 text-sm w-40 h-11'
+                                }
                                 ${isSelected 
                                   ? 'bg-white text-black shadow-md' 
                                   : 'bg-white/20 text-white hover:bg-white/30'
@@ -480,7 +525,9 @@ export default function OnboardingModal() {
                               whileTap={{ scale: 0.95 }}
                               transition={{ duration: 0.1 }}
                               className={`
-                                cursor-pointer rounded-lg px-4 py-2 text-center font-normal text-sm transition-all duration-200 w-40 h-11 flex items-center justify-center
+                                cursor-pointer rounded-lg py-2 text-center font-normal transition-all duration-200 flex items-center justify-center ${
+                                  isMobile ? 'px-2 text-xs w-28 h-9' : 'px-4 text-sm w-40 h-11'
+                                }
                                 ${isSelected 
                                   ? 'bg-white text-black shadow-md' 
                                   : 'bg-white/20 text-white hover:bg-white/30'
@@ -510,7 +557,9 @@ export default function OnboardingModal() {
                               whileTap={{ scale: 0.95 }}
                               transition={{ duration: 0.1 }}
                               className={`
-                                cursor-pointer rounded-lg px-4 py-2 text-center font-normal text-sm transition-all duration-200 w-40 h-11 flex items-center justify-center
+                                cursor-pointer rounded-lg py-2 text-center font-normal transition-all duration-200 flex items-center justify-center ${
+                                  isMobile ? 'px-2 text-xs w-28 h-9' : 'px-4 text-sm w-40 h-11'
+                                }
                                 ${isSelected 
                                   ? 'bg-white text-black shadow-md' 
                                   : 'bg-white/20 text-white hover:bg-white/30'
@@ -540,7 +589,9 @@ export default function OnboardingModal() {
                               whileTap={{ scale: 0.95 }}
                               transition={{ duration: 0.1 }}
                               className={`
-                                cursor-pointer rounded-lg px-4 py-2 text-center font-normal text-sm transition-all duration-200 w-40 h-11 flex items-center justify-center
+                                cursor-pointer rounded-lg py-2 text-center font-normal transition-all duration-200 flex items-center justify-center ${
+                                  isMobile ? 'px-2 text-xs w-28 h-9' : 'px-4 text-sm w-40 h-11'
+                                }
                                 ${isSelected 
                                   ? 'bg-white text-black shadow-md' 
                                   : 'bg-white/20 text-white hover:bg-white/30'
@@ -635,15 +686,15 @@ export default function OnboardingModal() {
               duration: 0.4,
               scale: { type: "spring", visualDuration: 0.4, bounce: 0.3 },
           }}
-          className="h-screen flex flex-col justify-center items-center px-4 pt-32 pb-32"
+          className={`${isMobile ? 'min-w-full h-[500px] flex flex-col justify-center items-center px-8 snap-center' : 'h-screen flex flex-col justify-center items-center px-4 pt-32 pb-32'}`}
         >
           <div className="w-full max-w-2xl">
-            <h1 className="text-6xl font-bold text-white mb-8 text-center">{steps[4].title}</h1>
+            <h1 className={`font-bold text-white text-center ${isMobile ? 'text-3xl mb-4' : 'text-6xl mb-8'}`}>{steps[4].title}</h1>
             <div className="space-y-6">
               <form.Field
                 name="interests"
                 children={(field) => (
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className={`grid gap-3 ${isMobile ? 'grid-cols-2 grid-rows-4' : 'grid-cols-2'}`}>
                     {INTEREST_OPTIONS.map((interest) => {
                       const isSelected = field.state.value.includes(interest);
                       return (
@@ -653,7 +704,7 @@ export default function OnboardingModal() {
                           whileTap={{ scale: 0.95 }}
                           transition={{ duration: 0.1 }}
                           className={`
-                            cursor-pointer rounded-lg p-4 text-center font-normal text-sm transition-all duration-200
+                            cursor-pointer rounded-lg text-center font-normal transition-all duration-200 ${isMobile ? 'p-3 text-xs' : 'p-4 text-sm'}
                             ${isSelected 
                               ? 'bg-white text-black shadow-md' 
                               : 'bg-white/20 text-white hover:bg-white/30'
@@ -735,11 +786,11 @@ export default function OnboardingModal() {
               duration: 0.4,
               scale: { type: "spring", visualDuration: 0.4, bounce: 0.3 },
           }}
-          className="h-screen flex flex-col justify-center items-center px-4 pt-32 pb-32"
+          className={`${isMobile ? 'min-w-full h-[500px] flex flex-col justify-center items-center px-8 snap-center' : 'h-screen flex flex-col justify-center items-center px-4 pt-32 pb-32'}`}
         >
-          <div className="w-full max-w-2xl text-center space-y-6">
-            <h1 className="text-6xl font-bold text-white mb-8">{steps[5].title}</h1>
-            <p className="text-white text-lg">{steps[5].description}</p>
+          <div className={`w-full max-w-2xl text-center ${isMobile ? 'space-y-4' : 'space-y-6'}`}>
+            <h1 className={`font-bold text-white ${isMobile ? 'text-3xl mb-4' : 'text-6xl mb-8'}`}>{steps[5].title}</h1>
+            <p className={`text-white ${isMobile ? 'text-sm' : 'text-lg'}`}>{steps[5].description}</p>
             <Button 
               onClick={() => {
                 sessionStorage.removeItem('onboarding_skipped');
@@ -752,126 +803,137 @@ export default function OnboardingModal() {
           </div>
         </motion.section>
       </div>
-      {/* Progress Line */}
-      <div className="flex w-40 h-full items-center justify-center relative overflow-hidden">
-        <motion.div
-          className="absolute left-1/2 -translate-x-1/2 w-px bg-white"
-          animate={{
-            top: step === 0 ? '50%' : '0%',
-            bottom: step === 5 ? '50%' : '0%',
-            height: step === 0 ? '50%' : step === 5 ? '50%' : '100%'
-          }}
-          transition={{
-            duration: 0.6,
-            ease: "easeInOut",
-          }}
-        />
-        <div className="absolute w-full h-full">
-          {steps.map((_, index) => {
-            // Calculate relative position from current step
-            const relativePosition = index - step;
-            
-            let topPercentage = 50; // Default center
-            let circleSize = 100;
-            let isVisible = false;
-            
-            // Show 3 circles: previous, current, and next
-            if (relativePosition === -1) {
-              // Previous step - top of screen
-              topPercentage = 20;
-              circleSize = 100;
-              isVisible = true;
-            } else if (relativePosition === 0) {
-              // Current step - center of screen, larger size
-              topPercentage = 50;
-              circleSize = 150;
-              isVisible = true;
-            } else if (relativePosition === 1) {
-              // Next step - bottom of screen
-              topPercentage = 80;
-              circleSize = 100;
-              isVisible = true;
-            } else if (relativePosition < -1) {
-              // Steps that are further back - move progressively upward off screen
-              const offsetSteps = Math.abs(relativePosition) - 1;
-              topPercentage = 20 - (offsetSteps * 30); // Move 30% up for each additional step back
-              circleSize = 100;
-              isVisible = topPercentage >= -10; // Fade out when too far up
-            } else if (relativePosition > 1) {
-              // Steps that are further ahead - move progressively downward off screen
-              const offsetSteps = relativePosition - 1;
-              topPercentage = 80 + (offsetSteps * 30); // Move 30% down for each additional step ahead
-              circleSize = 100;
-              isVisible = topPercentage <= 110; // Fade out when too far down
-            }
-            
-            return (
-              <motion.div
-                key={index}
-                className={`absolute left-1/2 rounded-full bg-[#F65772] border-2 border-white flex items-center justify-center ${
-                  relativePosition === -1 ? 'cursor-pointer hover:bg-[#E02040] transition-colors duration-200' : ''
-                }`}
-                onClick={relativePosition === -1 ? handleBack : undefined}
-                initial={{ 
-                  top: `${topPercentage}%`,
-                  translateX: '-50%',
-                  translateY: '-50%',
-                  width: `${circleSize}px`,
-                  height: `${circleSize}px`,
-                  opacity: isVisible ? 1 : 0,
-                  scale: 0
-                }}
-                animate={{ 
-                  top: `${topPercentage}%`,
-                  translateX: '-50%',
-                  translateY: '-50%',
-                  width: `${circleSize}px`,
-                  height: `${circleSize}px`,
-                  opacity: isVisible ? 1 : 0,
-                  scale: isVisible ? 1 : 0
-                }}
-                transition={{ 
-                  duration: 0.4,
-                  opacity: { duration: 0.3 },
-                  scale: { 
-                    type: "spring", 
-                    visualDuration: 0.4, 
-                    bounce: 0.3,
-                  },
-                  top: { 
-                    duration: 0.6,
-                    ease: "easeInOut"
-                  },
-                  width: { 
-                    duration: 0.6,
-                    ease: "easeInOut"
-                  },
-                  height: { 
-                    duration: 0.6,
-                    ease: "easeInOut"
-                  }
-                }}
-              >
-                <motion.span
-                  animate={{
-                    fontSize: `${circleSize * 0.4}px`
+      {/* Mobile Progress Line */}
+      <ProgressLineMobile 
+        step={step}
+        steps={steps}
+        stepEmojiMap={stepEmojiMap}
+        handleBack={handleBack}
+        isMobile={isMobile}
+      />
+      
+      {/* Desktop Progress Line */}
+      {!isMobile && (
+        <div className="flex min-w-40 h-full items-center justify-center relative overflow-hidden">
+          <motion.div
+            className="absolute left-1/2 -translate-x-1/2 w-px bg-white"
+            animate={{
+              top: step === 0 ? '50%' : '0%',
+              bottom: step === 5 ? '50%' : '0%',
+              height: step === 0 ? '50%' : step === 5 ? '50%' : '100%'
+            }}
+            transition={{
+              duration: 0.6,
+              ease: "easeInOut",
+            }}
+          />
+          <div className="absolute w-full h-full">
+            {steps.map((_, index) => {
+              // Calculate relative position from current step
+              const relativePosition = index - step;
+              
+              let topPercentage = 50; // Default center
+              let circleSize = 100;
+              let isVisible = false;
+              
+              // Show 3 circles: previous, current, and next
+              if (relativePosition === -1) {
+                // Previous step - top of screen
+                topPercentage = 20;
+                circleSize = 100;
+                isVisible = true;
+              } else if (relativePosition === 0) {
+                // Current step - center of screen, larger size
+                topPercentage = 50;
+                circleSize = 150;
+                isVisible = true;
+              } else if (relativePosition === 1) {
+                // Next step - bottom of screen
+                topPercentage = 80;
+                circleSize = 100;
+                isVisible = true;
+              } else if (relativePosition < -1) {
+                // Steps that are further back - move progressively upward off screen
+                const offsetSteps = Math.abs(relativePosition) - 1;
+                topPercentage = 20 - (offsetSteps * 30); // Move 30% up for each additional step back
+                circleSize = 100;
+                isVisible = topPercentage >= -10; // Fade out when too far up
+              } else if (relativePosition > 1) {
+                // Steps that are further ahead - move progressively downward off screen
+                const offsetSteps = relativePosition - 1;
+                topPercentage = 80 + (offsetSteps * 30); // Move 30% down for each additional step ahead
+                circleSize = 100;
+                isVisible = topPercentage <= 110; // Fade out when too far down
+              }
+              
+              return (
+                <motion.div
+                  key={index}
+                  className={`absolute left-1/2 rounded-full bg-[#F65772] border-2 border-white flex items-center justify-center ${
+                    relativePosition === -1 ? 'cursor-pointer hover:bg-[#E02040] transition-colors duration-200' : ''
+                  }`}
+                  onClick={relativePosition === -1 ? handleBack : undefined}
+                  initial={{ 
+                    top: `${topPercentage}%`,
+                    translateX: '-50%',
+                    translateY: '-50%',
+                    width: `${circleSize}px`,
+                    height: `${circleSize}px`,
+                    opacity: isVisible ? 1 : 0,
+                    scale: 0
                   }}
-                  transition={{
-                    duration: 0.6,
-                    ease: "easeInOut"
+                  animate={{ 
+                    top: `${topPercentage}%`,
+                    translateX: '-50%',
+                    translateY: '-50%',
+                    width: `${circleSize}px`,
+                    height: `${circleSize}px`,
+                    opacity: isVisible ? 1 : 0,
+                    scale: isVisible ? 1 : 0
                   }}
-                  style={{
-                    lineHeight: 1
+                  transition={{ 
+                    duration: 0.4,
+                    opacity: { duration: 0.3 },
+                    scale: { 
+                      type: "spring", 
+                      visualDuration: 0.4, 
+                      bounce: 0.3,
+                    },
+                    top: { 
+                      duration: 0.6,
+                      ease: "easeInOut"
+                    },
+                    width: { 
+                      duration: 0.6,
+                      ease: "easeInOut"
+                    },
+                    height: { 
+                      duration: 0.6,
+                      ease: "easeInOut"
+                    }
                   }}
                 >
-                  {stepEmojiMap[index as keyof typeof stepEmojiMap]}
-                </motion.span>
-              </motion.div>
-            );
-          })}
+                  <motion.span
+                    animate={{
+                      fontSize: `${circleSize * 0.4}px`
+                    }}
+                    transition={{
+                      duration: 0.6,
+                      ease: "easeInOut"
+                    }}
+                    style={{
+                      lineHeight: 1
+                    }}
+                  >
+                    {stepEmojiMap[index as keyof typeof stepEmojiMap]}
+                  </motion.span>
+                </motion.div>
+              );
+            })}
+          </div>
         </div>
-      </div>
-      </div>
+      )}
+    </div>
     </div>
   );
 }
