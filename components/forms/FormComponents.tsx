@@ -26,6 +26,7 @@ import { Textarea } from '../ui/textarea';
 import { DateTimePicker } from '../DateTimePicker';
 import { Checkbox } from '../ui/checkbox';
 import { RadioGroup, RadioGroupItem } from '../ui/radio-group';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 export function FieldInfo({ field }: { field: AnyFieldApi }) {
   return (
@@ -55,6 +56,8 @@ export function RenderInputField({
   field: AnyFieldApi;
   onChange?: (value: string) => void;
 }) {
+  const isMobile = useIsMobile();
+  
   return (
     <div className="flex flex-col gap-2 w-full text-left">
       <Label htmlFor={field.name}>{label}</Label>
@@ -70,7 +73,7 @@ export function RenderInputField({
         }
         type={type}
         placeholder={placeholder ?? label}
-        className='bg-white'
+        className={`bg-white ${isMobile ? 'h-9 text-sm' : 'h-10'}`}
       />
       <FieldInfo field={field} />
     </div>
@@ -115,6 +118,8 @@ export function RenderSelectField({
   field: AnyFieldApi;
   disabled?: boolean;
 }) {
+  const isMobile = useIsMobile();
+  
   return (
     <div className="flex flex-col gap-2 w-full">
       <Label htmlFor={field.name}>{label}</Label>
@@ -158,6 +163,7 @@ export function RenderComboBoxField({
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState(field.state.value || '');
   const [inputValue, setInputValue] = useState('');
+  const isMobile = useIsMobile();
 
   const filteredOptions = options.filter((option) =>
     option.toLowerCase().includes(inputValue.toLowerCase())
@@ -176,7 +182,8 @@ export function RenderComboBoxField({
             aria-expanded={open}
             className={cn(
               'justify-between font-normal w-full',
-              value ? '' : 'text-neutral-400'
+              value ? '' : 'text-neutral-400',
+              isMobile ? 'h-9 text-sm' : 'h-10'
             )}
           >
             <span className="truncate overflow-hidden whitespace-nowrap max-w-[6rem] lg:max-w-[8rem]">
