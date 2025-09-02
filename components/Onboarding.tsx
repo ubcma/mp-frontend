@@ -320,7 +320,7 @@ export default function OnboardingModal() {
               duration: 0.4,
               scale: { type: "spring", visualDuration: 0.4, bounce: 0.3 },
           }}
-          className={`${isMobile ? 'min-w-full h-[500px] flex flex-col justify-center items-center px-8 snap-center' : 'h-screen flex flex-col justify-center items-center px-4 pt-32 pb-32'}`}
+          className={`${isMobile ? 'min-w-full h-[515px] flex flex-col justify-center items-center px-8 snap-center' : 'h-screen flex flex-col justify-center items-center px-4 pt-32 pb-32'}`}
         >
           <div className="w-full max-w-2xl">
             <h1 className={`font-bold text-white text-center ${isMobile ? 'text-3xl mb-4' : 'text-6xl mb-8'}`}>{steps[1].title}</h1>
@@ -345,6 +345,7 @@ export default function OnboardingModal() {
                         label="Year"
                         field={field}
                         placeholder=" "
+                        labelClassName="text-white"
                       />
                     )}
                   />
@@ -361,6 +362,7 @@ export default function OnboardingModal() {
                         options={FACULTIES}
                         label="Faculty"
                         field={field}
+                        labelClassName="text-white"
                       />
                     )}
                   />
@@ -379,6 +381,7 @@ export default function OnboardingModal() {
                           label="Major"
                           field={field}
                           disabled={!selectedFaculty}
+                          labelClassName="text-white"
                         />
                       );
                     }}
@@ -388,7 +391,7 @@ export default function OnboardingModal() {
               <form.Field
                 name="linkedinUrl"
                 children={(field) => (
-                  <RenderInputField label="LinkedIn URL" field={field} />
+                  <RenderInputField label="LinkedIn URL" field={field} labelClassName="text-white" />
                 )}
               />
             </form>
@@ -425,6 +428,7 @@ export default function OnboardingModal() {
                   type="file"
                   label="Upload a Profile Picture!"
                   field={field}
+                  labelClassName="text-white"
                 />
               )}
             />
