@@ -14,7 +14,6 @@ export default function PaymentRequestButton({ clientSecret }: { clientSecret: s
 
   useEffect(() => {
   if (!stripe || !clientSecret) {
-    console.log("Stripe not ready yet");
     return;
   }
 

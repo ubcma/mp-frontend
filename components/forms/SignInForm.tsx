@@ -361,9 +361,9 @@ export default function SignInForm() {
             >
               <h1 className="font-normal text-sm">
                 Or
-                <span onClick={() => setStep('password')} className="text-ma-red font-semibold cursor-pointer">
+                <button onClick={() => setStep('password')} className="text-ma-red font-semibold cursor-pointer mx-1">
                   {' '}click here{' '}
-                </span>
+                </button>
                 to continue with email
               </h1>
             </motion.div>

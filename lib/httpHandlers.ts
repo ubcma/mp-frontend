@@ -26,10 +26,6 @@ export async function fetchFromAPI(
     ...customHeaders,
   };
 
-  console.log('HERE')
-
-  console.log('API Endpoint hit:', endpoint);
-
   const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}${endpoint}`, {
     method,
     headers,
