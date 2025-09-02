@@ -101,8 +101,6 @@ export default function TransactionsTable() {
   // Fetch paginated data using the custom hook
   const { data, isLoading, isError } = useTransactionsQuery(page, pageSize);
 
-  console.log(data);
-
   const transactions = data?.data;
   const pagination = data?.meta;
 
