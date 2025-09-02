@@ -29,11 +29,13 @@ export const signInWithGoogle = async () => {
 };
 
 export const signInWithEmail = async (email: string, password: string) => {
+    const frontendBaseURL = process.env.NEXT_PUBLIC_FRONTEND_URL;
+
   const response = await authClient.signIn.email(
     {
       email,
       password,
-      callbackURL: '/home',
+      callbackURL: frontendBaseURL + '/home',
       rememberMe: true,
     },
     {
@@ -42,8 +44,14 @@ export const signInWithEmail = async (email: string, password: string) => {
       },
     }
   );
+
   if (response.error) {
-    throw new Error(response.error.message);
+    if (response.error.message == "Email not verified") {
+      toast.error("Please verify your email before signing in.");
+    }
+    else {
+      throw new Error(response.error.message);
+    }
   }
   return response;
 };
