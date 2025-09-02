@@ -18,7 +18,7 @@ export default function Home() {
   }
 
   return (
-    <div className="grid md:grid-cols-2 grid-cols-1 gap-4 h-full md:mt-0 mt-16">
+    <div className="grid md:grid-cols-2 grid-cols-1 gap-4 md:mt-0 mt-16">
       {isLoading ? (
         <Spinner />
       ) : events && events.length > 0 ? (

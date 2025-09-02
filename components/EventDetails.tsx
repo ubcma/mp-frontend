@@ -11,6 +11,7 @@ import DynamicFormField from '@/components/forms/DynamicFormField';
 import TagPill from '@/components/TagPill';
 import { useRouter } from 'next/navigation';
 import { useUserQuery } from '@/lib/queries/user';
+import { useGetUserRegistrationsQuery } from '@/lib/queries/registrations';
 
 interface EventDetailsProps {
   event: EventDetails;
@@ -26,6 +27,9 @@ const RenderEventDetails: React.FC<EventDetailsProps> = ({
   dressCode,
 }) => {
   const { data: user } = useUserQuery();
+  const { data: registrations } = useGetUserRegistrationsQuery();
+
+  const isRegistered = registrations?.registrations.map((registration) => registration.eventId).includes(event.id)
 
   const [responses, setResponses] = useState<{ [key: number]: string }>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -144,7 +148,15 @@ const RenderEventDetails: React.FC<EventDetailsProps> = ({
             Purchase a membership to gain access to this event and many other perks.
           </p>
         </div>
-      ) : (
+      ) : isRegistered ? (
+              <div className='flex flex-col justify-center items-center text-center rounded-xl w-full h-48 bg-emerald-300/10 border-dashed border-emerald-700 border-2 gap-2'>
+          <h3 className='font-semibold text-emerald-700 text-2xl capitalize'> You're already registered for this event! </h3>
+          <p className='text-emerald-700/80'>
+            We look forward to seeing you there.
+          </p>
+        </div>
+      
+      ):(
         <div className="flex flex-col relative gap-4 py-1">
           {/* Registration Form */}
           <Card>

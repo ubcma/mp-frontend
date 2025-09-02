@@ -1,9 +1,15 @@
+import ReturnToHomeButton from "@/components/ReturnToHome";
 import Link from "next/link";
 
 export default function TermsOfServicePage() {
   return (
-    <div className="container mx-auto max-w-3xl py-12 px-6">
+    <div className="mx-auto max-w-3xl py-12 px-6">
+
       <div className="flex flex-col gap-8 text-sm leading-relaxed text-foreground">
+
+
+      <ReturnToHomeButton />
+
         {/* Effective Date */}
         <p className="text-lg font-medium">
           <strong>Effective Date:</strong> September 1st, 2025

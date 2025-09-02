@@ -113,7 +113,7 @@ export function AdminEventCard({ event, onEdit }: AdminEventCardProps) {
               <DropdownMenuItem asChild>
                 <Link
                   className="cursor-pointer"
-                  href={`/events/${event.slug}/edit`}
+                  href={`/events/${event.slug}`}
                   prefetch={true}
                 >
                   View public page

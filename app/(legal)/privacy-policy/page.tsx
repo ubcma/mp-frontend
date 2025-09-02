@@ -1,9 +1,12 @@
-import Link from "next/link";
+import ReturnToHomeButton from '@/components/ReturnToHome';
+import Link from 'next/link';
 
 export default function PrivacyPolicyPage() {
   return (
-    <div className="container mx-auto max-w-3xl py-12 px-6">
+    <div className="mx-auto max-w-3xl py-12 px-6">
       <div className="flex flex-col gap-8 text-sm leading-relaxed text-foreground">
+        <ReturnToHomeButton />
+
         {/* Effective Date */}
         <p className="text-lg font-medium">
           <strong>Effective Date:</strong> September 1st, 2025
@@ -21,7 +24,9 @@ export default function PrivacyPolicyPage() {
 
         {/* Section 2 */}
         <section className="flex flex-col gap-2">
-          <h2 className="text-lg font-semibold">2. How We Use Your Information</h2>
+          <h2 className="text-lg font-semibold">
+            2. How We Use Your Information
+          </h2>
           <ul className="list-disc list-inside space-y-1">
             <li>Process memberships and event ticket purchases</li>
             <li>Send event updates and organizational news</li>

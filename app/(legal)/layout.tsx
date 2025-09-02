@@ -8,9 +8,7 @@ export default function Layout({
   return (
     <div
       className="
-        flex justify-center items-center
-        fixed top-0 left-0 w-full
-        min-h-[100dvh] md:relative md:min-h-screen
+        flex justify-center items-center w-full md:relative
       "
     >
       {/* Background Gradient */}
@@ -21,7 +19,6 @@ export default function Layout({
         className="
           w-screen
           flex flex-col justify-center items-center
-          min-h-screen
           bg-background/60 bg-blend-hard-light backdrop-blur-xl
           md:border border-background/80
           shadow-[inset_0px_0px_80px_20px_rgba(255,255,255,0.1)]

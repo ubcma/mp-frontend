@@ -99,14 +99,13 @@ export default function Home() {
         <motion.div variants={itemVariants} className="flex flex-col gap-2">
           <span className="flex flex-row text-3xl font-semibold">
             {userFirstName ? (
-              `Welcome back, ${userFirstName}!`
+              `Welcome to MA, ${userFirstName}!`
             ) : (
               <Skeleton className="h-8 w-32 rounded-xl" />
             )}
           </span>
           <p className="text-muted-foreground">
-            Check out the exciting events and opportunities we’re bringing to you
-            next.
+            Check out the latest news and opportunities from us.
           </p>
         </motion.div>
 

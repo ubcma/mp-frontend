@@ -34,7 +34,7 @@ function ActionButton({
           className,
           !disabled ?
             'hover:shadow-[inset_8px_-8px_50px_rgba(255,255,255,0.6)] hover:scale-105 active:scale-[0.97] hover:opacity-80' :
-            'grayscale'
+            'opacity-60'
           
         )}
         disabled={disabled}

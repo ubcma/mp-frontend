@@ -91,7 +91,7 @@ export default function ImageUpload({
         <Button
           onClick={triggerFileSelect}
           disabled={isUploading}
-          className={`absolute -bottom-2 -right-2 rounded-full w-10 h-10 p-0 bg-ma-red hover:bg-ma-red/80 shadow-lg transition-colors duration-150 ${className}`}
+          className={`rounded-full w-10 h-10 p-0 bg-ma-red hover:bg-ma-red hover:brightness-105 shadow-lg transition-all duration-150 ${className}`}
           size="sm"
         >
           {isUploading ? (
