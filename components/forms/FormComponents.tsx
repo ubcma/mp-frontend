@@ -49,18 +49,20 @@ export function RenderInputField({
   label,
   field,
   onChange,
+  labelClassName,
 }: {
   type?: string;
   placeholder?: string;
   label: string;
   field: AnyFieldApi;
   onChange?: (value: string) => void;
+  labelClassName?: string;
 }) {
   const isMobile = useIsMobile();
   
   return (
     <div className="flex flex-col gap-2 w-full text-left">
-      <Label htmlFor={field.name}>{label}</Label>
+      <Label htmlFor={field.name} className={labelClassName}>{label}</Label>
       <Input
         id={field.name}
         name={field.name}
@@ -111,18 +113,20 @@ export function RenderSelectField({
   label,
   field,
   disabled,
+  labelClassName,
 }: {
   options: string[];
   placeholder?: string;
   label: string;
   field: AnyFieldApi;
   disabled?: boolean;
+  labelClassName?: string;
 }) {
   const isMobile = useIsMobile();
   
   return (
     <div className="flex flex-col gap-2 w-full">
-      <Label htmlFor={field.name}>{label}</Label>
+      <Label htmlFor={field.name} className={labelClassName}>{label}</Label>
       <Select
         value={field.state.value ?? ''}
         onValueChange={(value) => field.handleChange(value)}
@@ -153,12 +157,14 @@ export function RenderComboBoxField({
   label,
   field,
   disabled,
+  labelClassName,
 }: {
   options: string[];
   placeholder?: string;
   label: string;
   field: AnyFieldApi;
   disabled?: boolean;
+  labelClassName?: string;
 }) {
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState(field.state.value || '');
@@ -173,7 +179,7 @@ export function RenderComboBoxField({
 
   return (
     <div className="flex flex-col gap-2 w-full">
-      <Label htmlFor={field.name}>{label}</Label>
+      <Label htmlFor={field.name} className={labelClassName}>{label}</Label>
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild disabled={disabled}>
           <Button
