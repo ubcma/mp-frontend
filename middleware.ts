@@ -9,7 +9,7 @@ export async function middleware(request: NextRequest) {
 
   // Static assets and API routes
   const allowlist = [
-    '/maintenance',
+    // '/maintenance',
     '/favicon.ico',
     '/robots.txt',
     '/_next',
