@@ -27,11 +27,13 @@ export interface EventImageUploadRef {
 }
 
 const EventImageUpload = forwardRef<EventImageUploadRef, Props>(
-  ({ onImageSelect, maxFileSizeMB = 5, existingImageUrl}, ref) => {
+  ({ onImageSelect, maxFileSizeMB = 5, existingImageUrl }, ref) => {
     const [uploading, setUploading] = useState(false);
     const [processing, setProcessing] = useState(false);
     const [pendingFile, setPendingFile] = useState<File | null>(null);
-    const [previewUrl, setPreviewUrl] = useState<string | null>(existingImageUrl || null);
+    const [previewUrl, setPreviewUrl] = useState<string | null>(
+      existingImageUrl || null
+    );
     const [uploadProgress, setUploadProgress] = useState(0);
 
     const fileInput = useRef<HTMLInputElement>(null);
@@ -136,7 +138,7 @@ const EventImageUpload = forwardRef<EventImageUploadRef, Props>(
         )}
         onClick={!uploading && !processing ? pickFile : undefined}
       >
-        <CardContent className='px-0'>
+        <CardContent className="px-0">
           <input
             ref={fileInput}
             type="file"
@@ -146,7 +148,7 @@ const EventImageUpload = forwardRef<EventImageUploadRef, Props>(
           />
 
           {!processing && !uploading && !previewUrl && (
-            <div className="flex flex-col items-center justify-center p-8 text-center">
+            <div className="flex flex-col items-center justify-center p-8 text-center min-h-80">
               <div className="w-12 h-12 rounded-full bg-foreground/10 flex items-center justify-center mb-4 group-hover:bg-primary/10 group-hover:text-foreground transition-colors">
                 <ImageIcon className="w-6 h-6 text-muted-foreground" />
               </div>
@@ -173,32 +175,29 @@ const EventImageUpload = forwardRef<EventImageUploadRef, Props>(
           )}
 
           {!uploading && previewUrl && (
-            <div className="">
-              <div className="relative">
-                <Image
-                  src={previewUrl}
-                  alt="Event preview"
-                  width={400}
-                  height={200}
-                  className="w-full h-80 object-cover rounded-lg"
-                />
-                <Button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    removePendingFile();
-                  }}
-                  variant="ma"
-                  size="sm"
-                  className="absolute top-2 right-2 rounded-full w-8 h-8 p-0 bg-ma-red"
-                  type="button"
-                >
-                  <X className="w-4 h-4" />
-                </Button>
-                <Badge className="absolute bottom-2 left-2 text-emerald-900 bg-emerald-300 ">
-                  <Check className="w-4 h-4 mr-1" />
-                  Ready to upload{pendingFile ? ` '${pendingFile.name}'` : '!'}
-                </Badge>
-              </div>
+            <div className="relative h-80">
+              <Image
+                src={previewUrl}
+                alt="Event preview"
+                fill
+                className="w-full object-cover rounded-lg"
+              />
+              <Button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  removePendingFile();
+                }}
+                variant="ma"
+                size="sm"
+                className="absolute top-2 left-2 z-10 rounded-full h-8 w-8 aspect-square bg-ma-red"
+                type="button"
+              >
+                <X className="w-3 h-3" />
+              </Button>
+              <Badge className="absolute bottom-2 left-2 text-emerald-900 bg-emerald-300 ">
+                <Check className="w-4 h-4 mr-1" />
+                Ready to upload{pendingFile ? ` '${pendingFile.name}'` : '!'}
+              </Badge>
             </div>
           )}
 

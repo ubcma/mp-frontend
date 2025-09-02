@@ -15,7 +15,8 @@ export default function EventPurchaseSuccessPage() {
           Payment Successful 🎉
         </h1>
         <p className="text-sm text-neutral-600">
-          Your ticket has been confirmed. A confirmation email will arrive shortly.
+          Your payment has been confirmed - we look forward to seeing you there!
+          {/* // A confirmation email will arrive shortly. */}
         </p>
 
         {paymentIntent && (

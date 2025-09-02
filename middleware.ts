@@ -3,8 +3,8 @@ import type { NextRequest } from 'next/server';
 import { getOnboardingStatus } from './lib/queries/server/onboardingStatus';
 
 export async function middleware(request: NextRequest) {
-  const accessCode = request.cookies.get('access_code')?.value;
-  const expectedCode = process.env.ACCESS_CODE;
+  // const accessCode = request.cookies.get('access_code')?.value;
+  // const expectedCode = process.env.ACCESS_CODE;
   const { pathname } = request.nextUrl;
 
   // Static assets and API routes
@@ -29,11 +29,11 @@ export async function middleware(request: NextRequest) {
   }
 
   // Access code check first
-  if (accessCode !== expectedCode) {
-    return NextResponse.redirect(new URL('/maintenance', request.url));
-  }
+  // if (accessCode !== expectedCode) {
+  //   return NextResponse.redirect(new URL('/maintenance', request.url));
+  // }
 
-  const isMaintenance = pathname.startsWith('/maintenance');
+  // const isMaintenance = pathname.startsWith('/maintenance');
 
   // Check for session cookies (try multiple possible names)
   const sessionCookie = request.cookies.get(
@@ -41,7 +41,6 @@ export async function middleware(request: NextRequest) {
       ? '__Secure-membership-portal.session_token'
       : 'membership-portal.session_token'
   )?.value;
-
 
   let skipOnboarding = request.cookies.get('onboarding_skipped')?.value;
 
@@ -61,16 +60,24 @@ export async function middleware(request: NextRequest) {
     onboardingComplete = await getOnboardingStatus();
   }
 
-  const isAuthPage =
-    pathname.startsWith('/sign-in') ||
-    pathname.startsWith('/sign-up') ||
-    pathname.startsWith('/reset-password') ||
-    pathname.startsWith('/forgot-password') ||
-    pathname.startsWith('/terms-of-service') ||
-    pathname.startsWith('/privacy-policy')
+  const publicAuthRoutes = [
+    "/sign-in",
+    "/sign-up",
+    "/reset-password",
+    "/forgot-password",
+  ];
+
+  const isAuthPage = publicAuthRoutes.includes(pathname);
+
+  const publicPageRoutes = [
+    '/terms-of-service',
+    '/privacy-policy',
+  ];
+
+  const isPublicPage = publicPageRoutes.includes(pathname) || pathname.startsWith("/events");
 
   if (!sessionCookie) {
-    if (isAuthPage) return NextResponse.next();
+    if (isAuthPage || isPublicPage) return NextResponse.next();
     return NextResponse.redirect(new URL('/sign-in', request.url));
   }
 
@@ -78,7 +85,7 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/home', request.url));
   }
 
-  if (isAuthPage || isMaintenance) {
+  if (isAuthPage) { // || isMaintenance
     return NextResponse.redirect(new URL('/home', request.url));
   }
 

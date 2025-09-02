@@ -143,9 +143,6 @@ export default function CheckoutEventForm({ clientSecret }: { clientSecret: stri
         )}
       </div>
 
-      {/* Terms & Conditions (must accept before paying) */}
-      <TermsCheckbox onChange={setAgreed} />
-
       {/* Payment Methods */}
       <div className="space-y-5">
         <div className="flex items-center gap-2">
@@ -191,6 +188,9 @@ export default function CheckoutEventForm({ clientSecret }: { clientSecret: stri
           {errorMsg}
         </div>
       )}
+
+      {/* Terms & Conditions (must accept before paying) */}
+      <TermsCheckbox onChange={setAgreed} />
 
       {/* Pay Button */}
       <Button

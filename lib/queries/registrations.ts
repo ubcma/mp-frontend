@@ -3,7 +3,7 @@ import { fetchFromAPI } from '../httpHandlers';
 import { EventRegistrationsResponse } from '../types/eventRegistration';
 
 export type Registration = {
-  id: number;
+  id: string;
   eventId: string;
   status: string;
   stripeTransactionId: string | null; 

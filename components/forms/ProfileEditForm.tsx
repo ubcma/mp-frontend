@@ -113,12 +113,14 @@ export default function ProfileEditForm({
           </Avatar>
 
           {/* Image upload button for avatar */}
-          <ImageUpload
-            currentImageUrl={user?.avatar}
-            onImageUpload={onAvatarUpdate}
-            buttonVariant="floating"
-            maxFileSize={4}
-          />
+          <div className='absolute bottom-0 right-0'>
+            <ImageUpload
+              currentImageUrl={user?.avatar}
+              onImageUpload={onAvatarUpdate}
+              buttonVariant="floating"
+              maxFileSize={4}
+            />
+          </div>
         </div>
       </div>
 
@@ -221,6 +223,7 @@ export default function ProfileEditForm({
               children={([canSubmit, isSubmitting]) => (
                 <Button
                   type="submit"
+                  variant="ma"
                   disabled={!canSubmit || isSubmitting}
                   className="flex items-center gap-2"
                 >

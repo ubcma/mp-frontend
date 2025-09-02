@@ -17,7 +17,11 @@ import { useGetUserRegistrationsQuery } from '@/lib/queries/registrations';
 
 export default function ProfilePage() {
   const { data: user, isLoading, isError, refetch } = useUserQuery();
-  const { data: registrations, isLoading: registrationsLoading, isError: registrationsError} = useGetUserRegistrationsQuery();
+  const {
+    data: registrations,
+    isLoading: registrationsLoading,
+    isError: registrationsError,
+  } = useGetUserRegistrationsQuery();
 
   const [isEditMode, setIsEditMode] = useState(false);
 
@@ -40,7 +44,10 @@ export default function ProfilePage() {
       refetch();
     } catch (error) {
       console.error('Error updating avatar:', error);
-      handleClientError('Failed to update profile picture. Please try again.', new Error());
+      handleClientError(
+        'Failed to update profile picture. Please try again.',
+        new Error()
+      );
     }
   };
 
@@ -65,7 +72,10 @@ export default function ProfilePage() {
       refetch();
     } catch (error) {
       console.error('Error updating profile:', error);
-      handleClientError('Failed to update profile. Please try again.', error as Error);
+      handleClientError(
+        'Failed to update profile. Please try again.',
+        error as Error
+      );
       throw error; // Re-throw to let the form handle it
     }
   };
@@ -97,7 +107,7 @@ export default function ProfilePage() {
             <h2 className="text-xl font-semibold">Profile</h2>
             <Button
               onClick={() => setIsEditMode(!isEditMode)}
-              variant='ma'
+              variant="ma"
               size="sm"
               className="flex items-center gap-2"
             >
@@ -144,12 +154,14 @@ export default function ProfilePage() {
                 </Avatar>
 
                 {/* Change Profile Picture Button - only show in view mode */}
-                <ImageUpload
-                  currentImageUrl={user?.avatar}
-                  onImageUpload={updateUserAvatar}
-                  buttonVariant="floating"
-                  maxFileSize={4}
-                />
+                <div className="absolute bottom-0 right-0">
+                  <ImageUpload
+                    currentImageUrl={user?.avatar}
+                    onImageUpload={updateUserAvatar}
+                    buttonVariant="floating"
+                    maxFileSize={4}
+                  />
+                </div>
               </div>
 
               <div className="space-y-1">
