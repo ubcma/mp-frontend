@@ -23,6 +23,10 @@ export type PaginatedResponse<T> = {
   };
 };
 
+export type RevenueQueryResponse = {
+  totalRevenue: number;
+}
+
 export function useTransactionsQuery(page: number, pageSize: number) {
   return useQuery<PaginatedResponse<Transaction>>({
     queryKey: ['transactions', page, pageSize],
@@ -39,6 +43,29 @@ export function useTransactionsQuery(page: number, pageSize: number) {
       );
 
       const data = (await res.json()) as PaginatedResponse<Transaction>;
+      return data;
+    },
+    retry: 1,
+    staleTime: 5 * 60 * 1000,
+  });
+}
+
+export function useRevenueQuery() {
+  return useQuery<RevenueQueryResponse>({
+    queryKey: ["transactions", "totalRevenue"],
+        queryFn: async () => {
+      const res = await fetchFromAPI(
+        `/api/transactions/revenue`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+        }
+      );
+
+      const data = (await res.json()) as RevenueQueryResponse;
       return data;
     },
     retry: 1,

@@ -8,6 +8,7 @@ import { useGetEventsQuery } from '@/lib/queries/events';
 import { Registration, useGetUserRegistrationsQuery } from '@/lib/queries/registrations';
 
 type EventContextType = {
+  events: EventDetails[] | undefined;
   filteredEvents: EventDetails[];
   setFilteredEvents: React.Dispatch<React.SetStateAction<EventDetails[]>>;
   searchTerm: string;
@@ -73,6 +74,7 @@ export const EventProvider: React.FC<{ children: React.ReactNode }> = ({
   return (
     <EventContext.Provider
       value={{
+        events,
         filteredEvents,
         setFilteredEvents,
         searchTerm,

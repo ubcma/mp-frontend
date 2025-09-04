@@ -8,7 +8,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Registration } from '@/lib/queries/registrations';
 
 export function EventList() {
-  const { filteredEvents, registeredEvents, isLoading } = useEventContext();
+  const { events, filteredEvents, registeredEvents, isLoading } = useEventContext();
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -110,7 +110,7 @@ export function EventList() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
         >
-          No events found.
+          {events?.length === 0 ? "Check back for more events!" : "Oops! Nothing came up."}
         </motion.h3>
         <motion.p
           className="text-muted-foreground text-sm max-w-96"
@@ -118,9 +118,7 @@ export function EventList() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
         >
-          {
-            "We couldn't find anything matching your search criteria. Try adjusting your filters or search terms"
-          }
+          {events?.length === 0 ?  "Our first event is still yet to come - stay tuned!" : "We couldn't find any events matching your search criteria, try adjusting your filters!"}
         </motion.p>
       </motion.div>
     );
