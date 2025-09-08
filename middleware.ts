@@ -3,8 +3,6 @@ import type { NextRequest } from 'next/server';
 import { getOnboardingStatus } from './lib/queries/server/onboardingStatus';
 
 export async function middleware(request: NextRequest) {
-  const accessCode = request.cookies.get('access_code')?.value;
-  const expectedCode = process.env.ACCESS_CODE;
   const { pathname } = request.nextUrl;
 
   // Static assets and API routes
@@ -26,15 +24,6 @@ export async function middleware(request: NextRequest) {
 
   if (isAllowlisted) {
     return NextResponse.next();
-  }
-
-  // Access code check first
-  const isMaintenance = pathname.startsWith('/maintenance');
-
-  if (process.env.VERCEL_ENV === 'preview') {
-    if (!isMaintenance && accessCode !== expectedCode) {
-      return NextResponse.redirect(new URL('/maintenance', request.url));
-    }
   }
 
   // Check for session cookies (try multiple possible names)
@@ -84,10 +73,6 @@ export async function middleware(request: NextRequest) {
   }
 
   if (pathname === '/') {
-    return NextResponse.redirect(new URL('/home', request.url));
-  }
-
-  if (isAuthPage || isMaintenance) {
     return NextResponse.redirect(new URL('/home', request.url));
   }
 
