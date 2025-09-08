@@ -115,24 +115,24 @@ export default function OnboardingModal() {
   // }, [step, isMobile]);
 
   // auto-progress step 0 → 1 after 1.5s
-  useEffect(() => {
-    if (step === 0) {
-      const timer = setTimeout(() => {
-        handleNext(); // will set step=1
-      }, 1500);
-      return () => clearTimeout(timer);
-    }
-  }, [step]);
+  // useEffect(() => {
+  //   if (step === 0) {
+  //     const timer = setTimeout(() => {
+  //       handleNext(); // will set step=1
+  //     }, 1500);
+  //     return () => clearTimeout(timer);
+  //   }
+  // }, [step]);
 
   // when step changes, scroll to it
-  useLayoutEffect(() => {
-    if (step >= 0) {
-      // wait one frame for layout
-      requestAnimationFrame(() => {
-        scrollToStep(step);
-      });
-    }
-  }, [step, isMobile]);
+  // useLayoutEffect(() => {
+  //   if (step >= 0) {
+  //     // wait one frame for layout
+  //     requestAnimationFrame(() => {
+  //       scrollToStep(step);
+  //     });
+  //   }
+  // }, [step, isMobile]);
 
   // scroll to specific step
   const scrollToStep = (stepIndex: number) => {
@@ -195,6 +195,8 @@ export default function OnboardingModal() {
         });
         setStep(5);
         scrollToStep(5);
+                document.cookie =
+          "onboardingComplete=true; Path=/; Max-Age=0; SameSite=Lax";
       } catch (error) {
         console.error('Failed to submit onboarding form data:', error);
       }
@@ -362,6 +364,14 @@ export default function OnboardingModal() {
                 {steps[0].description}
               </p>
             </div>
+
+            <Button
+              type="button"
+              onClick={handleNext}
+              className="bg-white text-[#EF3050] hover:bg-white/90 mt-8"
+            >
+              Get Started
+            </Button>
           </motion.section>
 
           {/* Step 1 - Academic Info */}
@@ -459,12 +469,19 @@ export default function OnboardingModal() {
               </form>
 
               {/* Navigation buttons for step 1 */}
-              <div className="flex justify-end pt-6">
+              <div className="flex justify-between pt-6">
+                <Button
+                  type="button"
+                  onClick={handleBack}
+                  className="bg-white text-[#EF3050] hover:bg-white/90"
+                >
+                  Go back
+                </Button>
                 <Button
                   type="button"
                   onClick={handleNext}
                   className="bg-white text-[#EF3050] hover:bg-white/90"
-                  disabled={!values.year || !values.faculty || !values.major}
+                  disabled={!values.year && !values.faculty && !values.major}
                 >
                   Next
                 </Button>
@@ -548,7 +565,14 @@ export default function OnboardingModal() {
 
                   {/* Navigation buttons for step 2 */}
 
-                  <div className="flex justify-end pt-6">
+                  <div className="flex justify-between pt-6">
+                    <Button
+                      type="button"
+                      onClick={handleBack}
+                      className="bg-white text-[#EF3050] hover:bg-white/90"
+                    >
+                      Go back
+                    </Button>
                     <Button
                       type="button"
                       onClick={handleNext}
@@ -818,29 +842,38 @@ export default function OnboardingModal() {
               />
 
               {/* Navigation buttons for step 3 */}
-              <form.Subscribe
-                selector={(state) => [state.values.diet]}
-                children={([diet]) => {
-                  const hasDietarySelection = diet && diet.length > 0;
+              <div className="flex justify-between pt-6">
+                <Button
+                  type="button"
+                  onClick={handleBack}
+                  className="bg-white text-[#EF3050] hover:bg-white/90"
+                >
+                  Go back
+                </Button>
+                <form.Subscribe
+                  selector={(state) => [state.values.diet]}
+                  children={([diet]) => {
+                    const hasDietarySelection = diet && diet.length > 0;
 
-                  return (
-                    <div className="flex justify-end pt-6">
-                      <Button
-                        type="button"
-                        onClick={handleNext}
-                        disabled={!hasDietarySelection}
-                        className={`bg-white text-[#EF3050] hover:bg-white/90 ${
-                          !hasDietarySelection
-                            ? 'opacity-50 cursor-not-allowed'
-                            : ''
-                        }`}
-                      >
-                        Next
-                      </Button>
-                    </div>
-                  );
-                }}
-              />
+                    return (
+                      <div className="flex justify-end">
+                        <Button
+                          type="button"
+                          onClick={handleNext}
+                          disabled={!hasDietarySelection}
+                          className={`bg-white text-[#EF3050] hover:bg-white/90 ${
+                            !hasDietarySelection
+                              ? 'opacity-50 cursor-not-allowed'
+                              : ''
+                          }`}
+                        >
+                          Next
+                        </Button>
+                      </div>
+                    );
+                  }}
+                />
+              </div>
             </div>
           </motion.section>
 
@@ -899,67 +932,76 @@ export default function OnboardingModal() {
                     </div>
                   )}
                 />
-                <form.Subscribe
-                  selector={(state) => [
-                    state.canSubmit,
-                    state.isSubmitting,
-                    state.values.interests,
-                  ]}
-                  children={([canSubmit, isSubmitting, interests]) => {
-                    const hasThreeInterests =
-                      Array.isArray(interests) && interests.length >= 3;
+                <div className="flex justify-between mt-8">
+                  <Button
+                    type="button"
+                    onClick={handleBack}
+                    className="bg-white text-[#EF3050] hover:bg-white/90"
+                  >
+                    Go back
+                  </Button>
+                  <form.Subscribe
+                    selector={(state) => [
+                      state.canSubmit,
+                      state.isSubmitting,
+                      state.values.interests,
+                    ]}
+                    children={([canSubmit, isSubmitting, interests]) => {
+                      const hasThreeInterests =
+                        Array.isArray(interests) && interests.length >= 3;
 
-                    return (
-                      <div className="flex justify-end pt-6">
-                        <Button
-                          className={`cursor-pointer font-regular ${
-                            hasThreeInterests
-                              ? 'bg-ma-red'
-                              : 'bg-ma-red opacity-50'
-                          }`}
-                          variant="ma"
-                          type="button"
-                          disabled={!hasThreeInterests}
-                          onClick={async (e) => {
-                            e.preventDefault();
+                      return (
+                        <div className="flex justify-end">
+                          <Button
+                            className={`cursor-pointer font-regular ${
+                              hasThreeInterests
+                                ? 'bg-ma-red'
+                                : 'bg-ma-red opacity-50'
+                            }`}
+                            variant="ma"
+                            type="button"
+                            disabled={!hasThreeInterests}
+                            onClick={async (e) => {
+                              e.preventDefault();
 
-                            // Check required fields before submission
-                            const formValues = form.store.state.values;
-                            if (
-                              !formValues.year ||
-                              !formValues.faculty ||
-                              !formValues.major
-                            ) {
-                              // Trigger validation on all fields to show error messages
-                              form.validateAllFields('submit');
+                              // Check required fields before submission
+                              const formValues = form.store.state.values;
+                              if (
+                                !formValues.year ||
+                                !formValues.faculty ||
+                                !formValues.major
+                              ) {
+                                // Trigger validation on all fields to show error messages
+                                form.validateAllFields('submit');
 
-                              // Navigate back to step 1 where required fields are
-                              setStep(1);
-                              scrollToStep(1);
-                              return;
-                            }
+                                // Navigate back to step 1 where required fields are
+                                setStep(1);
+                                scrollToStep(1);
+                                return;
+                              }
 
-                            // If all required fields are filled, submit the form
-                            await form.handleSubmit();
-                          }}
-                        >
-                          {isSubmitting ? (
-                            <>
-                              <Spinner />
-                              <div>Loading</div>
-                            </>
-                          ) : (
-                            <div>
-                              {hasThreeInterests
-                                ? 'Complete Profile'
-                                : 'Choose 3 Interests'}
-                            </div>
-                          )}
-                        </Button>
-                      </div>
-                    );
-                  }}
-                />
+                              // If all required fields are filled, submit the form
+                              await form.handleSubmit();
+                            }}
+                          >
+                            {isSubmitting ? (
+                              <>
+                                <Spinner />
+                                <div>Loading</div>
+                              </>
+                            ) : (
+                              <div>
+                                {hasThreeInterests
+                                  ? 'Complete Profile'
+                                  : 'Choose 3 Interests'}
+                              </div>
+                            )}
+                          </Button>
+                        </div>
+                      );
+                    }}
+                  />
+                </div>
               </div>
             </div>
           </motion.section>
