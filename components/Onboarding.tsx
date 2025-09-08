@@ -274,7 +274,7 @@ export default function OnboardingModal() {
       </div>
 
       {/* Skip Onboarding Button */}
-      {/* {step < steps.length - 1 && step > 0 && (
+      {step < steps.length - 1 && step > 0 && (
         <motion.div
           className={`fixed z-50 bg-gradient-to-t from-[#FF8096] to-transparent ${
             isMobile
@@ -305,7 +305,7 @@ export default function OnboardingModal() {
             Skip Onboarding
           </Button>
         </motion.div>
-      )} */}
+      )}
 
       {/* Scrollable Content Container */}
       <div
