@@ -33,6 +33,18 @@ export async function middleware(request: NextRequest) {
       : 'membership-portal.session_token'
   )?.value;
 
+  let skipOnboarding = request.cookies.get('onboarding_skipped')?.value;
+
+  if (!skipOnboarding) {
+    const response = NextResponse.next();
+    response.cookies.set('onboarding_skipped', 'false', {
+      path: '/',
+      maxAge: 60 * 60 * 24 * 7,
+    });
+    skipOnboarding = 'false';
+    return response;
+  }
+
   let onboardingCompleteCookie =
     request.cookies.get('onboardingComplete')?.value;
 
@@ -77,7 +89,11 @@ export async function middleware(request: NextRequest) {
   }
 
   if (onboardingCompleteCookie === 'false') {
-    if (!onboardingComplete && pathname !== '/onboarding') {
+    if (
+      !onboardingComplete &&
+      pathname !== '/onboarding' &&
+      skipOnboarding === 'false'
+    ) {
       return NextResponse.redirect(new URL('/onboarding', request.url));
     }
   }
