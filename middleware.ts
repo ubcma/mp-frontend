@@ -29,11 +29,13 @@ export async function middleware(request: NextRequest) {
   }
 
   // Access code check first
-  if (process.env.VERCEL_ENV === "preview" && accessCode !== expectedCode) {
-    return NextResponse.redirect(new URL('/maintenance', request.url));
-  }
-
   const isMaintenance = pathname.startsWith('/maintenance');
+
+  if (process.env.VERCEL_ENV === 'preview') {
+    if (!isMaintenance && accessCode !== expectedCode) {
+      return NextResponse.redirect(new URL('/maintenance', request.url));
+    }
+  }
 
   // Check for session cookies (try multiple possible names)
   const sessionCookie = request.cookies.get(
@@ -50,7 +52,7 @@ export async function middleware(request: NextRequest) {
       path: '/',
       maxAge: 60 * 60 * 24 * 7,
     });
-    skipOnboarding = 'false'
+    skipOnboarding = 'false';
     return response;
   }
 
@@ -61,20 +63,18 @@ export async function middleware(request: NextRequest) {
   }
 
   const publicAuthRoutes = [
-    "/sign-in",
-    "/sign-up",
-    "/reset-password",
-    "/forgot-password",
+    '/sign-in',
+    '/sign-up',
+    '/reset-password',
+    '/forgot-password',
   ];
 
   const isAuthPage = publicAuthRoutes.includes(pathname);
 
-  const publicPageRoutes = [
-    '/terms-of-service',
-    '/privacy-policy',
-  ];
+  const publicPageRoutes = ['/terms-of-service', '/privacy-policy'];
 
-  const isPublicPage = publicPageRoutes.includes(pathname) || pathname.startsWith("/events");
+  const isPublicPage =
+    publicPageRoutes.includes(pathname) || pathname.startsWith('/events');
 
   if (!sessionCookie) {
     if (isAuthPage || isPublicPage) return NextResponse.next();
@@ -85,7 +85,7 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/home', request.url));
   }
 
-  if (isAuthPage || isMaintenance) { 
+  if (isAuthPage || isMaintenance) {
     return NextResponse.redirect(new URL('/home', request.url));
   }
 

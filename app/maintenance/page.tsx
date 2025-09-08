@@ -29,7 +29,7 @@ export default function MaintenancePage() {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen gap-2 -mt-8 w-full px-8">
+    <div className="flex flex-col items-center justify-center min-h-screen gap-2 -mt-8 w-full px-8 text-center">
       <Image src="/logos/logo_red.svg" width={164} height={164} alt="MA Logo"/>
       <h1 className="text-xl font-semibold">UBC Marketing Association</h1>
       <p className="text-sm text-muted-foreground">
