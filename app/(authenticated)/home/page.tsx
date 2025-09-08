@@ -7,6 +7,8 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useUserQuery } from '@/lib/queries/user';
 import { motion, AnimatePresence, Variants } from 'framer-motion';
 import { Award, Calendar, Globe, MapPin } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -63,7 +65,7 @@ const highlightCards = [
   //     },
   //   ],
   // },
-    {
+  {
     image:
       'https://gs42emtt45.ufs.sh/f/qeDSywamz1Nx5d0JzlLAyEGpJWNOfhraPBzoqbQT0MFdgi9H',
     heading: 'Check out our new website!',
@@ -81,6 +83,7 @@ const highlightCards = [
 ];
 
 export default function Home() {
+
   const { data: user } = useUserQuery();
   const userFirstName = user?.name.split(' ')[0];
 
@@ -94,7 +97,6 @@ export default function Home() {
         exit={{ opacity: 0, y: -10 }}
         className="flex flex-col justify-center w-full gap-4"
       >
-
         {/* Welcome Section */}
         <motion.div variants={itemVariants} className="flex flex-col gap-2">
           <span className="flex flex-row text-3xl font-semibold">

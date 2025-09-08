@@ -52,7 +52,7 @@ const steps = [
     icon: UserRoundPen,
   },
   {
-    title: 'Eat to live, or live to eat?',
+    title: 'Your dietary restrictions',
     description: `What food are you able to eat?`,
     icon: Vegan,
   },
@@ -196,6 +196,8 @@ export default function OnboardingModal() {
   ) as Faculty;
   const majors = selectedFaculty ? getMajorsForFaculty(selectedFaculty) : [];
 
+  const values = useStore(form.store, (state) => state.values);
+
   // Show loading screen until client-side rendering is complete
   if (!isClient) {
     return (
@@ -272,7 +274,7 @@ export default function OnboardingModal() {
       </div>
 
       {/* Skip Onboarding Button */}
-      {step < steps.length - 1 && step > 0 && (
+      {/* {step < steps.length - 1 && step > 0 && (
         <motion.div
           className={`fixed z-50 bg-gradient-to-t from-[#FF8096] to-transparent ${
             isMobile
@@ -303,7 +305,7 @@ export default function OnboardingModal() {
             Skip Onboarding
           </Button>
         </motion.div>
-      )}
+      )} */}
 
       {/* Scrollable Content Container */}
       <div
@@ -442,6 +444,7 @@ export default function OnboardingModal() {
                   type="button"
                   onClick={handleNext}
                   className="bg-white text-[#EF3050] hover:bg-white/90"
+                  disabled={!values.year || !values.faculty || !values.major}
                 >
                   Next
                 </Button>
@@ -514,8 +517,7 @@ export default function OnboardingModal() {
                                 className="w-full h-full object-cover"
                               />
                               {selected && (
-                                <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
-                                </div>
+                                <div className="absolute inset-0 bg-black/20 flex items-center justify-center"></div>
                               )}
                             </button>
                           );
@@ -531,6 +533,7 @@ export default function OnboardingModal() {
                       type="button"
                       onClick={handleNext}
                       className="bg-white text-[#EF3050] hover:bg-white/90"
+                      disabled={!values.avatar}
                     >
                       Next
                     </Button>

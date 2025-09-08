@@ -156,6 +156,13 @@ const RenderEventDetails: React.FC<EventDetailsProps> = ({
           </p>
         </div>
       
+      ): !user?.onboardingComplete ? (
+            <div className='flex flex-col justify-center items-center text-center rounded-xl w-full h-48 bg-ma-red/10 border-dashed border-ma-red border-2 gap-2'>
+          <h3 className='font-semibold text-ma-red text-2xl capitalize'> You haven't completed your profile yet! </h3>
+          <p className='text-ma-red/80'>
+            Complete your <a href="/onboarding" className='hover:underline transition-transform duration-200 text-blue-500'> portal onboarding  </a> to register for this event
+          </p>
+        </div>
       ):(
         <div className="flex flex-col relative gap-4 py-1">
           {/* Registration Form */}
