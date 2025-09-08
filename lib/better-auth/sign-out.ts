@@ -7,6 +7,8 @@ export const signOut = async () => {
     fetchOptions: {
       onSuccess: () => {
         toast.success('Signed out successfully!');
+        document.cookie =
+          "onboardingComplete=; Path=/; Max-Age=0; SameSite=Lax";
       },
     },
   });

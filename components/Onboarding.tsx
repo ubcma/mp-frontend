@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useLayoutEffect } from 'react';
 import { useForm, useStore } from '@tanstack/react-form';
 import Confetti from 'react-confetti';
 import { useWindowSize } from 'react-use';
@@ -99,18 +99,38 @@ export default function OnboardingModal() {
   }, [step]);
 
   // Auto-transition from step 0 to step 1 after 2 seconds
+  // useEffect(() => {
+  //   if (step === 0) {
+  //     if (isMobile) {
+  //       setTimeout(() => {
+  //         scrollToStep(1);
+  //       }, 1500);
+  //     }
+  //     const timer = setTimeout(() => {
+  //       handleNext();
+  //     }, 1500);
+
+  //     return () => clearTimeout(timer);
+  //   }
+  // }, [step, isMobile]);
+
+  // auto-progress step 0 → 1 after 1.5s
   useEffect(() => {
     if (step === 0) {
-      if (isMobile) {
-        setTimeout(() => {
-          scrollToStep(1);
-        }, 1500);
-      }
       const timer = setTimeout(() => {
-        handleNext();
+        handleNext(); // will set step=1
       }, 1500);
-
       return () => clearTimeout(timer);
+    }
+  }, [step]);
+
+  // when step changes, scroll to it
+  useLayoutEffect(() => {
+    if (step >= 0) {
+      // wait one frame for layout
+      requestAnimationFrame(() => {
+        scrollToStep(step);
+      });
     }
   }, [step, isMobile]);
 
@@ -187,7 +207,7 @@ export default function OnboardingModal() {
     'https://3ou0u5266t.ufs.sh/f/icFgxUjDNp9STlSXPGKtWjXZ5CV1loKvErcSBGzukR43NPpY',
     'https://3ou0u5266t.ufs.sh/f/icFgxUjDNp9SYLGttR8WgoQTZvmMRLxUD3d2ja49SHG8IXPn',
     'https://3ou0u5266t.ufs.sh/f/icFgxUjDNp9S4ckwUOew3HDuqnmEMpvOCSxlzFiXboeg842Z',
-    'https://3ou0u5266t.ufs.sh/f/icFgxUjDNp9SwdinEYX9FsDBy2ZcLIjmqVGSked1boNRCP37',
+    'https://3ou0u5266t.ufs.sh/f/icFgxUjDNp9SVR5N6u4TuQAht02xaiNg36ZLWwscPMYoCfRG',
   ];
 
   const selectedFaculty = useStore(
@@ -274,7 +294,7 @@ export default function OnboardingModal() {
       </div>
 
       {/* Skip Onboarding Button */}
-      {step < steps.length - 1 && step > 0 && (
+      {step < steps.length - 1 && step >= 0 && (
         <motion.div
           className={`fixed z-50 bg-gradient-to-t from-[#FF8096] to-transparent ${
             isMobile

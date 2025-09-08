@@ -51,7 +51,6 @@ export async function middleware(request: NextRequest) {
   let onboardingComplete: boolean | undefined = false;
 
   if (sessionCookie && !onboardingCompleteCookie) {
-    console.log('HERE');
     onboardingComplete = await getOnboardingStatus();
     const response = NextResponse.next();
     response.cookies.set(
