@@ -1,11 +1,11 @@
 'use client';
 
-import { useState, useEffect, useRef, useLayoutEffect } from 'react';
-import { useForm, useStore } from '@tanstack/react-form';
+import { useState, useEffect, JSX } from 'react';
+import { useForm, useStore, FieldApi, AnyFieldApi } from '@tanstack/react-form';
 import Confetti from 'react-confetti';
 import { useWindowSize } from 'react-use';
 import { Button } from '@/components/ui/button';
-import { motion } from 'motion/react';
+import { motion, AnimatePresence, easeInOut, easeOut } from 'motion/react';
 import {
   RenderComboBoxField,
   RenderInputField,
@@ -28,6 +28,7 @@ import {
   SmileIcon,
   UserRoundPen,
   Vegan,
+  LucideIcon,
 } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
@@ -35,7 +36,39 @@ import { fetchFromAPI } from '@/lib/httpHandlers';
 import { useIsMobile } from '@/hooks/use-mobile';
 import ProgressLineMobile from './ProgressLineMobile';
 
-const steps = [
+interface Step {
+  title: string;
+  description: string;
+  icon: LucideIcon;
+}
+
+interface FormValues {
+  year: string;
+  major: string;
+  faculty: string;
+  linkedinUrl: string;
+  avatar: string;
+  interests: string[];
+  diet: string[];
+  onboardingComplete: boolean;
+}
+
+interface StepProps {
+  isMobile: boolean;
+  handleNext: () => void;
+  handleBack: () => void;
+  form: ReturnType<any>;
+  values: FormValues;
+  step: number;
+  steps: Step[];
+  router: ReturnType<typeof useRouter>;
+  setStep: (step: number) => void;
+  avatars: string[];
+  selectedFaculty: Faculty;
+  majors: string[];
+}
+
+const steps: Step[] = [
   {
     title: 'Welcome to UBCMA!',
     description: `Let's get to know you a little better.`,
@@ -68,7 +101,7 @@ const steps = [
   },
 ];
 
-const stepEmojiMap = {
+const stepEmojiMap: Record<number, string> = {
   0: '👋',
   1: '🧑‍🎓',
   2: '📸',
@@ -77,11 +110,599 @@ const stepEmojiMap = {
   5: '🎉',
 } as const;
 
-export default function OnboardingModal() {
-  const [showConfetti, setShowConfetti] = useState(false);
-  const [step, setStep] = useState(0);
-  const [isClient, setIsClient] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
+// Individual step components
+const WelcomeStep: React.FC<
+  Pick<StepProps, 'isMobile' | 'handleNext' | 'steps'>
+> = ({ isMobile, handleNext, steps }) => {
+  const router = useRouter();
+
+  return (
+    <div
+      className={`w-full max-w-2xl text-center px-4 ${isMobile ? 'py-8' : 'py-16'}`}
+    >
+      <h1
+        className={`font-bold text-white ${isMobile ? 'text-4xl mb-4' : 'text-8xl mb-8'}`}
+      >
+        {steps[0].title}
+      </h1>
+      <p className={`text-white ${isMobile ? 'text-sm mb-6' : 'text-lg mb-8'}`}>
+        {steps[0].description}
+      </p>
+      <Button
+        onClick={handleNext}
+        className="bg-white text-[#EF3050] hover:bg-white/90"
+      >
+        Get Started
+      </Button>
+
+      {/* Skip Onboarding Button */}
+      <motion.div
+        className={`fixed z-50 ${
+          isMobile
+            ? 'bottom-4 left-1/2 transform -translate-x-1/2 px-4 py-2'
+            : 'bottom-0 left-0 px-20 py-8'
+        }`}
+        initial={{ opacity: 0, scale: 0 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{
+          duration: 0.4,
+          scale: {
+            type: 'spring',
+            visualDuration: 0.4,
+            bounce: 0.5,
+            delay: 0.5,
+          },
+        }}
+      >
+        <Button
+        variant="ghost"
+          onClick={() => {
+            document.cookie = 'onboarding_skipped=true; path=/; max-age=86400';
+            router.push('/home');
+          }}
+          className={`text-white hover:text-white hover:bg-transparent hover:opacity-80${
+            isMobile ? 'text-sm' : 'text-lg'
+          }`}
+        >
+          Skip Onboarding
+        </Button>
+      </motion.div>
+    </div>
+  );
+};
+
+const AcademicStep: React.FC<
+  Pick<
+    StepProps,
+    | 'isMobile'
+    | 'handleNext'
+    | 'handleBack'
+    | 'form'
+    | 'values'
+    | 'steps'
+    | 'majors'
+    | 'selectedFaculty'
+  >
+> = ({
+  isMobile,
+  handleNext,
+  handleBack,
+  form,
+  values,
+  steps,
+  majors,
+  selectedFaculty,
+}) => (
+  <div className={`w-full max-w-2xl px-4 ${isMobile ? 'py-8' : 'py-16'}`}>
+    <h1
+      className={`font-bold text-white text-center ${isMobile ? 'text-3xl mb-4' : 'text-6xl mb-8'}`}
+    >
+      {steps[1].title}
+    </h1>
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        form.handleSubmit();
+      }}
+      className="space-y-6"
+    >
+      <div
+        className={`flex gap-4 w-full ${isMobile ? 'flex-col' : 'flex-row'}`}
+      >
+        <div className={isMobile ? 'flex-1' : 'flex-[0_0_10%]'}>
+          <form.Field
+            name="year"
+            validators={{
+              onChange: ({ value }: { value: string }) =>
+                !value ? 'Year is required.' : undefined,
+            }}
+            children={(field: AnyFieldApi) => (
+              <RenderSelectField
+                options={YEAR_OPTIONS}
+                label="Year"
+                field={field}
+                placeholder=" "
+                labelClassName="text-white"
+              />
+            )}
+          />
+        </div>
+        <div className="flex-1">
+          <form.Field
+            name="faculty"
+            validators={{
+              onChange: ({ value }: { value: string }) =>
+                !value ? 'Faculty is required.' : undefined,
+            }}
+            children={(field: AnyFieldApi) => (
+              <RenderComboBoxField
+                options={FACULTIES}
+                label="Faculty"
+                field={field}
+                labelClassName="text-white"
+              />
+            )}
+          />
+        </div>
+        <div className="flex-1">
+          <form.Field
+            name="major"
+            validators={{
+              onChange: ({ value }: { value: string }) =>
+                !value ? 'Major is required.' : undefined,
+            }}
+            children={(field: AnyFieldApi) => {
+              return (
+                <RenderComboBoxField
+                  options={majors}
+                  label="Major"
+                  field={field}
+                  disabled={!selectedFaculty}
+                  labelClassName="text-white"
+                />
+              );
+            }}
+          />
+        </div>
+      </div>
+      <form.Field
+        name="linkedinUrl"
+        children={(field: AnyFieldApi) => (
+          <RenderInputField
+            label="LinkedIn URL"
+            field={field}
+            labelClassName="text-white"
+          />
+        )}
+      />
+    </form>
+
+    <div className="flex justify-between pt-6">
+      <Button
+        type="button"
+        onClick={handleBack}
+        className="bg-white text-[#EF3050] hover:bg-white/90"
+      >
+        Go back
+      </Button>
+      <Button
+        type="button"
+        onClick={handleNext}
+        className="bg-white text-[#EF3050] hover:bg-white/90"
+        disabled={!values.year || !values.faculty || !values.major}
+      >
+        Next
+      </Button>
+    </div>
+  </div>
+);
+
+const AvatarStep: React.FC<
+  Pick<
+    StepProps,
+    | 'isMobile'
+    | 'handleNext'
+    | 'handleBack'
+    | 'form'
+    | 'values'
+    | 'steps'
+    | 'avatars'
+  >
+> = ({ isMobile, handleNext, handleBack, form, values, steps, avatars }) => (
+  <div className={`w-fit max-w-2xl px-4 ${isMobile ? 'py-8' : 'py-16'}`}>
+    <h1
+      className={`font-bold text-white text-center ${isMobile ? 'text-3xl mb-4' : 'text-6xl mb-8'}`}
+    >
+      {steps[2].title}
+    </h1>
+
+    <div className="w-fit mx-auto">
+      <form.Field
+        name="avatar"
+        children={(field: AnyFieldApi) => (
+          <div className="w-fit gap-2 md:gap-8 grid grid-cols-3 grid-rows-2 place-items-center">
+            {avatars.map((src, idx) => {
+              const selected = field.state.value === src;
+              return (
+                <button
+                  key={idx}
+                  type="button"
+                  onClick={() => field.handleChange(src)}
+                  className={`relative w-28 h-28 md:w-32 md:h-32 rounded-full overflow-hidden border-4 transition-all duration-200 ${
+                    selected
+                      ? 'border-blue-500 scale-110'
+                      : 'border-transparent hover:scale-105'
+                  }`}
+                >
+                  <Image
+                    src={src}
+                    alt={`Avatar ${idx + 1}`}
+                    width={720}
+                    height={720}
+                    className="w-full h-full object-cover"
+                  />
+                  {selected && (
+                    <div className="absolute inset-0 bg-black/20 flex items-center justify-center"></div>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        )}
+      />
+
+      <div className="flex justify-between pt-6">
+        <Button
+          type="button"
+          onClick={handleBack}
+          className="bg-white text-[#EF3050] hover:bg-white/90"
+        >
+          Go back
+        </Button>
+        <Button
+          type="button"
+          onClick={handleNext}
+          className="bg-white text-[#EF3050] hover:bg-white/90"
+          disabled={!values.avatar}
+        >
+          Next
+        </Button>
+      </div>
+    </div>
+  </div>
+);
+
+const DietaryStep: React.FC<
+  Pick<
+    StepProps,
+    'isMobile' | 'handleNext' | 'handleBack' | 'form' | 'values' | 'steps'
+  >
+> = ({ isMobile, handleNext, handleBack, form, values, steps }) => (
+  <div className={`w-full max-w-2xl px-4 ${isMobile ? 'py-8' : 'py-16'}`}>
+    <h1
+      className={`font-bold text-white text-center ${isMobile ? 'text-3xl mb-4' : 'text-6xl mb-8'}`}
+    >
+      {steps[3].title}
+    </h1>
+    <form.Field
+      name="diet"
+      children={(field: AnyFieldApi) => {
+        const handleAddAllergy = (e: React.KeyboardEvent<HTMLInputElement>) => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            const value = (e.target as HTMLInputElement).value.trim();
+            if (value && !field.state.value.includes(value)) {
+              field.handleChange([...field.state.value, value]);
+              (e.target as HTMLInputElement).value = '';
+            }
+          }
+        };
+
+        const handleRemoveAllergy = (allergy: string) => {
+          const updated = field.state.value.filter(
+            (i: string) => i !== allergy
+          );
+          field.handleChange(updated);
+        };
+
+        const handleRestrictionClick = (restriction: string) => {
+          const isSelected = field.state.value.includes(restriction);
+          const newRestrictions = isSelected
+            ? field.state.value.filter((i: string) => i !== restriction)
+            : [...field.state.value, restriction];
+          field.handleChange(newRestrictions);
+        };
+
+        return (
+          <div className="space-y-4">
+            <div className="flex flex-col items-center space-y-3">
+              {/* Row 1 - 3 items */}
+              <div className="flex justify-center gap-3">
+                {DIETARY_RESTRICTIONS.slice(0, 3).map((restriction) => {
+                  const isSelected = field.state.value.includes(restriction);
+                  return (
+                    <motion.div
+                      key={restriction}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      transition={{ duration: 0.1 }}
+                      className={`cursor-pointer rounded-lg py-2 text-center font-normal transition-all duration-200 flex items-center justify-center ${
+                        isMobile
+                          ? 'px-2 text-xs w-28 h-9'
+                          : 'px-4 text-sm w-40 h-11'
+                      } ${
+                        isSelected
+                          ? 'bg-white text-black shadow-md'
+                          : 'bg-white/20 text-white hover:bg-white/30'
+                      }`}
+                      onClick={() => handleRestrictionClick(restriction)}
+                    >
+                      {restriction}
+                    </motion.div>
+                  );
+                })}
+              </div>
+
+              {/* Rows 2-4 */}
+              {[
+                DIETARY_RESTRICTIONS.slice(3, 6),
+                DIETARY_RESTRICTIONS.slice(6, 9),
+                DIETARY_RESTRICTIONS.slice(9, 11),
+              ].map((rowRestrictions, rowIndex) => (
+                <div key={rowIndex} className="flex justify-center gap-3">
+                  {rowRestrictions.map((restriction) => {
+                    const isSelected = field.state.value.includes(restriction);
+                    return (
+                      <motion.div
+                        key={restriction}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        transition={{ duration: 0.1 }}
+                        className={`cursor-pointer rounded-lg py-2 text-center font-normal transition-all duration-200 flex items-center justify-center ${
+                          isMobile
+                            ? 'px-2 text-xs w-28 h-9'
+                            : 'px-4 text-sm w-40 h-11'
+                        } ${
+                          isSelected
+                            ? 'bg-white text-black shadow-md'
+                            : 'bg-white/20 text-white hover:bg-white/30'
+                        }`}
+                        onClick={() => handleRestrictionClick(restriction)}
+                      >
+                        {restriction}
+                      </motion.div>
+                    );
+                  })}
+                </div>
+              ))}
+            </div>
+
+            {/* Dynamic allergy input */}
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-white">
+                Other Allergies
+              </label>
+              <input
+                type="text"
+                onKeyDown={handleAddAllergy}
+                placeholder="Type and press Enter..."
+                className="border rounded-md px-3 py-2 w-full h-9 bg-white text-black placeholder-gray-400"
+              />
+              {/* Show all selected allergies */}
+              <div className="flex flex-wrap gap-2 mt-2">
+                {field.state.value
+                  .filter(
+                    (item: string) => !DIETARY_RESTRICTIONS.includes(item)
+                  )
+                  .map((allergy: string) => (
+                    <div
+                      key={allergy}
+                      className="flex items-center gap-1 px-3 py-1 bg-gray-200 rounded-full text-sm"
+                    >
+                      {allergy}
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveAllergy(allergy)}
+                        className="text-red-500 ml-1"
+                      >
+                        &times;
+                      </button>
+                    </div>
+                  ))}
+              </div>
+            </div>
+          </div>
+        );
+      }}
+    />
+
+    <div className="flex justify-between pt-6">
+      <Button
+        type="button"
+        onClick={handleBack}
+        className="bg-white text-[#EF3050] hover:bg-white/90"
+      >
+        Go back
+      </Button>
+      <form.Subscribe
+        selector={(state: { values: { diet: any } }) => [state.values.diet]}
+        children={([diet]: [string[]]) => {
+          const hasDietarySelection = diet && diet.length > 0;
+          return (
+            <Button
+              type="button"
+              onClick={handleNext}
+              disabled={!hasDietarySelection}
+              className={`bg-white text-[#EF3050] hover:bg-white/90 ${
+                !hasDietarySelection ? 'opacity-50 cursor-not-allowed' : ''
+              }`}
+            >
+              Next
+            </Button>
+          );
+        }}
+      />
+    </div>
+  </div>
+);
+
+const InterestsStep: React.FC<
+  Pick<
+    StepProps,
+    | 'isMobile'
+    | 'handleNext'
+    | 'handleBack'
+    | 'form'
+    | 'values'
+    | 'steps'
+    | 'setStep'
+  >
+> = ({ isMobile, handleNext, handleBack, form, values, steps, setStep }) => (
+  <div className={`w-full max-w-2xl px-4 ${isMobile ? 'py-8' : 'py-16'}`}>
+    <h1
+      className={`font-bold text-white text-center ${isMobile ? 'text-3xl mb-4' : 'text-6xl mb-8'}`}
+    >
+      {steps[4].title}
+    </h1>
+    <div className="space-y-6">
+      <form.Field
+        name="interests"
+        children={(field: AnyFieldApi) => (
+          <div
+            className={`grid gap-3 ${isMobile ? 'grid-cols-2 grid-rows-4' : 'grid-cols-2'}`}
+          >
+            {INTEREST_OPTIONS.map((interest) => {
+              const isSelected = field.state.value.includes(interest);
+              return (
+                <motion.div
+                  key={interest}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  transition={{ duration: 0.1 }}
+                  className={`cursor-pointer rounded-lg text-center font-normal transition-all duration-200 ${
+                    isMobile ? 'p-3 text-xs' : 'p-4 text-sm'
+                  } ${
+                    isSelected
+                      ? 'bg-white text-black shadow-md'
+                      : 'bg-white/20 text-white hover:bg-white/30'
+                  }`}
+                  onClick={() => {
+                    const newInterests = isSelected
+                      ? field.state.value.filter((i: string) => i !== interest)
+                      : [...field.state.value, interest];
+                    field.handleChange(newInterests);
+                  }}
+                >
+                  {interest}
+                </motion.div>
+              );
+            })}
+          </div>
+        )}
+      />
+      <div className="flex justify-between mt-8">
+        <Button
+          type="button"
+          onClick={handleBack}
+          className="bg-white text-[#EF3050] hover:bg-white/90"
+        >
+          Go back
+        </Button>
+        <form.Subscribe
+          selector={(state: {
+            canSubmit: any;
+            isSubmitting: any;
+            values: { interests: any };
+          }) => [state.canSubmit, state.isSubmitting, state.values.interests]}
+          children={([canSubmit, isSubmitting, interests]: [
+            boolean,
+            boolean,
+            string[],
+          ]) => {
+            const hasThreeInterests =
+              Array.isArray(interests) && interests.length >= 3;
+
+            return (
+              <Button
+                className={`cursor-pointer font-regular ${
+                  hasThreeInterests ? 'bg-ma-red' : 'bg-ma-red opacity-50'
+                }`}
+                variant="ma"
+                type="button"
+                disabled={!hasThreeInterests}
+                onClick={async (e: React.MouseEvent<HTMLButtonElement>) => {
+                  e.preventDefault();
+
+                  // Check required fields before submission
+                  const formValues = form.store.state.values;
+                  if (
+                    !formValues.year ||
+                    !formValues.faculty ||
+                    !formValues.major
+                  ) {
+                    // Trigger validation on all fields to show error messages
+                    form.validateAllFields('submit');
+                    // Navigate back to step 1 where required fields are
+                    setStep(1);
+                    return;
+                  }
+
+                  // If all required fields are filled, submit the form
+                  await form.handleSubmit();
+                }}
+              >
+                {isSubmitting ? (
+                  <>
+                    <Spinner />
+                    <div>Loading</div>
+                  </>
+                ) : (
+                  <div>
+                    {hasThreeInterests
+                      ? 'Complete Profile'
+                      : 'Choose 3 Interests'}
+                  </div>
+                )}
+              </Button>
+            );
+          }}
+        />
+      </div>
+    </div>
+  </div>
+);
+
+const CompletionStep: React.FC<Pick<StepProps, 'isMobile' | 'steps'>> = ({
+  isMobile,
+  steps,
+}) => (
+  <div
+    className={`w-full max-w-2xl text-center px-4 ${isMobile ? 'space-y-4 py-8' : 'space-y-6 py-16'}`}
+  >
+    <h1
+      className={`font-bold text-white ${isMobile ? 'text-3xl mb-4' : 'text-6xl mb-8'}`}
+    >
+      {steps[5].title}
+    </h1>
+    <p className={`text-white ${isMobile ? 'text-sm' : 'text-lg'}`}>
+      {steps[5].description}
+    </p>
+    <Button
+      onClick={() => {
+        sessionStorage.removeItem('onboarding_skipped');
+        window.location.href = '/home';
+      }}
+      className="bg-white text-[#EF3050] hover:bg-white/90"
+    >
+      Go to Home
+    </Button>
+  </div>
+);
+
+export default function OnboardingModal(): JSX.Element {
+  const [showConfetti, setShowConfetti] = useState<boolean>(false);
+  const [step, setStep] = useState<number>(0);
+  const [isClient, setIsClient] = useState<boolean>(false);
   const router = useRouter();
   const isMobile = useIsMobile();
 
@@ -98,81 +719,49 @@ export default function OnboardingModal() {
     }
   }, [step]);
 
-  // Auto-transition from step 0 to step 1 after 2 seconds
-  // useEffect(() => {
-  //   if (step === 0) {
-  //     if (isMobile) {
-  //       setTimeout(() => {
-  //         scrollToStep(1);
-  //       }, 1500);
-  //     }
-  //     const timer = setTimeout(() => {
-  //       handleNext();
-  //     }, 1500);
+  type Direction = 'forward' | 'backward';
 
-  //     return () => clearTimeout(timer);
-  //   }
-  // }, [step, isMobile]);
+  const [direction, setDirection] = useState<Direction>('forward');
 
-  // auto-progress step 0 → 1 after 1.5s
-  // useEffect(() => {
-  //   if (step === 0) {
-  //     const timer = setTimeout(() => {
-  //       handleNext(); // will set step=1
-  //     }, 1500);
-  //     return () => clearTimeout(timer);
-  //   }
-  // }, [step]);
-
-  // when step changes, scroll to it
-  // useLayoutEffect(() => {
-  //   if (step >= 0) {
-  //     // wait one frame for layout
-  //     requestAnimationFrame(() => {
-  //       scrollToStep(step);
-  //     });
-  //   }
-  // }, [step, isMobile]);
-
-  // scroll to specific step
-  const scrollToStep = (stepIndex: number) => {
-    if (containerRef.current) {
-      const stepElement = containerRef.current.children[
-        stepIndex
-      ] as HTMLElement;
-      if (stepElement) {
-        if (isMobile) {
-          // For mobile, scroll horizontally to show full step
-          const scrollLeft = stepElement.offsetLeft;
-
-          containerRef.current.scrollTo({
-            left: scrollLeft,
-            behavior: 'smooth',
-          });
-        } else {
-          // For desktop, scroll vertically
-          stepElement.scrollIntoView({
-            behavior: 'smooth',
-            block: 'center',
-          });
-        }
-      }
-    }
-  };
-
-  // Handle navigation
-  const handleNext = () => {
+  const handleNext = (): void => {
     if (step < steps.length - 1) {
-      setStep(step + 1);
-      scrollToStep(step + 1);
+      setDirection('forward');
+      setStep((step) => step + 1);
     }
   };
 
-  const handleBack = () => {
+  const handleBack = (): void => {
     if (step > 0) {
-      setStep(step - 1);
-      scrollToStep(step - 1);
+      setDirection('backward');
+      setStep((step) => step - 1);
     }
+  };
+
+  const motionVariants = {
+    enter: (direction: Direction) => ({
+      opacity: 0,
+      x: isMobile ? (direction === 'forward' ? 100 : -100) : 0,
+      y: isMobile ? 0 : direction === 'forward' ? 100 : -100,
+      scale: 0.8,
+    }),
+    center: {
+      opacity: 1,
+      x: 0,
+      y: 0,
+      scale: 1,
+      transition: {
+        duration: 0.3,
+        ease: easeOut,
+        opacity: { duration: 0.2 },
+        scale: { type: 'spring', duration: 0.3, bounce: 0.3 },
+      },
+    },
+    exit: (direction: Direction) => ({
+      opacity: 0,
+      x: isMobile ? (direction === 'forward' ? -100 : 100) : 0,
+      y: isMobile ? 0 : direction === 'forward' ? -100 : 100,
+      scale: 0.8,
+    }),
   };
 
   const form = useForm({
@@ -188,24 +777,22 @@ export default function OnboardingModal() {
     },
     onSubmit: async ({ value }) => {
       try {
-        // Submit the form data to the API
         await fetchFromAPI('/api/me/', {
           method: 'POST',
           body: value,
         });
         setStep(5);
-        scrollToStep(5);
-                document.cookie =
-          "onboardingComplete=true; Path=/; Max-Age=0; SameSite=Lax";
+        document.cookie =
+          'onboardingComplete=true; Path=/; Max-Age=0; SameSite=Lax';
       } catch (error) {
         console.error('Failed to submit onboarding form data:', error);
       }
     },
   });
 
-  const avatars = [
+  const avatars: string[] = [
     'https://3ou0u5266t.ufs.sh/f/icFgxUjDNp9SHfSpARavrBaOy879hQLYlq2tTDxSFN56uAVk',
-    'https://3ou0u5266t.ufs.sh/f/icFgxUjDNp9SizApqDjDNp9SM0XdoRCTBjwvmg1IAGqYKzZE',
+    'https://3ou0u5266t.ufs.sh/f/icFgxUjDNp9SWuHx1AIQ5Jxnu8htDbYe6BEljCiZRS1HX90r',
     'https://3ou0u5266t.ufs.sh/f/icFgxUjDNp9STlSXPGKtWjXZ5CV1loKvErcSBGzukR43NPpY',
     'https://3ou0u5266t.ufs.sh/f/icFgxUjDNp9SYLGttR8WgoQTZvmMRLxUD3d2ja49SHG8IXPn',
     'https://3ou0u5266t.ufs.sh/f/icFgxUjDNp9S4ckwUOew3HDuqnmEMpvOCSxlzFiXboeg842Z',
@@ -217,7 +804,6 @@ export default function OnboardingModal() {
     (state) => state.values.faculty
   ) as Faculty;
   const majors = selectedFaculty ? getMajorsForFaculty(selectedFaculty) : [];
-
   const values = useStore(form.store, (state) => state.values);
 
   // Show loading screen until client-side rendering is complete
@@ -231,6 +817,40 @@ export default function OnboardingModal() {
       ></div>
     );
   }
+
+  const renderCurrentStep = (): JSX.Element => {
+    const stepProps: StepProps = {
+      isMobile,
+      handleNext,
+      handleBack,
+      form,
+      values,
+      step,
+      steps,
+      router,
+      setStep,
+      avatars,
+      selectedFaculty,
+      majors,
+    };
+
+    switch (step) {
+      case 0:
+        return <WelcomeStep {...stepProps} />;
+      case 1:
+        return <AcademicStep {...stepProps} />;
+      case 2:
+        return <AvatarStep {...stepProps} />;
+      case 3:
+        return <DietaryStep {...stepProps} />;
+      case 4:
+        return <InterestsStep {...stepProps} />;
+      case 5:
+        return <CompletionStep {...stepProps} />;
+      default:
+        return <WelcomeStep {...stepProps} />;
+    }
+  };
 
   return (
     <div
@@ -254,7 +874,9 @@ export default function OnboardingModal() {
 
       {/* Header - Logo and Stepper */}
       <div
-        className={`fixed top-0 left-0 right-0 z-50 flex ${isMobile ? 'justify-center' : 'justify-between'} items-center px-20 py-8 bg-gradient-to-b from-[#EF3050] to-transparent`}
+        className={`fixed top-0 left-0 right-0 z-50 flex ${
+          isMobile ? 'justify-center' : 'justify-between'
+        } items-center px-20 py-8 bg-gradient-to-b from-[#EF3050] to-transparent`}
       >
         {/* Logo */}
         <motion.div
@@ -272,6 +894,7 @@ export default function OnboardingModal() {
           }}
         >
           <Image
+            priority
             src="/logos/logo_white.svg"
             alt="UBCMA Logo"
             width={100}
@@ -295,762 +918,25 @@ export default function OnboardingModal() {
         )}
       </div>
 
-      {/* Skip Onboarding Button */}
-      {step < steps.length - 1 && step >= 0 && (
-        <motion.div
-          className={`fixed z-50 bg-gradient-to-t from-[#FF8096] to-transparent ${
-            isMobile
-              ? 'bottom-4 left-1/2 transform -translate-x-1/2 px-4 py-2'
-              : 'bottom-0 left-0 px-20 py-8'
-          }`}
-          initial={{ opacity: 0, scale: 0 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{
-            duration: 0.4,
-            scale: {
-              type: 'spring',
-              visualDuration: 0.4,
-              bounce: 0.5,
-              delay: 0.5,
-            },
-          }}
-        >
-          <Button
-            variant="ghost"
-            onClick={() => {
-              document.cookie =
-                'onboarding_skipped=true; path=/; max-age=86400';
-              router.push('/home');
-            }}
-            className={`text-white hover:text-white hover:bg-white/10 ${isMobile ? 'text-sm' : 'text-lg'}`}
+      {/* Main Content Container */}
+      <div className="h-full flex flex-row items-center justify-center">
+        <AnimatePresence mode="wait" initial={false} custom={direction}>
+          <motion.div
+            key={step}
+            className="w-full h-full flex items-center justify-center"
+            custom={direction}
+            variants={motionVariants}
+            initial="enter"
+            animate="center"
+            exit="exit"
           >
-            Skip Onboarding
-          </Button>
-        </motion.div>
-      )}
-
-      {/* Scrollable Content Container */}
-      <div
-        className={`h-full flex items-center justify-center ${isMobile ? 'flex-col gap-10' : 'flex-row gap-20'}`}
-      >
-        <div
-          ref={containerRef}
-          className={`${isMobile ? 'w-full overflow-hidden flex' : 'h-full w-auto max-w-2xl overflow-hidden scroll-smooth'}`}
-          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-        >
-          <style jsx>{`
-            div::-webkit-scrollbar {
-              display: none;
-            }
-          `}</style>
-
-          {/* Step 0 - Welcome */}
-          <motion.section
-            initial={{ opacity: 0, scale: 0 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{
-              duration: 0.4,
-              scale: { type: 'spring', visualDuration: 0.4, bounce: 0.5 },
-            }}
-            className={`${isMobile ? 'min-w-full h-[500px] flex flex-col justify-center items-center px-4 snap-center' : 'h-screen flex flex-col justify-center items-center px-4 pt-32 pb-32'}`}
-          >
-            <div className="w-full max-w-2xl text-center">
-              <h1
-                className={`font-bold text-white ${isMobile ? 'text-4xl mb-4' : 'text-8xl mb-8'}`}
-              >
-                {steps[0].title}
-              </h1>
-              <p className={`text-white ${isMobile ? 'text-sm' : 'text-lg'}`}>
-                {steps[0].description}
-              </p>
-            </div>
-
-            <Button
-              type="button"
-              onClick={handleNext}
-              className="bg-white text-[#EF3050] hover:bg-white/90 mt-8"
-            >
-              Get Started
-            </Button>
-          </motion.section>
-
-          {/* Step 1 - Academic Info */}
-          <motion.section
-            initial={{ opacity: 0, scale: 0 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            transition={{
-              duration: 0.4,
-              scale: { type: 'spring', visualDuration: 0.4, bounce: 0.3 },
-            }}
-            className={`${isMobile ? 'min-w-full h-[515px] flex flex-col justify-center items-center px-8 snap-center' : 'h-screen flex flex-col justify-center items-center px-4 pt-32 pb-32'}`}
-          >
-            <div className="w-full max-w-2xl">
-              <h1
-                className={`font-bold text-white text-center ${isMobile ? 'text-3xl mb-4' : 'text-6xl mb-8'}`}
-              >
-                {steps[1].title}
-              </h1>
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  form.handleSubmit();
-                }}
-                className="space-y-6"
-              >
-                <div
-                  className={`flex gap-4 w-full ${isMobile ? 'flex-col' : 'flex-row'}`}
-                >
-                  <div className={isMobile ? 'flex-1' : 'flex-[0_0_10%]'}>
-                    <form.Field
-                      name="year"
-                      validators={{
-                        onChange: ({ value }) =>
-                          !value ? 'Year is required.' : undefined,
-                      }}
-                      children={(field) => (
-                        <RenderSelectField
-                          options={YEAR_OPTIONS}
-                          label="Year"
-                          field={field}
-                          placeholder=" "
-                          labelClassName="text-white"
-                        />
-                      )}
-                    />
-                  </div>
-                  <div className="flex-1">
-                    <form.Field
-                      name="faculty"
-                      validators={{
-                        onChange: ({ value }) =>
-                          !value ? 'Faculty is required.' : undefined,
-                      }}
-                      children={(field) => (
-                        <RenderComboBoxField
-                          options={FACULTIES}
-                          label="Faculty"
-                          field={field}
-                          labelClassName="text-white"
-                        />
-                      )}
-                    />
-                  </div>
-                  <div className="flex-1">
-                    <form.Field
-                      name="major"
-                      validators={{
-                        onChange: ({ value }) =>
-                          !value ? 'Major is required.' : undefined,
-                      }}
-                      children={(field) => {
-                        return (
-                          <RenderComboBoxField
-                            options={majors}
-                            label="Major"
-                            field={field}
-                            disabled={!selectedFaculty}
-                            labelClassName="text-white"
-                          />
-                        );
-                      }}
-                    />
-                  </div>
-                </div>
-                <form.Field
-                  name="linkedinUrl"
-                  children={(field) => (
-                    <RenderInputField
-                      label="LinkedIn URL"
-                      field={field}
-                      labelClassName="text-white"
-                    />
-                  )}
-                />
-              </form>
-
-              {/* Navigation buttons for step 1 */}
-              <div className="flex justify-between pt-6">
-                <Button
-                  type="button"
-                  onClick={handleBack}
-                  className="bg-white text-[#EF3050] hover:bg-white/90"
-                >
-                  Go back
-                </Button>
-                <Button
-                  type="button"
-                  onClick={handleNext}
-                  className="bg-white text-[#EF3050] hover:bg-white/90"
-                  disabled={!values.year && !values.faculty && !values.major}
-                >
-                  Next
-                </Button>
-              </div>
-            </div>
-          </motion.section>
-
-          {/* Step 2 - Photo Upload (now Avatar Selection) */}
-          <motion.section
-            initial={{ opacity: 0, scale: 0 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            transition={{
-              duration: 0.4,
-              scale: { type: 'spring', visualDuration: 0.4, bounce: 0.3 },
-            }}
-            className={`${
-              isMobile
-                ? 'min-w-full h-[500px] flex flex-col justify-center items-center px-8 snap-center'
-                : 'h-screen flex flex-col justify-center items-center px-4 pt-32 pb-32'
-            }`}
-          >
-            <div className="w-full max-w-2xl">
-              <h1
-                className={`font-bold text-white text-center ${
-                  isMobile ? 'text-3xl mb-4' : 'text-6xl mb-8'
-                }`}
-              >
-                {steps[2].title}
-              </h1>
-
-              <motion.section
-                initial={{ opacity: 0, scale: 0 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                transition={{
-                  duration: 0.4,
-
-                  scale: { type: 'spring', visualDuration: 0.4, bounce: 0.3 },
-                }}
-                className={
-                  isMobile
-                    ? 'min-w-full h-[500px] flex flex-col justify-center items-center px-8 snap-center'
-                    : 'h-screen flex flex-col justify-center items-center px-4 pt-32 pb-32'
-                }
-              >
-                <div className="w-fit max-w-2xl">
-                  <h1
-                    className={`font-bold text-white text-center ${isMobile ? 'text-4xl mb-4' : 'text-5xl mb-8'}`}
-                  >
-                    {steps[2].title}
-                  </h1>
-
-                  <form.Field
-                    name="avatar"
-                    children={(field) => (
-                      <div className="w-fit mx-auto md:w-full gap-2 md:gap-8 grid grid-cols-3 grid-rows-2 place-items-center">
-                        {avatars.map((src, idx) => {
-                          const selected = field.state.value === src;
-                          return (
-                            <button
-                              key={idx}
-                              type="button"
-                              onClick={() => field.handleChange(src)}
-                              className={`relative w-28 h-28 md:w-32 md:h-32 rounded-full overflow-hidden border-4 transition-all duration-200 ${selected ? 'border-blue-500 scale-110' : 'border-transparent hover:scale-105'}`}
-                            >
-                              <Image
-                                src={src}
-                                alt={`Avatar ${idx + 1}`}
-                                width={720}
-                                height={720}
-                                className="w-full h-full object-cover"
-                              />
-                              {selected && (
-                                <div className="absolute inset-0 bg-black/20 flex items-center justify-center"></div>
-                              )}
-                            </button>
-                          );
-                        })}
-                      </div>
-                    )}
-                  />
-
-                  {/* Navigation buttons for step 2 */}
-
-                  <div className="flex justify-between pt-6">
-                    <Button
-                      type="button"
-                      onClick={handleBack}
-                      className="bg-white text-[#EF3050] hover:bg-white/90"
-                    >
-                      Go back
-                    </Button>
-                    <Button
-                      type="button"
-                      onClick={handleNext}
-                      className="bg-white text-[#EF3050] hover:bg-white/90"
-                      disabled={!values.avatar}
-                    >
-                      Next
-                    </Button>
-                  </div>
-                </div>
-              </motion.section>
-
-              {/* Navigation buttons for step 2 */}
-              <div className="flex justify-end pt-8">
-                <Button
-                  type="button"
-                  onClick={handleNext}
-                  className="bg-white text-[#EF3050] hover:bg-white/90"
-                >
-                  Next
-                </Button>
-              </div>
-            </div>
-          </motion.section>
-
-          {/* Step 3 - Dietary Restrictions */}
-          <motion.section
-            initial={{ opacity: 0, scale: 0 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            transition={{
-              duration: 0.4,
-              scale: { type: 'spring', visualDuration: 0.4, bounce: 0.3 },
-            }}
-            className={`${isMobile ? 'min-w-full h-[500px] flex flex-col justify-center items-center px-8 snap-center' : 'h-screen flex flex-col justify-center items-center px-4 pt-32 pb-32'}`}
-          >
-            <div className="w-full max-w-2xl">
-              <h1
-                className={`font-bold text-white text-center ${isMobile ? 'text-3xl mb-4' : 'text-6xl mb-8'}`}
-              >
-                {steps[3].title}
-              </h1>
-              <form.Field
-                name="diet"
-                children={(field) => {
-                  const handleAddAllergy = (
-                    e: React.KeyboardEvent<HTMLInputElement>
-                  ) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault();
-                      const value = (e.target as HTMLInputElement).value.trim();
-                      if (value && !field.state.value.includes(value)) {
-                        field.handleChange([...field.state.value, value]);
-                        (e.target as HTMLInputElement).value = '';
-                      }
-                    }
-                  };
-
-                  const handleRemoveAllergy = (allergy: string) => {
-                    const updated = field.state.value.filter(
-                      (i: string) => i !== allergy
-                    );
-                    field.handleChange(updated);
-                  };
-
-                  return (
-                    <div className="space-y-4">
-                      <div className="flex flex-col items-center space-y-3">
-                        {/* Row 1 - 3 items */}
-                        <div className="flex justify-center gap-3">
-                          {DIETARY_RESTRICTIONS.slice(0, 3).map(
-                            (restriction) => {
-                              const isSelected =
-                                field.state.value.includes(restriction);
-                              return (
-                                <motion.div
-                                  key={restriction}
-                                  whileHover={{ scale: 1.05 }}
-                                  whileTap={{ scale: 0.95 }}
-                                  transition={{ duration: 0.1 }}
-                                  className={`
-                                cursor-pointer rounded-lg py-2 text-center font-normal transition-all duration-200 flex items-center justify-center ${
-                                  isMobile
-                                    ? 'px-2 text-xs w-28 h-9'
-                                    : 'px-4 text-sm w-40 h-11'
-                                }
-                                ${
-                                  isSelected
-                                    ? 'bg-white text-black shadow-md'
-                                    : 'bg-white/20 text-white hover:bg-white/30'
-                                }
-                              `}
-                                  onClick={() => {
-                                    const newRestrictions = isSelected
-                                      ? field.state.value.filter(
-                                          (i: string) => i !== restriction
-                                        )
-                                      : [...field.state.value, restriction];
-                                    field.handleChange(newRestrictions);
-                                  }}
-                                >
-                                  {restriction}
-                                </motion.div>
-                              );
-                            }
-                          )}
-                        </div>
-
-                        {/* Row 2 - 2 items */}
-                        <div className="flex justify-center gap-3">
-                          {DIETARY_RESTRICTIONS.slice(3, 6).map(
-                            (restriction) => {
-                              const isSelected =
-                                field.state.value.includes(restriction);
-                              return (
-                                <motion.div
-                                  key={restriction}
-                                  whileHover={{ scale: 1.05 }}
-                                  whileTap={{ scale: 0.95 }}
-                                  transition={{ duration: 0.1 }}
-                                  className={`
-                                cursor-pointer rounded-lg py-2 text-center font-normal transition-all duration-200 flex items-center justify-center ${
-                                  isMobile
-                                    ? 'px-2 text-xs w-28 h-9'
-                                    : 'px-4 text-sm w-40 h-11'
-                                }
-                                ${
-                                  isSelected
-                                    ? 'bg-white text-black shadow-md'
-                                    : 'bg-white/20 text-white hover:bg-white/30'
-                                }
-                              `}
-                                  onClick={() => {
-                                    const newRestrictions = isSelected
-                                      ? field.state.value.filter(
-                                          (i: string) => i !== restriction
-                                        )
-                                      : [...field.state.value, restriction];
-                                    field.handleChange(newRestrictions);
-                                  }}
-                                >
-                                  {restriction}
-                                </motion.div>
-                              );
-                            }
-                          )}
-                        </div>
-
-                        {/* Row 3 - 3 items */}
-                        <div className="flex justify-center gap-3">
-                          {DIETARY_RESTRICTIONS.slice(6, 9).map(
-                            (restriction) => {
-                              const isSelected =
-                                field.state.value.includes(restriction);
-                              return (
-                                <motion.div
-                                  key={restriction}
-                                  whileHover={{ scale: 1.05 }}
-                                  whileTap={{ scale: 0.95 }}
-                                  transition={{ duration: 0.1 }}
-                                  className={`
-                                cursor-pointer rounded-lg py-2 text-center font-normal transition-all duration-200 flex items-center justify-center ${
-                                  isMobile
-                                    ? 'px-2 text-xs w-28 h-9'
-                                    : 'px-4 text-sm w-40 h-11'
-                                }
-                                ${
-                                  isSelected
-                                    ? 'bg-white text-black shadow-md'
-                                    : 'bg-white/20 text-white hover:bg-white/30'
-                                }
-                              `}
-                                  onClick={() => {
-                                    const newRestrictions = isSelected
-                                      ? field.state.value.filter(
-                                          (i: string) => i !== restriction
-                                        )
-                                      : [...field.state.value, restriction];
-                                    field.handleChange(newRestrictions);
-                                  }}
-                                >
-                                  {restriction}
-                                </motion.div>
-                              );
-                            }
-                          )}
-                        </div>
-
-                        {/* Row 4 - 2 items */}
-                        <div className="flex justify-center gap-3">
-                          {DIETARY_RESTRICTIONS.slice(9, 11).map(
-                            (restriction) => {
-                              const isSelected =
-                                field.state.value.includes(restriction);
-                              return (
-                                <motion.div
-                                  key={restriction}
-                                  whileHover={{ scale: 1.05 }}
-                                  whileTap={{ scale: 0.95 }}
-                                  transition={{ duration: 0.1 }}
-                                  className={`
-                                cursor-pointer rounded-lg py-2 text-center font-normal transition-all duration-200 flex items-center justify-center ${
-                                  isMobile
-                                    ? 'px-2 text-xs w-28 h-9'
-                                    : 'px-4 text-sm w-40 h-11'
-                                }
-                                ${
-                                  isSelected
-                                    ? 'bg-white text-black shadow-md'
-                                    : 'bg-white/20 text-white hover:bg-white/30'
-                                }
-                              `}
-                                  onClick={() => {
-                                    const newRestrictions = isSelected
-                                      ? field.state.value.filter(
-                                          (i: string) => i !== restriction
-                                        )
-                                      : [...field.state.value, restriction];
-                                    field.handleChange(newRestrictions);
-                                  }}
-                                >
-                                  {restriction}
-                                </motion.div>
-                              );
-                            }
-                          )}
-                        </div>
-                      </div>
-
-                      {/* Dynamic allergy input */}
-                      <div className="space-y-2">
-                        <label className="block text-sm font-medium text-white">
-                          Other Allergies
-                        </label>
-                        <input
-                          type="text"
-                          onKeyDown={handleAddAllergy}
-                          placeholder="Type and press Enter..."
-                          className="border rounded-md px-3 py-2 w-full h-9 bg-white text-black placeholder-gray-400"
-                        />
-                        {/* Show all selected allergies */}
-                        <div className="flex flex-wrap gap-2 mt-2">
-                          {field.state.value
-                            .filter(
-                              (item: string) =>
-                                !DIETARY_RESTRICTIONS.includes(item)
-                            )
-                            .map((allergy: string) => (
-                              <div
-                                key={allergy}
-                                className="flex items-center gap-1 px-3 py-1 bg-gray-200 rounded-full text-sm"
-                              >
-                                {allergy}
-                                <button
-                                  type="button"
-                                  onClick={() => handleRemoveAllergy(allergy)}
-                                  className="text-red-500 ml-1"
-                                >
-                                  &times;
-                                </button>
-                              </div>
-                            ))}
-                        </div>
-                      </div>
-                    </div>
-                  );
-                }}
-              />
-
-              {/* Navigation buttons for step 3 */}
-              <div className="flex justify-between pt-6">
-                <Button
-                  type="button"
-                  onClick={handleBack}
-                  className="bg-white text-[#EF3050] hover:bg-white/90"
-                >
-                  Go back
-                </Button>
-                <form.Subscribe
-                  selector={(state) => [state.values.diet]}
-                  children={([diet]) => {
-                    const hasDietarySelection = diet && diet.length > 0;
-
-                    return (
-                      <div className="flex justify-end">
-                        <Button
-                          type="button"
-                          onClick={handleNext}
-                          disabled={!hasDietarySelection}
-                          className={`bg-white text-[#EF3050] hover:bg-white/90 ${
-                            !hasDietarySelection
-                              ? 'opacity-50 cursor-not-allowed'
-                              : ''
-                          }`}
-                        >
-                          Next
-                        </Button>
-                      </div>
-                    );
-                  }}
-                />
-              </div>
-            </div>
-          </motion.section>
-
-          {/* Step 4 - Interests */}
-          <motion.section
-            initial={{ opacity: 0, scale: 0 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            transition={{
-              duration: 0.4,
-              scale: { type: 'spring', visualDuration: 0.4, bounce: 0.3 },
-            }}
-            className={`${isMobile ? 'min-w-full h-[500px] flex flex-col justify-center items-center px-8 snap-center' : 'h-screen flex flex-col justify-center items-center px-4 pt-32 pb-32'}`}
-          >
-            <div className="w-full max-w-2xl">
-              <h1
-                className={`font-bold text-white text-center ${isMobile ? 'text-3xl mb-4' : 'text-6xl mb-8'}`}
-              >
-                {steps[4].title}
-              </h1>
-              <div className="space-y-6">
-                <form.Field
-                  name="interests"
-                  children={(field) => (
-                    <div
-                      className={`grid gap-3 ${isMobile ? 'grid-cols-2 grid-rows-4' : 'grid-cols-2'}`}
-                    >
-                      {INTEREST_OPTIONS.map((interest) => {
-                        const isSelected = field.state.value.includes(interest);
-                        return (
-                          <motion.div
-                            key={interest}
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                            transition={{ duration: 0.1 }}
-                            className={`
-                            cursor-pointer rounded-lg text-center font-normal transition-all duration-200 ${isMobile ? 'p-3 text-xs' : 'p-4 text-sm'}
-                            ${
-                              isSelected
-                                ? 'bg-white text-black shadow-md'
-                                : 'bg-white/20 text-white hover:bg-white/30'
-                            }
-                          `}
-                            onClick={() => {
-                              const newInterests = isSelected
-                                ? field.state.value.filter(
-                                    (i) => i !== interest
-                                  )
-                                : [...field.state.value, interest];
-                              field.handleChange(newInterests);
-                            }}
-                          >
-                            {interest}
-                          </motion.div>
-                        );
-                      })}
-                    </div>
-                  )}
-                />
-                <div className="flex justify-between mt-8">
-                  <Button
-                    type="button"
-                    onClick={handleBack}
-                    className="bg-white text-[#EF3050] hover:bg-white/90"
-                  >
-                    Go back
-                  </Button>
-                  <form.Subscribe
-                    selector={(state) => [
-                      state.canSubmit,
-                      state.isSubmitting,
-                      state.values.interests,
-                    ]}
-                    children={([canSubmit, isSubmitting, interests]) => {
-                      const hasThreeInterests =
-                        Array.isArray(interests) && interests.length >= 3;
-
-                      return (
-                        <div className="flex justify-end">
-                          <Button
-                            className={`cursor-pointer font-regular ${
-                              hasThreeInterests
-                                ? 'bg-ma-red'
-                                : 'bg-ma-red opacity-50'
-                            }`}
-                            variant="ma"
-                            type="button"
-                            disabled={!hasThreeInterests}
-                            onClick={async (e) => {
-                              e.preventDefault();
-
-                              // Check required fields before submission
-                              const formValues = form.store.state.values;
-                              if (
-                                !formValues.year ||
-                                !formValues.faculty ||
-                                !formValues.major
-                              ) {
-                                // Trigger validation on all fields to show error messages
-                                form.validateAllFields('submit');
-
-                                // Navigate back to step 1 where required fields are
-                                setStep(1);
-                                scrollToStep(1);
-                                return;
-                              }
-
-                              // If all required fields are filled, submit the form
-                              await form.handleSubmit();
-                            }}
-                          >
-                            {isSubmitting ? (
-                              <>
-                                <Spinner />
-                                <div>Loading</div>
-                              </>
-                            ) : (
-                              <div>
-                                {hasThreeInterests
-                                  ? 'Complete Profile'
-                                  : 'Choose 3 Interests'}
-                              </div>
-                            )}
-                          </Button>
-                        </div>
-                      );
-                    }}
-                  />
-                </div>
-              </div>
-            </div>
-          </motion.section>
-
-          {/* Step 5 - Completion */}
-          <motion.section
-            initial={{ opacity: 0, scale: 0 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            transition={{
-              duration: 0.4,
-              scale: { type: 'spring', visualDuration: 0.4, bounce: 0.3 },
-            }}
-            className={`${isMobile ? 'min-w-full h-[500px] flex flex-col justify-center items-center px-8 snap-center' : 'h-screen flex flex-col justify-center items-center px-4 pt-32 pb-32'}`}
-          >
-            <div
-              className={`w-full max-w-2xl text-center ${isMobile ? 'space-y-4' : 'space-y-6'}`}
-            >
-              <h1
-                className={`font-bold text-white ${isMobile ? 'text-3xl mb-4' : 'text-6xl mb-8'}`}
-              >
-                {steps[5].title}
-              </h1>
-              <p className={`text-white ${isMobile ? 'text-sm' : 'text-lg'}`}>
-                {steps[5].description}
-              </p>
-              <Button
-                onClick={() => {
-                  sessionStorage.removeItem('onboarding_skipped');
-                  window.location.href = '/home';
-                }}
-                className="bg-white text-[#EF3050] hover:bg-white/90"
-              >
-                Go to Home
-              </Button>
-            </div>
-          </motion.section>
-        </div>
-        {/* Mobile Progress Line */}
-        <ProgressLineMobile
-          step={step}
-          steps={steps}
-          stepEmojiMap={stepEmojiMap}
-          handleBack={handleBack}
-          isMobile={isMobile}
-        />
+            {renderCurrentStep()}
+          </motion.div>
+        </AnimatePresence>
 
         {/* Desktop Progress Line */}
         {!isMobile && (
-          <div className="flex min-w-40 h-full items-center justify-center relative overflow-hidden">
+          <div className="flex min-w-40 h-full items-center justify-center relative overflow-hidden mx-16">
             <motion.div
               className="absolute left-1/2 -translate-x-1/2 w-px bg-white"
               animate={{
@@ -1068,38 +954,33 @@ export default function OnboardingModal() {
                 // Calculate relative position from current step
                 const relativePosition = index - step;
 
-                let topPercentage = 50; // Default center
+                let topPercentage = 50;
                 let circleSize = 100;
                 let isVisible = false;
 
                 // Show 3 circles: previous, current, and next
                 if (relativePosition === -1) {
-                  // Previous step - top of screen
                   topPercentage = 20;
                   circleSize = 100;
                   isVisible = true;
                 } else if (relativePosition === 0) {
-                  // Current step - center of screen, larger size
                   topPercentage = 50;
                   circleSize = 150;
                   isVisible = true;
                 } else if (relativePosition === 1) {
-                  // Next step - bottom of screen
                   topPercentage = 80;
                   circleSize = 100;
                   isVisible = true;
                 } else if (relativePosition < -1) {
-                  // Steps that are further back - move progressively upward off screen
                   const offsetSteps = Math.abs(relativePosition) - 1;
-                  topPercentage = 20 - offsetSteps * 30; // Move 30% up for each additional step back
+                  topPercentage = 20 - offsetSteps * 30;
                   circleSize = 100;
-                  isVisible = topPercentage >= -10; // Fade out when too far up
+                  isVisible = topPercentage >= -10;
                 } else if (relativePosition > 1) {
-                  // Steps that are further ahead - move progressively downward off screen
                   const offsetSteps = relativePosition - 1;
-                  topPercentage = 80 + offsetSteps * 30; // Move 30% down for each additional step ahead
+                  topPercentage = 80 + offsetSteps * 30;
                   circleSize = 100;
-                  isVisible = topPercentage <= 110; // Fade out when too far down
+                  isVisible = topPercentage <= 110;
                 }
 
                 return (
