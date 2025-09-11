@@ -140,6 +140,9 @@ importers:
       react-confetti:
         specifier: ^6.4.0
         version: 6.4.0(react@19.1.1)
+      react-csv:
+        specifier: ^2.2.2
+        version: 2.2.2
       react-day-picker:
         specifier: 9.7.0
         version: 9.7.0(react@19.1.1)
@@ -183,6 +186,9 @@ importers:
       '@types/react':
         specifier: ^19
         version: 19.1.9
+      '@types/react-csv':
+        specifier: ^1.1.10
+        version: 1.1.10
       '@types/react-dom':
         specifier: ^19
         version: 19.1.7(@types/react@19.1.9)
@@ -1353,6 +1359,9 @@ packages:
 
   '@types/node@20.19.10':
     resolution: {integrity: sha512-iAFpG6DokED3roLSP0K+ybeDdIX6Bc0Vd3mLW5uDqThPWtNos3E+EqOM11mPQHKzfWHqEBuLjIlsBQQ8CsISmQ==}
+
+  '@types/react-csv@1.1.10':
+    resolution: {integrity: sha512-PESAyASL7Nfi/IyBR3ufd8qZkyoS+7jOylKmJxRZUZLFASLo4NZaRsJ8rNP8pCcbIziADyWBbLPD1nPddhsL4g==}
 
   '@types/react-dom@19.1.7':
     resolution: {integrity: sha512-i5ZzwYpqjmrKenzkoLM2Ibzt6mAsM7pxB6BCIouEVVmgiqaMj1TjaK7hnA36hbW5aZv20kx7Lw6hWzPWg0Rurw==}
@@ -2777,6 +2786,9 @@ packages:
     engines: {node: '>=16'}
     peerDependencies:
       react: ^16.3.0 || ^17.0.1 || ^18.0.0 || ^19.0.0
+
+  react-csv@2.2.2:
+    resolution: {integrity: sha512-RG5hOcZKZFigIGE8LxIEV/OgS1vigFQT4EkaHeKgyuCbUAu9Nbd/1RYq++bJcJJ9VOqO/n9TZRADsXNDR4VEpw==}
 
   react-day-picker@9.7.0:
     resolution: {integrity: sha512-urlK4C9XJZVpQ81tmVgd2O7lZ0VQldZeHzNejbwLWZSkzHH498KnArT0EHNfKBOWwKc935iMLGZdxXPRISzUxQ==}
@@ -4370,6 +4382,10 @@ snapshots:
     dependencies:
       undici-types: 6.21.0
 
+  '@types/react-csv@1.1.10':
+    dependencies:
+      '@types/react': 19.1.9
+
   '@types/react-dom@19.1.7(@types/react@19.1.9)':
     dependencies:
       '@types/react': 19.1.9
@@ -5938,6 +5954,8 @@ snapshots:
     dependencies:
       react: 19.1.1
       tween-functions: 1.2.0
+
+  react-csv@2.2.2: {}
 
   react-day-picker@9.7.0(react@19.1.1):
     dependencies:

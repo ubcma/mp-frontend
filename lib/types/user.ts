@@ -1,4 +1,4 @@
-export type Role = "GUEST" | "BASIC" | "MEMBER" | "ADMIN";
+export type Role = "Basic" | "Member" | "Admin";
 
 export interface UserProfileData {
     name: string,
