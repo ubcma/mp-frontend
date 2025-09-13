@@ -157,7 +157,7 @@ const WelcomeStep: React.FC<
         <Button
         variant="ghost"
           onClick={() => {
-            document.cookie = 'onboarding_skipped=true; path=/; max-age=86400';
+            localStorage.setItem("onboarding_skipped", "true");
             router.push('/home');
           }}
           className={`text-white hover:text-white hover:bg-transparent hover:opacity-80${

@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { getOnboardingStatus } from './lib/queries/server/onboardingStatus';
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -33,37 +32,6 @@ export async function middleware(request: NextRequest) {
       : 'membership-portal.session_token'
   )?.value;
 
-  let skipOnboarding = request.cookies.get('onboarding_skipped')?.value;
-
-  if (!skipOnboarding) {
-    const response = NextResponse.next();
-    response.cookies.set('onboarding_skipped', 'false', {
-      path: '/',
-      maxAge: 60 * 60 * 24 * 7,
-    });
-    skipOnboarding = 'false';
-    return response;
-  }
-
-  let onboardingCompleteCookie =
-    request.cookies.get('onboardingComplete')?.value;
-
-  let onboardingComplete: boolean | undefined = false;
-
-  if (sessionCookie && !onboardingCompleteCookie) {
-    onboardingComplete = await getOnboardingStatus();
-    const response = NextResponse.next();
-    response.cookies.set(
-      'onboardingComplete',
-      onboardingComplete ? 'true' : 'false',
-      {
-        path: '/',
-        maxAge: 60 * 60 * 24 * 7,
-      }
-    );
-    return response;
-  }
-
   const publicAuthRoutes = [
     '/sign-in',
     '/sign-up',
@@ -76,7 +44,7 @@ export async function middleware(request: NextRequest) {
   const publicPageRoutes = ['/terms-of-service', '/privacy-policy'];
 
   const isPublicPage =
-    publicPageRoutes.includes(pathname) || pathname.startsWith('/events');
+    publicPageRoutes.includes(pathname);
 
   if (!sessionCookie) {
     if (isAuthPage || isPublicPage) return NextResponse.next();
@@ -85,20 +53,6 @@ export async function middleware(request: NextRequest) {
 
   if (pathname === '/') {
     return NextResponse.redirect(new URL('/home', request.url));
-  }
-
-  if (onboardingCompleteCookie === 'false') {
-    if (
-      !onboardingComplete &&
-      pathname !== '/onboarding' &&
-      skipOnboarding === 'false'
-    ) {
-      return NextResponse.redirect(new URL('/onboarding', request.url));
-    }
-  }
-
-  if (onboardingCompleteCookie === 'true' && pathname === '/onboarding') {
-    return NextResponse.redirect(new URL('/', request.url));
   }
 
   return NextResponse.next();

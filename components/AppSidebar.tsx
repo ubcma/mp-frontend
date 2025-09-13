@@ -38,7 +38,7 @@ import { getInitials } from '@/lib/utils';
 import { useUserQuery } from '@/lib/queries/user';
 import { Skeleton } from './ui/skeleton';
 import { signOut } from '@/lib/better-auth/sign-out';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Spinner from './common/Spinner';
 import Image from 'next/image';
 import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
@@ -141,6 +141,18 @@ export function AppSidebar() {
       setIsSignOutLoading(false);
     }
   };
+
+  useEffect(() => {
+
+    const skip = localStorage.getItem('onboarding_skipped');
+
+    if (pathname !== '/onboarding') {
+      if (skip !== 'true' && user && !user?.onboardingComplete) {
+        router.push('/onboarding');
+        return;
+      }
+    }
+  }, [user]);
 
   return (
     <Sidebar collapsible="icon" side={isMobile ? 'right' : 'left'}>
