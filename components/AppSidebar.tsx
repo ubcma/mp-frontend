@@ -81,21 +81,21 @@ export function AppSidebar() {
     {
       href: '/job-board',
       icon: BriefcaseBusiness,
-      label: 'Job Board (Coming Soon)',
-      disabled: true,
+      label: 'Job Board',
+      disabled: false,
     },
-    {
-      href: '/alumni-network',
-      icon: Handshake,
-      label: 'Alumni Network (Coming Soon)',
-      disabled: true,
-    },
-    {
-      href: '/discounts',
-      icon: BadgePercent,
-      label: 'Member Discounts (Coming Soon)',
-      disabled: true,
-    },
+    // {
+    //   href: '/alumni-network',
+    //   icon: Handshake,
+    //   label: 'Alumni Network (Coming Soon)',
+    //   disabled: true,
+    // },
+    // {
+    //   href: '/discounts',
+    //   icon: BadgePercent,
+    //   label: 'Member Discounts (Coming Soon)',
+    //   disabled: true,
+    // },
   ];
 
   const adminMenu = [
@@ -196,14 +196,14 @@ export function AppSidebar() {
             activeMatch="startsWith"
           />
 
-          {/* <SidebarSection
-            label="Member Apps"
+          <SidebarSection
+            label="Members"
             menuItems={memberMenu}
             pathname={pathname}
             setOpenMobile={setOpenMobile}
             isVisible={user?.role === 'Member' || user?.role === 'Admin'}
             activeMatch="startsWith"
-          /> */}
+          />
 
           <SidebarSection
             label="Admin"
