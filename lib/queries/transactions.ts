@@ -25,7 +25,7 @@ export type PaginatedResponse<T> = {
 
 export type RevenueQueryResponse = {
   totalRevenue: number;
-}
+};
 
 export function useTransactionsQuery(page: number, pageSize: number) {
   return useQuery<PaginatedResponse<Transaction>>({
@@ -50,20 +50,52 @@ export function useTransactionsQuery(page: number, pageSize: number) {
   });
 }
 
+export function useAllTransactionsQuery() {
+  return useQuery({
+    queryKey: ['transactions', 'all'],
+    queryFn: async (): Promise<Transaction[]> => {
+      const pageSize = 100;
+
+      const firstResponse = await fetchFromAPI(
+        `/api/transactions?page=1&pageSize=${pageSize}`
+      );
+      if (!firstResponse.ok) throw new Error('Failed to fetch transactions');
+
+      const firstResult: PaginatedResponse<Transaction> =
+        await firstResponse.json();
+      const totalPages = firstResult.meta.totalPages;
+
+      if (totalPages === 1) {
+        return firstResult.data;
+      }
+
+      const pagePromises = Array.from({ length: totalPages - 1 }, (_, i) => {
+        const page = i + 2;
+        return fetchFromAPI(`/api/transactions?page=${page}&pageSize=${pageSize}`)
+          .then((res) => res.json())
+          .then((result: PaginatedResponse<Transaction>) => result.data);
+      });
+
+      const remainingPages = await Promise.all(pagePromises);
+
+      return [firstResult.data, ...remainingPages].flat();
+    },
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000, 
+  });
+}
+
 export function useRevenueQuery() {
   return useQuery<RevenueQueryResponse>({
-    queryKey: ["transactions", "totalRevenue"],
-        queryFn: async () => {
-      const res = await fetchFromAPI(
-        `/api/transactions/revenue`,
-        {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          credentials: 'include',
-        }
-      );
+    queryKey: ['transactions', 'totalRevenue'],
+    queryFn: async () => {
+      const res = await fetchFromAPI(`/api/transactions/revenue`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+      });
 
       const data = (await res.json()) as RevenueQueryResponse;
       return data;

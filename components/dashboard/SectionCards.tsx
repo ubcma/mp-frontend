@@ -22,24 +22,19 @@ export function SectionCards() {
   {
     title: "Total Revenue",
     value: (revenue?.totalRevenue ? `$${(revenue?.totalRevenue / 100).toFixed(2)}` : "N/A"),
-    change: 12.5,
+    change: 102,
     changeIcon: <TrendingUp />,
-    description: "[REAL DATA] Trending up this month",
+    description: "Trending up this month",
+    note: "Total revenue from members and events"
   },
   {
-    title: "New Members",
-    value: 10,
-    change: -20,
-    changeIcon: <TrendingDown />,
-    description: "[SAMPLE DATA] Down 20% from last month",
-  },
-  {
-    title: "Active Accounts",
-    value: 20,
-    change: 12.5,
+    title: "Total Members",
+    value: 90,
+    change: 80,
     changeIcon: <TrendingUp />,
-    description: "[SAMPLE DATA] Strong user retention",
-  }
+    description: "Trending up this month",
+    note: "Total memberships purchased"
+  },
 ]
 
   return (
@@ -63,7 +58,7 @@ export function SectionCards() {
               {detail.description} {detail.changeIcon}
             </div>
             <div className="text-muted-foreground">
-              Visitors for the last 6 months
+              {detail.note}
             </div>
           </CardContent>
         </Card>

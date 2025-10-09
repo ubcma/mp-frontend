@@ -112,8 +112,14 @@ export default function MemberDemographics() {
                 type="category"
                 tickFormatter={tickFormatter}
               />
+              <defs>
+                <linearGradient id="colorDem" x1="1" y1="0" x2="0" y2="0">
+                  <stop offset="5%" stopColor="#FF324D" stopOpacity={0.8} />
+                  <stop offset="95%" stopColor="#FF6F82" stopOpacity={0.6} />
+                </linearGradient>
+              </defs>
               <Tooltip />
-              <Bar dataKey="count" fill="#8884d8" />
+              <Bar dataKey="count" fill="url(#colorDem)" />
             </BarChart>
           </ResponsiveContainer>
         </div>
