@@ -16,6 +16,7 @@ import {
   Settings2,
   BadgeCheck,
   ChevronDown,
+  Briefcase,
 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
@@ -118,6 +119,12 @@ export function AppSidebar() {
       disabled: false,
     },
     {
+      href: '/create-job',
+      icon: Briefcase,
+      label: 'Create New Job',
+      disabled: false,
+    },
+    {
       href: '/manage-members',
       icon: Users,
       label: 'Manage Members',
@@ -211,7 +218,7 @@ export function AppSidebar() {
             pathname={pathname}
             setOpenMobile={setOpenMobile}
             isVisible={user?.role === 'Admin'}
-            activeMatch="exact"
+            activeMatch="startsWith"
           />
         </div>
 
