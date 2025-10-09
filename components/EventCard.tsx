@@ -5,13 +5,19 @@ import { Button } from '@/components/ui/button';
 import { cn, getEventStatus } from '@/lib/utils';
 import { EventDetails } from '@/lib/types';
 import { useRouter } from 'next/navigation';
-import { ArrowUpRight } from 'lucide-react';
+import { ArrowUpRight, CheckCircle } from 'lucide-react';
 import Link from 'next/link';
 import dayjs from 'dayjs';
 import Image from 'next/image';
 import { isValidImageUrl } from '@/lib/uploadthing';
 
-export function EventCard({ event }: { event: EventDetails }) {
+export function EventCard({
+  event,
+  registered,
+}: {
+  event: EventDetails;
+  registered?: boolean;
+}) {
   const status = getEventStatus(event.startsAt);
 
   const router = useRouter();
@@ -66,18 +72,25 @@ export function EventCard({ event }: { event: EventDetails }) {
                 {event.title}
               </h3>
               <p className="text-white/60 truncate mb-4">{event.description}</p>
-              {status === 'Upcoming' ? (
-                <Button
-                  onClick={() => router.push(`/events/${event.title}`)}
-                  variant="ma" 
-                  className="w-full group-hover:brightness-80 text-white"
-                >
-                  Register for this event!
-                  <ArrowUpRight className="h-4 w-4 group-hover:rotate-45 transition-transform duration-200 ease-in-out" />
-                </Button>
+              {!registered ? (
+                status === 'Upcoming' ? (
+                  <Button
+                    onClick={() => router.push(`/events/${event.title}`)}
+                    variant="ma"
+                    className="w-full group-hover:brightness-80 text-white"
+                  >
+                    Register for this event!
+                    <ArrowUpRight className="h-4 w-4 group-hover:rotate-45 transition-transform duration-200 ease-in-out" />
+                  </Button>
+                ) : (
+                  <Button variant="ma" className="w-full text-white" disabled>
+                    Registration has passed.
+                  </Button>
+                )
               ) : (
-                <Button variant="ma" className="w-full text-white" disabled>
-                  Registration has passed.
+                <Button className="w-full bg-emerald-500 hover:bg-emerald-500">
+                  <CheckCircle className="h-4 w-4" />
+                  You're registered!
                 </Button>
               )}
             </div>

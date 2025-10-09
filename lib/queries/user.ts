@@ -19,6 +19,9 @@ export function useUserQuery() {
       return data;
     },
     retry: 1,
-    staleTime: 5 * 60 * 1000,
+    staleTime: Infinity,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
   });
 }

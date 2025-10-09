@@ -3,7 +3,7 @@
 import { Button } from '@/components/ui/button';
 import { handleClientError } from '@/lib/error/handleClient';
 import { fetchFromAPI } from '@/lib/httpHandlers';
-import { verifyUserPayment } from '@/lib/queries/stripe';
+import { useVerifyUserPayment} from '@/lib/queries/stripe';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -33,10 +33,9 @@ export default function SuccessPage() {
     }
   }, []);
 
-  const { data, isLoading, isError, error } = verifyUserPayment({
-    paymentIntentId: paymentIntentId!,
-    enabled: !!paymentIntentId,
-  });
+const { data, isLoading, isError, error } =
+  useVerifyUserPayment(paymentIntentId, Boolean(paymentIntentId));
+
 
   useEffect(() => {
     if (data?.verified === true) {
@@ -81,9 +80,9 @@ export default function SuccessPage() {
             <Image
               src="/logos/MA_mascot.png"
               alt="UBCMA Mascot"
-              className="self-center place-self-center justify-self-center -mb-16 z-10"
-              width={256}
-              height={256}
+              className="self-center -mt-16 mb-4 z-10" // 👈 increase negative top margin, shrink bottom
+              width={200}
+              height={200}
             />
             <div className="flex flex-col items-center bg-rose-50 border border-rose-200 rounded-2xl shadow-lg px-4 p-8 md:p-10 text-center space-y-4 animate-fade-in">
               <h2 className="text-4xl font-bold text-black">

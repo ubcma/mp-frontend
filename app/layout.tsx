@@ -25,7 +25,7 @@ export default async function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={onest.className}>
-        <ThemeProvider attribute="class" defaultTheme="light" forcedTheme='light'>
+        <ThemeProvider attribute="class" defaultTheme="light" forcedTheme="light">
           <QueryProvider>
             {children}
           </QueryProvider>

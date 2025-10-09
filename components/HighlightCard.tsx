@@ -22,8 +22,8 @@ export interface HighlightCardProps {
 export function HighlightCard({ image, heading, subheading, url, highlightTags, color }: HighlightCardProps) {
     return (
         <Link href={url} className="block group">
-            <Card className="relative h-72 w-[24rem] md:h-96 md:w-[40rem] duration-200 shadow-md">
-                {/* Background Image */}
+            <Card className="relative h-64 w-[calc(100vw-3rem)] md:h-96 md:w-[40rem] duration-200 shadow-md md:py-8 py-4">
+
                 <div className="absolute inset-0 overflow-hidden rounded-xl">
                     <Image
                         src={image || "/placeholder.svg"}
@@ -37,14 +37,12 @@ export function HighlightCard({ image, heading, subheading, url, highlightTags, 
                     }} />
                 </div>
 
-                {/* Content */}
-                <div className="relative z-[5] h-full flex flex-col gap-4 justify-end px-6 text-white">
+                <div className="relative z-[5] h-full flex flex-col gap-4 justify-end md:px-8 px-4 text-white">
                     <div className="space-y-1">
                         <h3 className="text-xl md:text-2xl font-bold leading-tight">{heading}</h3>
-                        <p className="text-sm md:text-md text-background/80">{subheading}</p>
+                        <p className="text-xs md:text-md text-background/80">{subheading}</p>
                     </div>
 
-                    {/* Tags */}
                     <div className="flex flex-wrap gap-2 w-10/12">
                         {highlightTags.map((tag, index) => {
                             const IconComponent = tag.icon

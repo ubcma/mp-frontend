@@ -116,6 +116,7 @@ export default function EventForm({
       price: initialValues?.price ?? 0,
       location: initialValues?.location ?? '',
       isVisible: initialValues?.isVisible ?? false,
+      membersOnly: initialValues?.membersOnly ?? true,
       startsAt: initialValues?.startsAt ?? '',
       endsAt: initialValues?.endsAt ?? '',
     },
@@ -144,6 +145,7 @@ export default function EventForm({
               startsAt: new Date(value.startsAt),
               endsAt: new Date(value.endsAt),
               isVisible: value.isVisible,
+              membersOnly: value.membersOnly,
               ...(mode === 'create' && {
                 questions: questions.map((q, index) => ({
                   label: q.label,
@@ -344,6 +346,22 @@ export default function EventForm({
                 />
                 <Label htmlFor={fieldApi.name}>
                   Make visible to the public?
+                </Label>
+              </div>
+            )}
+          />
+
+          <form.Field
+            name="membersOnly"
+            children={(fieldApi) => (
+              <div className="flex items-center gap-2 cursor-pointer">
+                <Switch
+                  checked={fieldApi.state.value}
+                  onCheckedChange={fieldApi.handleChange}
+                  className="data-[state=checked]:bg-emerald-400"
+                />
+                <Label htmlFor={fieldApi.name}>
+                  Restrict access to members only?
                 </Label>
               </div>
             )}

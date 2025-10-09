@@ -27,6 +27,7 @@ export type EventDetails = {
   startsAt: Date;
   endsAt: Date;
   isVisible: boolean;
+  membersOnly: boolean;
   createdAt: string | null;
   updatedAt: string | null;
 };
@@ -110,6 +111,7 @@ export type BaseEventForm = {
   price: number;
   location: string;
   isVisible: boolean;
+  membersOnly: boolean;
   startsAt: string;
   endsAt: string;
 };

@@ -1,3 +1,5 @@
+"use client"
+
 import { Badge } from "@/components/ui/badge"
 import {
   Card,
@@ -8,34 +10,38 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
+import { useRevenueQuery } from "@/lib/queries/transactions"
 import { cn } from "@/lib/utils"
 import { TrendingDown, TrendingUp } from "lucide-react"
 
-const details = [
+export function SectionCards() {
+
+  const { data: revenue, isLoading: isRevenueLoading, isError: isRevenueError} = useRevenueQuery();
+
+  const details = [
   {
     title: "Total Revenue",
-    value: "$1,250.00",
+    value: (revenue?.totalRevenue ? `$${(revenue?.totalRevenue / 100).toFixed(2)}` : "N/A"),
     change: 12.5,
     changeIcon: <TrendingUp />,
-    description: "Trending up this month",
+    description: "[REAL DATA] Trending up this month",
   },
   {
     title: "New Members",
-    value: "63",
+    value: 10,
     change: -20,
     changeIcon: <TrendingDown />,
-    description: "Down 20% from last month",
+    description: "[SAMPLE DATA] Down 20% from last month",
   },
   {
     title: "Active Accounts",
-    value: "45,678",
+    value: 20,
     change: 12.5,
     changeIcon: <TrendingUp />,
-    description: "Strong user retention",
+    description: "[SAMPLE DATA] Strong user retention",
   }
 ]
 
-export function SectionCards() {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
 

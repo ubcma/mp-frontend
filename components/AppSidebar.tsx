@@ -15,6 +15,7 @@ import {
   UserCircle2,
   Settings2,
   BadgeCheck,
+  ChevronDown,
 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
@@ -37,7 +38,7 @@ import { getInitials } from '@/lib/utils';
 import { useUserQuery } from '@/lib/queries/user';
 import { Skeleton } from './ui/skeleton';
 import { signOut } from '@/lib/better-auth/sign-out';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Spinner from './common/Spinner';
 import Image from 'next/image';
 import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
@@ -141,6 +142,18 @@ export function AppSidebar() {
     }
   };
 
+  useEffect(() => {
+
+    const skip = localStorage.getItem('onboarding_skipped');
+
+    if (pathname !== '/onboarding') {
+      if (skip !== 'true' && user && !user?.onboardingComplete) {
+        router.push('/onboarding');
+        return;
+      }
+    }
+  }, [user]);
+
   return (
     <Sidebar collapsible="icon" side={isMobile ? 'right' : 'left'}>
       <SidebarHeader className="p-2 pt-4">
@@ -173,7 +186,7 @@ export function AppSidebar() {
           isMobile={isMobile}
         />
 
-        <div className=''>
+        <div className="">
           <SidebarSection
             label="Explore"
             menuItems={publicMenu}
@@ -183,14 +196,14 @@ export function AppSidebar() {
             activeMatch="startsWith"
           />
 
-          <SidebarSection
+          {/* <SidebarSection
             label="Member Apps"
             menuItems={memberMenu}
             pathname={pathname}
             setOpenMobile={setOpenMobile}
             isVisible={user?.role === 'Member' || user?.role === 'Admin'}
             activeMatch="startsWith"
-          />
+          /> */}
 
           <SidebarSection
             label="Admin"
@@ -259,8 +272,8 @@ export function SidebarSection({
   if (!isVisible) return null;
 
   return (
-    <SidebarGroup className='py-1'>
-      <SidebarGroupLabel className='font-normal'>{label}</SidebarGroupLabel>
+    <SidebarGroup className="py-1">
+      <SidebarGroupLabel className="font-normal">{label}</SidebarGroupLabel>
       <SidebarGroupContent>
         <SidebarMenu>
           {menuItems.map((item) => {
@@ -311,6 +324,8 @@ export function ProfilePopover({
   state,
   isMobile,
 }: ProfilePopoverProps) {
+  const [isPopoverOpen, setPopoverOpen] = useState(false);
+
   return (
     <SidebarGroup>
       {isLoading ? (
@@ -322,7 +337,7 @@ export function ProfilePopover({
           </div>
         </div>
       ) : (
-        <Popover>
+        <Popover open={isPopoverOpen} onOpenChange={setPopoverOpen}>
           <PopoverTrigger asChild>
             <button
               className={`flex w-full items-center gap-4 md:gap-3 transition-all duration-300 ease-in-out hover:opacity-70 focus:outline-none ${
@@ -345,10 +360,13 @@ export function ProfilePopover({
                 )}
               </Avatar>
               {state !== 'collapsed' && (
-                <div className="text-left">
-                  <h3 className="text-lg md:text-md font-medium text-nowrap">
-                    {user?.name}
-                  </h3>
+                <div className="text-left w-full">
+                  <div className="flex flex-row items-center justify-between max-w-full md:max-w-[170px]">
+                    <h3 className="text-lg md:text-md font-medium overflow-hidden truncate">
+                      {user?.name}
+                    </h3>
+                    <ChevronDown className="text-neutral-500 w-4 h-4" />
+                  </div>
                   <p className="text-sm md:text-xs text-muted-foreground text-nowrap">
                     {user?.role}
                   </p>
@@ -362,22 +380,17 @@ export function ProfilePopover({
             className={`md:w-[15rem]
                w-[19rem] p-1 md:text-sm text-md`}
           >
-            {/* md:w-[15rem] */}
             <Link
               href="/profile"
               className="block rounded-md p-4 py-3 md:p-2 hover:bg-accent"
+              onClick={() => setPopoverOpen(false)}
             >
               View Profile
             </Link>
             <Link
-              href="/preferences"
-              className="block rounded-md p-4 py-3 md:p-2 hover:bg-accent"
-            >
-              Preferences
-            </Link>
-            <Link
               href="/membership"
               className="block rounded-md p-4 py-3 md:p-2 hover:bg-accent"
+              onClick={() => setPopoverOpen(false)}
             >
               Membership
             </Link>

@@ -26,6 +26,7 @@ import { Textarea } from '../ui/textarea';
 import { DateTimePicker } from '../DateTimePicker';
 import { Checkbox } from '../ui/checkbox';
 import { RadioGroup, RadioGroupItem } from '../ui/radio-group';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 export function FieldInfo({ field }: { field: AnyFieldApi }) {
   return (
@@ -48,16 +49,20 @@ export function RenderInputField({
   label,
   field,
   onChange,
+  labelClassName,
 }: {
   type?: string;
   placeholder?: string;
   label: string;
   field: AnyFieldApi;
   onChange?: (value: string) => void;
+  labelClassName?: string;
 }) {
+  const isMobile = useIsMobile();
+  
   return (
     <div className="flex flex-col gap-2 w-full text-left">
-      <Label htmlFor={field.name}>{label}</Label>
+      <Label htmlFor={field.name} className={labelClassName}>{label}</Label>
       <Input
         id={field.name}
         name={field.name}
@@ -70,6 +75,7 @@ export function RenderInputField({
         }
         type={type}
         placeholder={placeholder ?? label}
+        className={`bg-white ${isMobile ? 'h-9 text-sm' : 'h-10'}`}
       />
       <FieldInfo field={field} />
     </div>
@@ -107,22 +113,26 @@ export function RenderSelectField({
   label,
   field,
   disabled,
+  labelClassName,
 }: {
   options: string[];
   placeholder?: string;
   label: string;
   field: AnyFieldApi;
   disabled?: boolean;
+  labelClassName?: string;
 }) {
+  const isMobile = useIsMobile();
+  
   return (
     <div className="flex flex-col gap-2 w-full">
-      <Label htmlFor={field.name}>{label}</Label>
+      <Label htmlFor={field.name} className={labelClassName}>{label}</Label>
       <Select
         value={field.state.value ?? ''}
         onValueChange={(value) => field.handleChange(value)}
         disabled={disabled}
       >
-        <SelectTrigger className='w-full'>
+        <SelectTrigger className='w-full bg-white'>
           <SelectValue
             placeholder={placeholder || 'Select'}
             defaultValue={field.state.value}
@@ -147,16 +157,19 @@ export function RenderComboBoxField({
   label,
   field,
   disabled,
+  labelClassName,
 }: {
   options: string[];
   placeholder?: string;
   label: string;
   field: AnyFieldApi;
   disabled?: boolean;
+  labelClassName?: string;
 }) {
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState(field.state.value || '');
   const [inputValue, setInputValue] = useState('');
+  const isMobile = useIsMobile();
 
   const filteredOptions = options.filter((option) =>
     option.toLowerCase().includes(inputValue.toLowerCase())
@@ -166,7 +179,7 @@ export function RenderComboBoxField({
 
   return (
     <div className="flex flex-col gap-2 w-full">
-      <Label htmlFor={field.name}>{label}</Label>
+      <Label htmlFor={field.name} className={labelClassName}>{label}</Label>
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild disabled={disabled}>
           <Button
@@ -175,7 +188,8 @@ export function RenderComboBoxField({
             aria-expanded={open}
             className={cn(
               'justify-between font-normal w-full',
-              value ? '' : 'text-neutral-400'
+              value ? '' : 'text-neutral-400',
+              isMobile ? 'h-9 text-sm' : 'h-10'
             )}
           >
             <span className="truncate overflow-hidden whitespace-nowrap max-w-[6rem] lg:max-w-[8rem]">
@@ -396,7 +410,7 @@ export function RenderCheckboxField({
   field,
   options,
 }: {
-  label: string;
+  label?: string;
   field: AnyFieldApi;
   options: string[];
 }) {
