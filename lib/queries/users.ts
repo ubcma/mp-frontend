@@ -5,11 +5,10 @@ import { UserProfileData } from '../types';
 export type PaginatedResponse<U> = {
   data: U[];
   meta: {
-    page?: number;
-    pageSize?: number;
+    page: number;
+    pageSize: number;
     totalCount: number;
-    totalPages?: number;
-    exportAll?: boolean;
+    totalPages: number;
     filters?: {
       role?: string | null;
       search?: string | null;
@@ -17,40 +16,36 @@ export type PaginatedResponse<U> = {
   };
 };
 
+
 export function useGetAllUsersQuery(
   page: number,
   pageSize: number,
   role?: string,
-  search?: string,
-  exportAll: boolean = false
+  search?: string
 ) {
   return useQuery<PaginatedResponse<UserProfileData>>({
-    queryKey: ['users', page, pageSize, role, search, exportAll],
+    queryKey: ['users', page, pageSize, role, search],
     queryFn: async () => {
       const params = new URLSearchParams();
 
-    if (exportAll) {
-      params.append('export', 'all');
-    } else {
       params.append('page', page.toString());
       params.append('pageSize', pageSize.toString());
-    }
 
-    if (role && role !== 'All Roles') params.append('role', role);
-    if (search && search.trim().length > 0) params.append('search', search);
+      if (role && role !== 'All Roles') params.append('role', role);
+      if (search && search.trim().length > 0) params.append('search', search);
 
+      const res = await fetchFromAPI(`/api/users?${params.toString()}`, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+      });
 
-    const res = await fetchFromAPI(`/api/users?${params.toString()}`, {
-      method: 'GET',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-    });
-
-    const data = (await res.json()) as PaginatedResponse<UserProfileData>;
-    return data;
+      if (!res.ok) throw new Error(`Failed to fetch users: ${res.statusText}`);
+      const data = (await res.json()) as PaginatedResponse<UserProfileData>;
+      return data;
     },
     retry: 1,
-    placeholderData: keepPreviousData, // smoother page transitions
+    placeholderData: keepPreviousData, 
     staleTime: 5 * 60 * 1000,
   });
 }

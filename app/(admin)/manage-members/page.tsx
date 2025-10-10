@@ -9,30 +9,31 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useGetAllUsersQuery } from '@/lib/queries/users';
+import { fetchExportUsers } from '@/lib/queries/export';
 import { Role } from '@/lib/types';
 import { Download } from 'lucide-react';
 import { useState, useEffect } from 'react';
-import { CSVLink } from 'react-csv';
 import { Button } from '@/components/ui/button';
 import SearchBar from '@/components/SearchBar';
 import { useSearchParams } from 'next/navigation';
 
 export default function Home() {
-  // pagination + filter states
+  // Pagination + filter state
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(25);
   const [roleFilter, setRoleFilter] = useState<Role | 'All Roles'>('All Roles');
   const [exportMode, setExportMode] = useState<'all' | 'page'>('all');
   const [isClient, setIsClient] = useState(false);
+
   const searchParams = useSearchParams();
   const search = searchParams.get('search') || '';
 
   useEffect(() => setIsClient(true), []);
 
-  useEffect(() => {
-    setPage(1);
-  }, [roleFilter, search]);
+  // Reset pagination when filters change
+  useEffect(() => setPage(1), [roleFilter, search]);
 
+  // Fetch users
   const { data, isLoading, error } = useGetAllUsersQuery(
     page,
     pageSize,
@@ -41,39 +42,21 @@ export default function Home() {
   );
 
   const users = data?.data ?? [];
-  const pagination = data?.meta;
-  const totalPages = pagination?.totalPages ?? 1;
-  const totalCount = pagination?.totalCount ?? 0;
+  const totalPages = data?.meta?.totalPages ?? 1;
+  const totalCount = data?.meta?.totalCount ?? 0;
 
   const ROLES = ['All Roles', 'Basic', 'Member', 'Admin'] as const;
-  const headers = [
-    { label: 'Name', key: 'name' },
-    { label: 'Email', key: 'email' },
-    { label: 'Role', key: 'role' },
-    { label: 'Bio', key: 'bio' },
-    { label: 'Avatar', key: 'avatar' },
-    { label: 'Year', key: 'year' },
-    { label: 'Faculty', key: 'faculty' },
-    { label: 'Major', key: 'major' },
-    { label: 'LinkedIn', key: 'linkedinUrl' },
-    { label: 'Diet', key: 'diet' },
-    { label: 'Interests', key: 'interests' },
-    { label: 'Onboarding Complete', key: 'onboardingComplete' },
-  ];
 
-  const [csvFilename, setCsvFilename] = useState('ubcma_members.csv');
-  useEffect(() => {
-    const today = new Date().toISOString().split('T')[0];
-    setCsvFilename(`ubcma_members_${exportMode}_${today}.csv`);
-  }, [exportMode]);
 
-  const formatCsvData = (users: any[] = []) =>
-    users.map((user) => ({
-      ...user,
-      diet: user.diet?.join(', ') || '',
-      interests: user.interests?.join(', ') || '',
-      onboardingComplete: user.onboardingComplete ? 'Yes' : 'No',
-    }));
+  const handleExport = async (type: 'page' | 'all') => {
+    await fetchExportUsers({
+      exportType: type,
+      page,
+      pageSize,
+      role: roleFilter,
+      search,
+    });
+  };
 
   if (isLoading) return <div>Loading members...</div>;
   if (error) return <div>Error loading users.</div>;
@@ -82,11 +65,10 @@ export default function Home() {
     <div className="space-y-4">
       <div className="font-semibold text-2xl mb-4">Manage All Members</div>
 
+      {/* Role Filter */}
       <Select
         value={roleFilter}
-        onValueChange={(value: Role | 'All Roles') => {
-          setRoleFilter(value);
-        }}
+        onValueChange={(value: Role | 'All Roles') => setRoleFilter(value)}
       >
         <SelectTrigger className="w-[140px]">
           <SelectValue placeholder="Filter by role" />
@@ -100,7 +82,7 @@ export default function Home() {
         </SelectContent>
       </Select>
 
-
+      {/* Pagination Controls */}
       <div className="flex items-center justify-between py-4">
         <div className="text-sm text-muted-foreground">
           Showing {(page - 1) * pageSize + 1}-
@@ -109,14 +91,14 @@ export default function Home() {
         </div>
 
         <div className="flex items-center space-x-4">
-
+          {/* Page size */}
           <div className="flex items-center space-x-2">
             <span className="text-sm text-muted-foreground">Rows per page:</span>
             <Select
               value={pageSize.toString()}
               onValueChange={(value) => {
                 setPageSize(Number(value));
-                setPage(1); 
+                setPage(1);
               }}
             >
               <SelectTrigger className="w-[80px]">
@@ -132,12 +114,12 @@ export default function Home() {
             </Select>
           </div>
 
-
+          {/* Prev / Next */}
           <div className="space-x-2">
             <Button
               variant="outline"
               size="sm"
-              onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
+              onClick={() => setPage((p) => Math.max(p - 1, 1))}
               disabled={page === 1}
             >
               Previous
@@ -145,7 +127,7 @@ export default function Home() {
             <Button
               variant="outline"
               size="sm"
-              onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
+              onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
               disabled={page === totalPages}
             >
               Next
@@ -154,18 +136,20 @@ export default function Home() {
         </div>
       </div>
 
-
+      {/* Search */}
       <SearchBar
         placeholder="Search by name or email..."
         searchParamKey="search"
       />
 
+      {/* Table */}
       <DataTable columns={membersColumns} data={users} />
 
+      {/* Export */}
       <div className="flex items-center gap-2">
         <Select
           value={exportMode}
-          onValueChange={(value) => setExportMode(value as 'all' | 'page')}
+          onValueChange={(v) => setExportMode(v as 'all' | 'page')}
         >
           <SelectTrigger className="w-[120px]">
             <SelectValue placeholder="Export scope" />
@@ -176,21 +160,13 @@ export default function Home() {
           </SelectContent>
         </Select>
 
-        {isClient && (
-          <CSVLink
-            data={
-              exportMode === 'page'
-                ? formatCsvData(users)
-                : formatCsvData(users)
-            }
-            headers={headers}
-            filename={csvFilename}
-            className="text-sm flex flex-row w-fit gap-2 items-center bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors"
-          >
-            <Download size={16} />
-            Download CSV
-          </CSVLink>
-        )}
+        <Button
+          onClick={() => handleExport(exportMode)}
+          className="text-sm flex flex-row w-fit gap-2 items-center bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors"
+        >
+          <Download size={16} />
+          Download CSV
+        </Button>
       </div>
     </div>
   );
