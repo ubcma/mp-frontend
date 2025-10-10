@@ -1,24 +1,56 @@
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { fetchFromAPI } from '../httpHandlers';
 import { UserProfileData } from '../types';
 
-export function useGetAllUsersQuery() {
-  return useQuery({
-    queryKey: ['users'],
+export type PaginatedResponse<U> = {
+  data: U[];
+  meta: {
+    page?: number;
+    pageSize?: number;
+    totalCount: number;
+    totalPages?: number;
+    exportAll?: boolean;
+    filters?: {
+      role?: string | null;
+      search?: string | null;
+    };
+  };
+};
+
+export function useGetAllUsersQuery(
+  page: number,
+  pageSize: number,
+  role?: string,
+  search?: string,
+  exportAll: boolean = false
+) {
+  return useQuery<PaginatedResponse<UserProfileData>>({
+    queryKey: ['users', page, pageSize, role, search, exportAll],
     queryFn: async () => {
-      const res = await fetchFromAPI('/api/users', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-      });
+      const params = new URLSearchParams();
 
-      const data = (await res.json()) as UserProfileData[];
+    if (exportAll) {
+      params.append('export', 'all');
+    } else {
+      params.append('page', page.toString());
+      params.append('pageSize', pageSize.toString());
+    }
 
-      return data;
+    if (role && role !== 'All Roles') params.append('role', role);
+    if (search && search.trim().length > 0) params.append('search', search);
+
+
+    const res = await fetchFromAPI(`/api/users?${params.toString()}`, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+    });
+
+    const data = (await res.json()) as PaginatedResponse<UserProfileData>;
+    return data;
     },
     retry: 1,
+    placeholderData: keepPreviousData, // smoother page transitions
     staleTime: 5 * 60 * 1000,
   });
 }
