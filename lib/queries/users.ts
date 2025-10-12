@@ -1,6 +1,8 @@
-import { keepPreviousData, useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { fetchFromAPI } from '../httpHandlers';
 import { UserProfileData } from '../types';
+import { toast } from 'sonner';
+import { handleClientError } from '../error/handleClient';
 
 export type PaginatedResponse<U> = {
   data: U[];
@@ -15,7 +17,6 @@ export type PaginatedResponse<U> = {
     };
   };
 };
-
 
 export function useGetAllUsersQuery(
   page: number,
@@ -47,5 +48,38 @@ export function useGetAllUsersQuery(
     retry: 1,
     placeholderData: keepPreviousData, 
     staleTime: 5 * 60 * 1000,
+  });
+}
+
+
+export function useUpdateUserMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      userId,
+      newRole,
+    }: {
+      userId: string;
+      newRole: string;
+    }) => {
+      const res = await fetchFromAPI(`/api/users/${userId}/role`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: { newRole },
+      });
+
+      if (!res.ok) {
+        throw new Error('Failed to update user role');
+      }
+
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['users'] });
+      toast.success('User role updated!');
+    },
+    onError: (err: unknown) => handleClientError('Error updating user role', err),
   });
 }
