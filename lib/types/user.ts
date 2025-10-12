@@ -1,6 +1,7 @@
 export type Role = "Basic" | "Member" | "Admin";
 
 export interface UserProfileData {
+    userId: string, // added this so that the membercolumns works 
     name: string,
     email: string,
     role: string,
