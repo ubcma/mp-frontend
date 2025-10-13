@@ -8,7 +8,7 @@ import {
   RenderTextArea,
 } from './FormComponents';
 import { useRef } from 'react';
-import EventImageUpload, { EventImageUploadRef } from '../EventImageUpload';
+import AdminImageUpload, { AdminImageUploadRef } from '../AdminImageUpload';
 import { Switch } from '../ui/switch';
 import { Label } from '../ui/label';
 import { toast } from 'sonner';
@@ -59,7 +59,7 @@ export default function JobForm({
   onSubmit,
 }: JobFormProps) {
   const router = useRouter();
-  const logoUploadRef = useRef<EventImageUploadRef>(null);
+  const logoUploadRef = useRef<AdminImageUploadRef>(null);
 
   const form = useForm({
     defaultValues: {
@@ -151,7 +151,7 @@ export default function JobForm({
                     Company Logo (Optional)
                   </label>
 
-                  <EventImageUpload
+                  <AdminImageUpload
                     ref={logoUploadRef}
                     existingImageUrl={logoUrl}
                     onImageSelect={(hasFile) => {

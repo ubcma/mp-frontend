@@ -16,7 +16,7 @@ export interface JobListing {
   description: string;
   type: string;
   location: string;
-  applicationType: 'email' | 'external';
+  applicationType: 'email' | 'external' | 'instructions';
   applicationUrl: string | null;
   applicationEmail: string | null;
   applicationText: string | null;
@@ -53,6 +53,7 @@ export function JobCard({ job, tags = [] }: JobCardProps) {
       navigator.clipboard.writeText(job.applicationEmail);
       toast.success('Copied email to clipboard: ' + job.applicationEmail);
     }
+    // For 'instructions' type, the instructions are displayed in the card
   };
 
   const getCompanyInitial = (name: string) => {
@@ -60,54 +61,69 @@ export function JobCard({ job, tags = [] }: JobCardProps) {
   };
 
   return (
-    <Card className="p-6 hover:shadow-lg transition-shadow duration-200 flex flex-col md:flex-row justify-start items-start md:justify-between">
-      <div className="flex flex-col md:flex-row items-center md:items-start justify-start gap-4">
-        <div className="min-w-16 min-h-16 h-16 w-16 rounded-full text-primary-foreground flex items-center justify-center font-semibold text-2xl p-1">
-          {job.companyLogo ? (
-            <img
-              src={job.companyLogo || '/placeholder.svg'}
-              alt={`${job.companyName} logo`}
-              className="w-full h-full rounded-full object-contain"
-            />
-          ) : (
-            getCompanyInitial(job.companyName)
+    <Card className="p-6 hover:shadow-lg transition-shadow duration-200 flex flex-col">
+      <div className="flex flex-col md:flex-row justify-start items-start md:justify-between">
+        <div className="flex flex-col md:flex-row items-center md:items-start justify-start gap-4">
+          <div className="min-w-16 min-h-16 h-16 w-16 rounded-full text-primary-foreground flex items-center justify-center font-semibold text-2xl p-1">
+            {job.companyLogo ? (
+              <img
+                src={job.companyLogo || '/placeholder.svg'}
+                alt={`${job.companyName} logo`}
+                className="w-full h-full rounded-full object-contain"
+              />
+            ) : (
+              getCompanyInitial(job.companyName)
+            )}
+          </div>
+
+          <div className="flex flex-col items-start justify-between gap-2">
+            <div>
+              <h3 className="text-lg font-semibold text-foreground">
+                {job.title}
+              </h3>
+              <p className="text-sm text-muted-foreground">
+                {job.companyName} • {getTimeAgo(job.postedAt)}
+              </p>
+            </div>
+
+            <div className="flex flex-wrap gap-2">
+              <Badge variant="secondary" className="capitalize">
+                {job.type}
+              </Badge>
+            </div>
+
+            <div>{job.description}</div>
+          </div>
+        </div>
+
+        <Button onClick={handleApply} variant="ma">
+          {job.applicationType === 'external' && (
+            <>
+              View Posting
+              <ExternalLink className="w-4 h-4 ml-1" />
+            </>
           )}
-        </div>
-
-        <div className="flex flex-col items-start justify-between gap-2">
-          <div>
-            <h3 className="text-lg font-semibold text-foreground">
-              {job.title}
-            </h3>
-            <p className="text-sm text-muted-foreground">
-              {job.companyName} • {getTimeAgo(job.postedAt)}
-            </p>
-          </div>
-
-          <div className="flex flex-wrap gap-2">
-            <Badge variant="secondary" className="capitalize">
-              {job.type}
-            </Badge>
-          </div>
-
-          <div>{job.description}</div>
-        </div>
+          {job.applicationType === 'email' && (
+            <>
+              Copy Email
+              <Mail className="w-4 h-4 ml-1" />
+            </>
+          )}
+          {job.applicationType === 'instructions' && <>Apply</>}
+        </Button>
       </div>
 
-      <Button onClick={handleApply} variant="ma">
-        {job.applicationType === 'external' && (
-          <>
-            View Posting
-            <ExternalLink className="w-4 h-4 ml-1" />
-          </>
-        )}
-        {job.applicationType === 'email' && (
-          <>
-            Copy Email
-            <Mail className="w-4 h-4 ml-1" />
-          </>
-        )}
-      </Button>
+      {/* Custom Application Instructions */}
+      {job.applicationType === 'instructions' && job.applicationText && (
+        <div className="w-full mt-6 pt-4 border-t border-neutral-200">
+          <h4 className="text-sm font-semibold text-foreground mb-2">
+            Application Instructions:
+          </h4>
+          <p className="text-sm text-muted-foreground whitespace-pre-wrap">
+            {job.applicationText}
+          </p>
+        </div>
+      )}
     </Card>
   );
 }

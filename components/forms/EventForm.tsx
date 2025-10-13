@@ -32,7 +32,7 @@ import { nanoid } from 'nanoid';
 import { Plus } from 'lucide-react';
 import { useState, useRef } from 'react';
 import { generateSlug } from '@/lib/utils';
-import EventImageUpload, { EventImageUploadRef } from '../EventImageUpload';
+import AdminImageUpload, { AdminImageUploadRef } from '../AdminImageUpload';
 import { Switch } from '../ui/switch';
 import { Label } from '../ui/label';
 import { toast } from 'sonner';
@@ -53,7 +53,7 @@ export default function EventForm({
   const [hasManuallyEditedSlug, setHasManuallyEditedSlug] = useState(false);
   const [questions, setQuestions] = useState<QuestionInput[]>([]);
   const [hasSelectedImage, setHasSelectedImage] = useState(false);
-  const eventImageUploadRef = useRef<EventImageUploadRef>(null);
+  const eventImageUploadRef = useRef<AdminImageUploadRef>(null);
 
   const sensors = useSensors(useSensor(PointerSensor));
 
@@ -237,7 +237,7 @@ export default function EventForm({
                     Image
                   </label>
 
-                  <EventImageUpload
+                  <AdminImageUpload
                     ref={eventImageUploadRef}
                     existingImageUrl={imageUrl}
                     onImageSelect={(hasFile) => {
