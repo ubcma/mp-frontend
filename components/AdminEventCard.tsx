@@ -7,7 +7,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { MoreHorizontal, Calendar, Tag, MapPin, ChartLine, LucideSettings } from 'lucide-react';
+import { MoreHorizontal, Calendar, Tag, MapPin, ChartLine, LucideSettings, Users } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { EventDetails } from '@/lib/types';
@@ -86,6 +86,16 @@ export function AdminEventCard({ event, onEdit }: AdminEventCardProps) {
             <div className="flex items-center gap-2">
               <MapPin className="h-4 w-4 flex-shrink-0" />
               <span className="line-clamp-1">{event.location}</span>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <Users className="h-4 w-4 flex-shrink-0" />
+              <span className="text-sm">
+                {event.attendeeCap ? 
+                  `${event.currentAttendeeCount || 0} / ${event.attendeeCap} attendees` :
+                  `${event.currentAttendeeCount || 0} attendees`
+                }
+              </span>
             </div>
           </div>
         </div>

@@ -12,6 +12,7 @@ export type CreateEventInput = {
   imageUrl: string;
   price: number;
   location: string;
+  attendeeCap?: number;
   startsAt: Date;
   endsAt: Date;
 };
@@ -28,6 +29,8 @@ export type EventDetails = {
   endsAt: Date;
   isVisible: boolean;
   membersOnly: boolean;
+  attendeeCap?: number;  
+  currentAttendeeCount?: number;  
   createdAt: string | null;
   updatedAt: string | null;
 };
@@ -112,6 +115,7 @@ export type BaseEventForm = {
   location: string;
   isVisible: boolean;
   membersOnly: boolean;
+  attendeeCap?: number;
   startsAt: string;
   endsAt: string;
 };
