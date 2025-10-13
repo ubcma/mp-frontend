@@ -117,6 +117,7 @@ export default function EventForm({
       location: initialValues?.location ?? '',
       isVisible: initialValues?.isVisible ?? false,
       membersOnly: initialValues?.membersOnly ?? true,
+      attendeeCap: initialValues?.attendeeCap ?? undefined,
       startsAt: initialValues?.startsAt ?? '',
       endsAt: initialValues?.endsAt ?? '',
     },
@@ -334,6 +335,18 @@ export default function EventForm({
               )}
             />
           </div>
+
+          <form.Field
+            name="attendeeCap"
+            children={(fieldApi) => (
+              <RenderInputField
+                type="number"
+                label="Attendee Cap (Optional)"
+                field={fieldApi}
+                placeholder="Leave empty for unlimited capacity"
+              />
+            )}
+          />
 
           <form.Field
             name="isVisible"

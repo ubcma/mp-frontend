@@ -46,3 +46,8 @@ export const getEventStatus = (date: Date) => {
     return "Past"
   }
 }
+
+export const isEventFull = (event: { attendeeCap?: number; currentAttendeeCount?: number }) => {
+  if (!event.attendeeCap) return false;
+  return (event.currentAttendeeCount || 0) >= event.attendeeCap;
+}

@@ -2,7 +2,7 @@
 
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { cn, getEventStatus } from '@/lib/utils';
+import { cn, getEventStatus, isEventFull } from '@/lib/utils';
 import { EventDetails } from '@/lib/types';
 import { useRouter } from 'next/navigation';
 import { ArrowUpRight, CheckCircle } from 'lucide-react';
@@ -19,6 +19,7 @@ export function EventCard({
   registered?: boolean;
 }) {
   const status = getEventStatus(event.startsAt);
+  const eventFull = isEventFull(event);
 
   const router = useRouter();
 
@@ -36,7 +37,7 @@ export function EventCard({
       <Card
         className={cn(
           'flex flex-col h-full overflow-hidden gap-0 p-0 bg-black group transition-transform duration-200 hover:rotate-1 hover:scale-105',
-          status !== 'Upcoming' && 'opacity-60'
+          (status !== 'Upcoming' || eventFull) && 'opacity-60'
         )}
       >
         <CardContent className="p-0 flex-1 flex flex-col relative">
@@ -73,14 +74,18 @@ export function EventCard({
               </h3>
               <p className="text-white/60 truncate mb-4">{event.description}</p>
               {!registered ? (
-                status === 'Upcoming' ? (
+                status === 'Upcoming' && !eventFull ? (
                   <Button
-                    onClick={() => router.push(`/events/${event.title}`)}
+                    onClick={() => router.push(`/events/${event.slug}`)}
                     variant="ma"
                     className="w-full group-hover:brightness-80 text-white"
                   >
                     Register for this event!
                     <ArrowUpRight className="h-4 w-4 group-hover:rotate-45 transition-transform duration-200 ease-in-out" />
+                  </Button>
+                ) : eventFull ? (
+                  <Button variant="ma" className="w-full text-white" disabled>
+                    Event is full.
                   </Button>
                 ) : (
                   <Button variant="ma" className="w-full text-white" disabled>
