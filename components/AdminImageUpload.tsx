@@ -19,14 +19,14 @@ interface Props {
   maxFileSizeMB?: number;
 }
 
-export interface EventImageUploadRef {
+export interface AdminImageUploadRef {
   uploadPendingFile: () => Promise<string | null>;
   hasPendingFile: () => boolean;
   clearPendingFile: () => void;
   isUploading: () => boolean;
 }
 
-const EventImageUpload = forwardRef<EventImageUploadRef, Props>(
+const AdminImageUpload = forwardRef<AdminImageUploadRef, Props>(
   ({ onImageSelect, maxFileSizeMB = 5, existingImageUrl }, ref) => {
     const [uploading, setUploading] = useState(false);
     const [processing, setProcessing] = useState(false);
@@ -153,7 +153,7 @@ const EventImageUpload = forwardRef<EventImageUploadRef, Props>(
                 <ImageIcon className="w-6 h-6 text-muted-foreground" />
               </div>
               <h3 className="font-medium text-foreground mb-2">
-                Upload Event Image
+                Upload Image
               </h3>
               <p className="text-sm text-muted-foreground mb-4">
                 Click to select or drag and drop your image
@@ -235,6 +235,6 @@ const EventImageUpload = forwardRef<EventImageUploadRef, Props>(
   }
 );
 
-EventImageUpload.displayName = 'EventImageUpload';
+AdminImageUpload.displayName = 'AdminImageUpload';
 
-export default EventImageUpload;
+export default AdminImageUpload;

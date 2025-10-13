@@ -17,6 +17,7 @@ import {
   BadgeCheck,
   ChevronDown,
   Briefcase,
+  BookOpen
 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
@@ -122,6 +123,12 @@ export function AppSidebar() {
       href: '/create-job',
       icon: Briefcase,
       label: 'Create New Job',
+      disabled: false,
+    },
+    {
+      href: '/manage-jobs',
+      icon: BookOpen,
+      label: 'Manage Jobs',
       disabled: false,
     },
     {
