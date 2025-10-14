@@ -50,21 +50,21 @@ const highlightCards = [
   //     },
   //   ],
   // },
-  // {
-  //   image:
-  //     'https://gs42emtt45.ufs.sh/f/qeDSywamz1NxnEfYPdoHpX2NmeMbcOv7uC06IdP1w5839oBh',
-  //   heading: 'Job board now open',
-  //   subheading: 'Delivering opportunities to your doorstep',
-  //   url: '/jobs',
-  //   color: '#202E43',
-  //   highlightTags: [
-  //     {
-  //       icon: Award,
-  //       text: 'Members only',
-  //       color: '#FF5370',
-  //     },
-  //   ],
-  // },
+  {
+    image:
+      'https://gs42emtt45.ufs.sh/f/qeDSywamz1NxnEfYPdoHpX2NmeMbcOv7uC06IdP1w5839oBh',
+    heading: 'Job board now open',
+    subheading: 'Delivering opportunities to your doorstep',
+    url: '/job-board',
+    color: '#202E43',
+    highlightTags: [
+      {
+        icon: Award,
+        text: 'Members only',
+        color: '#FF5370',
+      },
+    ],
+  },
   {
     image:
       'https://gs42emtt45.ufs.sh/f/qeDSywamz1Nx5d0JzlLAyEGpJWNOfhraPBzoqbQT0MFdgi9H',
