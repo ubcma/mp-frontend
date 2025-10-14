@@ -68,7 +68,7 @@ export function ActionButtons() {
         href="/job-board"
         className="bg-[#d5e6ff] text-[#1E58AD]"
         icon={BriefcaseBusiness}
-        disabled={true}
+        disabled={false}
       >
         <div className="space-y-1 text-3xl font-bold z-[5]">
           <div>Job</div>

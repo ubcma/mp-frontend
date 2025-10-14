@@ -11,7 +11,7 @@ export default function JobBoard() {
 
   return (
     <div className="w-full h-full flex flex-col gap-4">
-      <h1 className="font-bold text-4xl">MA Job Board</h1>
+      <h1 className="font-bold text-4xl text-ma-red">MA Job Board</h1>
 
       {isLoading ? (
         <p>Loading jobs...</p>

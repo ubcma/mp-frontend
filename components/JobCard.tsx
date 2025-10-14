@@ -60,15 +60,21 @@ export function JobCard({ job, tags = [] }: JobCardProps) {
     return name.charAt(0).toUpperCase();
   };
 
+  const truncate = (text: string, maxLength: number = 150) => {
+  return text.length > maxLength ? `${text.slice(0, maxLength)}...` : text;
+};
+
   return (
-    <Card className="p-6 hover:shadow-lg transition-shadow duration-200 flex flex-col">
+    <Card className="p-6 transition-shadow duration-200 flex flex-col bg-radial-[at_125%_100%] from-rose-50 via-white to-white border-rose-100/50">
       <div className="flex flex-col md:flex-row justify-start items-start md:justify-between">
-        <div className="flex flex-col md:flex-row items-center md:items-start justify-start gap-4">
-          <div className="min-w-16 min-h-16 h-16 w-16 rounded-full text-primary-foreground flex items-center justify-center font-semibold text-2xl p-1">
+        <div className="flex flex-col md:flex-row items-start justify-start gap-4">
+          <div className="min-w-16 min-h-16 h-16 w-16 rounded-full text-primary-foreground flex items-start justify-start font-semibold text-2xl p-1">
             {job.companyLogo ? (
-              <img
+              <Image
                 src={job.companyLogo || '/placeholder.svg'}
                 alt={`${job.companyName} logo`}
+                width={320}
+                height={320}
                 className="w-full h-full rounded-full object-contain"
               />
             ) : (
@@ -76,46 +82,44 @@ export function JobCard({ job, tags = [] }: JobCardProps) {
             )}
           </div>
 
-          <div className="flex flex-col items-start justify-between gap-2">
+          <div className="flex flex-col items-start justify-between gap-2 space-y-4">
             <div>
-              <h3 className="text-lg font-semibold text-foreground">
+              <div className="flex flex-wrap gap-2 mb-1 text-lg font-semibold text-foreground">
                 {job.title}
-              </h3>
+                <Badge variant="secondary" className="capitalize">
+                  {job.type}
+                </Badge>
+              </div>
               <p className="text-sm text-muted-foreground">
                 {job.companyName} • {getTimeAgo(job.postedAt)}
               </p>
             </div>
 
-            <div className="flex flex-wrap gap-2">
-              <Badge variant="secondary" className="capitalize">
-                {job.type}
-              </Badge>
-            </div>
-
-            <div>{job.description}</div>
+            <div className='text-sm text-muted-foreground'>{truncate(job.description, 300)}</div>
           </div>
         </div>
 
-        <Button onClick={handleApply} variant="ma">
-          {job.applicationType === 'external' && (
-            <>
-              View Posting
-              <ExternalLink className="w-4 h-4 ml-1" />
-            </>
-          )}
-          {job.applicationType === 'email' && (
-            <>
-              Copy Email
-              <Mail className="w-4 h-4 ml-1" />
-            </>
-          )}
-          {job.applicationType === 'instructions' && <>Apply</>}
-        </Button>
+        {job.applicationType !== 'instructions' && (
+          <Button onClick={handleApply} variant="ma" className='md:mt-0 mt-4 md:w-fit w-full'>
+            {job.applicationType === 'external' && (
+              <>
+                View Posting
+                <ExternalLink className="w-4 h-4 ml-1" />
+              </>
+            )}
+            {job.applicationType === 'email' && (
+              <>
+                Copy Email
+                <Mail className="w-4 h-4 ml-1" />
+              </>
+            )}
+          </Button>
+        )}
       </div>
 
       {/* Custom Application Instructions */}
       {job.applicationType === 'instructions' && job.applicationText && (
-        <div className="w-full mt-6 pt-4 border-t border-neutral-200">
+        <div className="w-full pt-4 border-t border-neutral-200">
           <h4 className="text-sm font-semibold text-foreground mb-2">
             Application Instructions:
           </h4>
