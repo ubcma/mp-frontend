@@ -12,6 +12,7 @@ export type CreateEventInput = {
   imageUrl: string;
   price: number;
   location: string;
+  currentAttendeeCount?: number;
   attendeeCap?: number;
   startsAt: Date;
   endsAt: Date;
