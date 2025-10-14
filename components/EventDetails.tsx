@@ -12,6 +12,7 @@ import TagPill from '@/components/TagPill';
 import { useRouter } from 'next/navigation';
 import { useUserQuery } from '@/lib/queries/user';
 import { useGetUserRegistrationsQuery } from '@/lib/queries/registrations';
+import { EventStatusMessage } from './EventStatusMessage';
 
 interface EventDetailsProps {
   event: EventDetails;
@@ -29,7 +30,9 @@ const RenderEventDetails: React.FC<EventDetailsProps> = ({
   const { data: user } = useUserQuery();
   const { data: registrations } = useGetUserRegistrationsQuery();
 
-  const isRegistered = registrations?.registrations.map((registration) => registration.eventId).includes(event.id)
+  const isRegistered = registrations?.registrations
+    .map((registration) => registration.eventId)
+    .includes(event.id);
 
   const [responses, setResponses] = useState<{ [key: number]: string }>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -141,31 +144,60 @@ const RenderEventDetails: React.FC<EventDetailsProps> = ({
         <p className="text-sm text-muted-foreground">{event.description}</p>
       )}
 
-      {user?.role === 'Basic' && event.membersOnly ? (
-        <div className='flex flex-col justify-center items-center text-center rounded-xl w-full h-48 bg-ma-red/10 border-dashed border-ma-red border-2 gap-2'>
-          <h3 className='font-semibold text-ma-red text-2xl capitalize'> This event is for members only! </h3>
-          <p className='text-ma-red/80'>
-            Purchase a membership to gain access to this event and many other perks.
-          </p>
-        </div>
+      {new Date(event.startsAt) < new Date() ? (
+        new Date(event.endsAt) < new Date() ? (
+          <EventStatusMessage
+            variant="error"
+            title="Event has passed."
+            description="This event has ended. Check out our upcoming events to find other opportunities."
+          />
+        ) : (
+          <EventStatusMessage
+            variant="error"
+            title="Registration has closed!"
+            description="This event has already started. Check out our upcoming events to find other opportunities."
+          />
+        )
       ) : isRegistered ? (
-              <div className='flex flex-col justify-center items-center text-center rounded-xl w-full h-48 bg-emerald-300/10 border-dashed border-emerald-700 border-2 gap-2'>
-          <h3 className='font-semibold text-emerald-700 text-2xl capitalize'> You're already registered for this event! </h3>
-          <p className='text-emerald-700/80'>
-            We look forward to seeing you there.
-          </p>
-        </div>
-      
-      ): !user?.onboardingComplete ? (
-            <div className='flex flex-col justify-center items-center text-center rounded-xl w-full h-48 bg-ma-red/10 border-dashed border-ma-red border-2 gap-2'>
-          <h3 className='font-semibold text-ma-red text-2xl capitalize'> You haven't completed your profile yet! </h3>
-          <p className='text-ma-red/80'>
-            Complete your <a href="/onboarding" className='hover:underline transition-transform duration-200 text-blue-500'> portal onboarding  </a> to register for this event
-          </p>
-        </div>
-      ):(
+        <EventStatusMessage
+          variant="success"
+          title="You're already registered for this event!"
+          description="We look forward to seeing you there."
+        />
+      ) : event.attendeeCap &&
+        event.currentAttendeeCount &&
+        event.currentAttendeeCount >= event.attendeeCap ? (
+        <EventStatusMessage
+          variant="warning"
+          title="This event is sold out!"
+          description="Follow our socials to keep up to date with our next events, we look forward to seeing you there."
+        />
+      ) : user?.role === 'Basic' && event.membersOnly ? (
+        <EventStatusMessage
+          variant="error"
+          title="This event is for members only!"
+          description="Purchase a membership to gain access to this event and many other perks."
+        />
+      ) : !user?.onboardingComplete ? (
+        <EventStatusMessage
+          variant="error"
+          title="You haven't completed your profile yet!"
+          description={
+            <>
+              Complete your{' '}
+              <a
+                href="/onboarding"
+                className="hover:underline transition-transform duration-200 text-blue-500"
+              >
+                portal onboarding
+              </a>{' '}
+              to register for this event
+            </>
+          }
+        />
+      ) : (
         <div className="flex flex-col relative gap-4 py-1">
-          {/* Registration Form */}
+          {JSON.stringify(event)}
           <Card>
             <CardContent className="p-6">
               <h2 className="text-xl font-semibold mb-6">Event Registration</h2>
