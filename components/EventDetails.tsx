@@ -197,7 +197,6 @@ const RenderEventDetails: React.FC<EventDetailsProps> = ({
         />
       ) : (
         <div className="flex flex-col relative gap-4 py-1">
-          {JSON.stringify(event)}
           <Card>
             <CardContent className="p-6">
               <h2 className="text-xl font-semibold mb-6">Event Registration</h2>
