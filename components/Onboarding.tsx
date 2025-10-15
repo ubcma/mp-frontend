@@ -796,7 +796,7 @@ export default function OnboardingModal(): JSX.Element {
     'https://3ou0u5266t.ufs.sh/f/icFgxUjDNp9STlSXPGKtWjXZ5CV1loKvErcSBGzukR43NPpY',
     'https://3ou0u5266t.ufs.sh/f/icFgxUjDNp9SYLGttR8WgoQTZvmMRLxUD3d2ja49SHG8IXPn',
     'https://3ou0u5266t.ufs.sh/f/icFgxUjDNp9S4ckwUOew3HDuqnmEMpvOCSxlzFiXboeg842Z',
-    'https://3ou0u5266t.ufs.sh/f/icFgxUjDNp9SVR5N6u4TuQAht02xaiNg36ZLWwscPMYoCfRG',
+    'https://3ou0u5266t.ufs.sh/f/icFgxUjDNp9St4uv7XDdOFLQW0GzgHKq8hCcUxNP5wuAVjiR',
   ];
 
   const selectedFaculty = useStore(
