@@ -13,25 +13,46 @@ import { useGetEventQuery } from '@/lib/queries/event';
 import { Lock, CreditCard, Zap, ShieldCheck, Calendar } from 'lucide-react';
 import { Button } from '../ui/button';
 import Spinner from '../common/Spinner';
-// ⬇️ adjust the import path to where you placed the component
 import TermsCheckbox from '@/components/forms/TermsCheckbox';
+import { cn, getEventStatus, isEventFull } from '@/lib/utils';
+import { useRouter } from 'next/navigation';
+
 
 export default function CheckoutEventForm({ clientSecret }: { clientSecret: string }) {
   const stripe = useStripe();
   const elements = useElements();
 
-  const [isLoading, setIsLoading] = useState(false);
+
+  const [isLoading, setIsLoading] = useState(false); 
   const [errorMsg, setErrorMsg] = useState('');
   const [paymentRequest, setPaymentRequest] = useState<StripePaymentRequest | null>(null);
-  const [agreed, setAgreed] = useState(false); // 
-
+  const [agreed, setAgreed] = useState(false); 
   const searchParams = useSearchParams();
   const eventSlug = searchParams.get('eventSlug');
+  const router = useRouter()
+  
   const { data, isLoading: isEventLoading, isError } = useGetEventQuery({ eventSlug: eventSlug! });
   const event = data?.event;
 
-  // Setup Payment Request (Apple/Google Pay)
+  const eventFull = event ? isEventFull(event) : false;
+  const status = event ? getEventStatus(event.startsAt) : 'Upcoming';
+
+  // render form unless there are associated 
   useEffect(() => {
+    if (isError || !event) { 
+      setErrorMsg('404 Event not Found');
+      return;
+    }
+    if (eventFull) {
+    setErrorMsg('404 Event not Found')
+    router.replace(`/events/${event.slug}/full`);
+    return;
+
+    } else if (status === 'Past') {
+    router.replace(`/events/${event.slug}`)
+    return;
+    }
+    
     if (!stripe || !clientSecret || !event) return;
 
     const pr = stripe.paymentRequest({
@@ -48,7 +69,7 @@ export default function CheckoutEventForm({ clientSecret }: { clientSecret: stri
     pr.canMakePayment().then((result) => {
       if (result) setPaymentRequest(pr);
     });
-  }, [stripe, clientSecret, event]);
+  }, [stripe, clientSecret, event, eventFull, status, event?.slug, router]);
 
   // Handle PaymentRequest events
   useEffect(() => {
@@ -56,7 +77,6 @@ export default function CheckoutEventForm({ clientSecret }: { clientSecret: stri
 
     paymentRequest.on('paymentmethod', async (ev) => {
       if (!agreed) {
-        // Block quick pay if TOS not accepted
         ev.complete('fail');
         setErrorMsg('Please accept the Terms before paying.');
         return;
@@ -81,7 +101,6 @@ export default function CheckoutEventForm({ clientSecret }: { clientSecret: stri
     });
   }, [paymentRequest, stripe, clientSecret, agreed]);
 
-  // Handle manual card submission
   const handleSubmit = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     if (!stripe || !elements) return;
