@@ -1,21 +1,22 @@
-"use client";
+'use client';
 
-import { DataTable } from "@/components/ui/data-table";
-import { useGetEventRegistrationsQuery } from "@/lib/queries/registrations";
-import { registrationsColumns } from "@/components/table/RegistrationColumns";
-import Spinner from "./common/Spinner";
-import { useEffect, useState } from "react";
-import { Input } from "./ui/input";
+import { DataTable } from '@/components/ui/data-table';
+import { useGetEventRegistrationsQuery } from '@/lib/queries/registrations';
+import { registrationsColumns } from '@/components/table/RegistrationColumns';
+import Spinner from './common/Spinner';
+import { useEffect, useState } from 'react';
+import { Input } from './ui/input';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
-import { CSVLink } from "react-csv";
-import { Download } from "lucide-react";
+} from '@/components/ui/select';
+import { Button } from '@/components/ui/button';
+import { CSVLink } from 'react-csv';
+import { Download } from 'lucide-react';
+import { EventRegistration } from '@/lib/types/eventRegistration';
 
 interface EventRegistrationsProps {
   eventId: string;
@@ -27,18 +28,18 @@ export default function EventRegistrations({
   eventTitle,
 }: EventRegistrationsProps) {
   const { data, isLoading, error } = useGetEventRegistrationsQuery(eventId);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState('');
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(25);
-  const [exportMode, setExportMode] = useState<"all" | "page">("all");
+  const [exportMode, setExportMode] = useState<'all' | 'page'>('all');
   const [isClient, setIsClient] = useState(false);
-  const [csvFilename, setCsvFilename] = useState("event_registrations.csv");
+  const [csvFilename, setCsvFilename] = useState('event_registrations.csv');
 
   useEffect(() => setIsClient(true), []);
 
   // Generate CSV filename dynamically (client-side)
   useEffect(() => {
-    const today = new Date().toISOString().split("T")[0];
+    const today = new Date().toISOString().split('T')[0];
     setCsvFilename(`event_registrations_${eventId}_${exportMode}_${today}.csv`);
   }, [exportMode, eventId]);
 
@@ -48,7 +49,9 @@ export default function EventRegistrations({
     return (
       <div className="p-8">
         <div className="bg-red-50 border border-red-200 rounded-md p-4">
-          <h3 className="text-red-800 font-medium">Error loading registrations</h3>
+          <h3 className="text-red-800 font-medium">
+            Error loading registrations
+          </h3>
           <p className="text-red-600 text-sm mt-1">
             Failed to load event registrations. Please try again later.
           </p>
@@ -61,40 +64,93 @@ export default function EventRegistrations({
   const questions = data?.questions || [];
 
   // Filter
-  const filteredRegistrations = registrations.filter(
-    (r) =>
-      r?.firstName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      r?.lastName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      r?.userEmail?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredRegistrations = registrations.filter((r) => {
+    const q = searchQuery.toLowerCase();
+    return (
+      r?.userName?.toLowerCase().includes(q) ||
+      r?.userEmail?.toLowerCase().includes(q)
+    );
+  });
 
   // Pagination logic
   const startIndex = (page - 1) * pageSize;
   const endIndex = startIndex + pageSize;
   const totalPages = Math.ceil((filteredRegistrations?.length || 0) / pageSize);
-  const paginatedRegistrations = filteredRegistrations?.slice(startIndex, endIndex);
+  const paginatedRegistrations = filteredRegistrations?.slice(
+    startIndex,
+    endIndex
+  );
 
   // CSV headers
   const headers = [
-    { label: "First Name", key: "firstName" },
-    { label: "Last Name", key: "lastName" },
-    { label: "Email", key: "userEmail" },
-    { label: "Event ID", key: "eventId" },
-    { label: "Submitted At", key: "createdAt" },
+    { label: 'ID', key: 'id' },
+    { label: 'User ID', key: 'userId' },
+    { label: 'Event ID', key: 'eventId' },
+    { label: 'Stripe Transaction ID', key: 'stripeTransactionId' },
+    { label: 'Status', key: 'status' },
+    { label: 'Registered At', key: 'registeredAt' },
+    { label: 'Email', key: 'userEmail' },
+    { label: 'First Name', key: 'firstName' },
+    { label: 'Last Name', key: 'lastName' },
+    { label: 'User Name', key: 'userName' },
+    { label: 'Student Number', key: 'studentNumber' },
+    { label: 'Year of Study', key: 'yearOfStudy' },
+    { label: 'Faculty', key: 'faculty' },
+    { label: 'Phone Number', key: 'phoneNumber' },
   ];
 
   // Format CSV data
-  function formatCsvData(registrations: any[] = []) {
-    return registrations.map((r) => ({
-      ...r,
-      createdAt: r.createdAt
-        ? new Date(r.createdAt).toLocaleString()
-        : "N/A",
-    }));
+  function formatCsvData(
+    registrations: EventRegistration[] = []
+  ): Record<string, string | number | null>[] {
+    return registrations.map((r) => {
+      const {
+        id,
+        userId,
+        eventId,
+        stripeTransactionId,
+        status,
+        registeredAt,
+        userEmail,
+        userName,
+        firstName,
+        lastName,
+        studentNumber,
+        yearOfStudy,
+        faculty,
+        phoneNumber,
+        responses,
+      } = r;
+
+      const flatResponses = Object.fromEntries(
+        Object.entries(responses ?? {}).map(([key, value]) => [
+          key,
+          String(value),
+        ])
+      );
+
+      return {
+        id,
+        userId,
+        eventId,
+        stripeTransactionId,
+        status,
+        registeredAt: new Date(registeredAt).toLocaleString(),
+        userEmail,
+        userName,
+        firstName,
+        lastName,
+        studentNumber,
+        yearOfStudy,
+        faculty,
+        phoneNumber,
+        ...flatResponses,
+      };
+    });
   }
 
   return (
-    <div className="my-16 space-y-6">
+    <div className="my-8 space-y-6">
       <div>
         <h1 className="font-semibold text-2xl mb-2">
           Event Registrations: {eventTitle}
@@ -105,25 +161,80 @@ export default function EventRegistrations({
         </div>
       </div>
 
-      {/* Search bar */}
-      <Input
-        type="text"
-        placeholder="Search by name or email"
-        value={searchQuery}
-        onChange={(e) => setSearchQuery(e.target.value)}
-        className="w-full"
-      />
+      <div className="flex flex-col md:flex-row md:justify-between gap-4">
+        <Input
+          type="text"
+          placeholder="Search by name or email"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="w-full"
+        />
+
+        <div className="flex items-center gap-2 w-fit">
+          <Select
+            value={exportMode}
+            onValueChange={(value) => setExportMode(value as 'all' | 'page')}
+          >
+            <SelectTrigger className="w-[120px]">
+              <SelectValue placeholder="Export scope" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="page">This Page</SelectItem>
+              <SelectItem value="all">All Results</SelectItem>
+            </SelectContent>
+          </Select>
+
+          {isClient && (
+            <CSVLink
+              data={
+                exportMode === 'page'
+                  ? formatCsvData(paginatedRegistrations)
+                  : formatCsvData(filteredRegistrations)
+              }
+              headers={headers}
+              filename={csvFilename}
+              className="flex flex-row text-nowrap w-fit gap-2 items-center bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors text-sm"
+            >
+              <Download size={16} />
+              Download CSV
+            </CSVLink>
+          )}
+        </div>
+      </div>
+
+      {/* Data table */}
+      {registrations.length === 0 ? (
+        <div className="text-center">
+          <div className="bg-gray-50 rounded-lg p-16">
+            <h3 className="text-lg font-medium text-gray-900 mb-2">
+              No registrations yet
+            </h3>
+            <p className="text-gray-500">
+              This event doesn't have any registrations yet.
+            </p>
+          </div>
+        </div>
+      ) : (
+        <DataTable
+          columns={registrationsColumns(questions, eventId)}
+          data={paginatedRegistrations}
+        />
+      )}
 
       {/* Pagination controls */}
-      <div className="flex items-center justify-between py-4">
+      <div className="flex items-center justify-between">
         <div className="text-sm text-muted-foreground">
-          Showing {startIndex + 1}-{Math.min(endIndex, filteredRegistrations?.length || 0)} of{" "}
-          {filteredRegistrations?.length || 0} results (Page {page} of {totalPages})
+          Showing {startIndex + 1}-
+          {Math.min(endIndex, filteredRegistrations?.length || 0)} of{' '}
+          {filteredRegistrations?.length || 0} results (Page {page} of{' '}
+          {totalPages})
         </div>
 
         <div className="flex items-center space-x-4">
           <div className="flex items-center space-x-2">
-            <span className="text-sm text-muted-foreground">Rows per page:</span>
+            <span className="text-sm text-muted-foreground">
+              Rows per page:
+            </span>
             <Select
               value={pageSize.toString()}
               onValueChange={(value) => {
@@ -163,57 +274,6 @@ export default function EventRegistrations({
             </Button>
           </div>
         </div>
-      </div>
-
-      {/* Data table */}
-      {registrations.length === 0 ? (
-        <div className="text-center">
-          <div className="bg-gray-50 rounded-lg p-16">
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
-              No registrations yet
-            </h3>
-            <p className="text-gray-500">
-              This event doesn't have any registrations yet.
-            </p>
-          </div>
-        </div>
-      ) : (
-        <DataTable
-          columns={registrationsColumns(questions, eventId)}
-          data={paginatedRegistrations}
-        />
-      )}
-
-      {/* CSV Export Controls */}
-      <div className="flex items-center gap-2">
-        <Select
-          value={exportMode}
-          onValueChange={(value) => setExportMode(value as "all" | "page")}
-        >
-          <SelectTrigger className="w-[120px]">
-            <SelectValue placeholder="Export scope" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="page">This Page</SelectItem>
-            <SelectItem value="all">All Results</SelectItem>
-          </SelectContent>
-        </Select>
-
-        {isClient && (
-          <CSVLink
-            data={
-              exportMode === "page"
-                ? formatCsvData(paginatedRegistrations)
-                : formatCsvData(filteredRegistrations)
-            }
-            headers={headers}
-            filename={csvFilename}
-            className="text-sm flex flex-row w-fit gap-2 items-center bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors"
-          >
-            <Download size={16} />
-            Download CSV
-          </CSVLink>
-        )}
       </div>
     </div>
   );

@@ -11,11 +11,17 @@ import {
 import { useGetAllUsersQuery } from '@/lib/queries/users';
 import { fetchExportUsers } from '@/lib/queries/export';
 import { Role } from '@/lib/types';
-import { Download } from 'lucide-react';
+import { ChevronDown, Download } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import SearchBar from '@/components/SearchBar';
 import { useSearchParams } from 'next/navigation';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 export default function Home() {
   // Pagination + filter state
@@ -47,7 +53,6 @@ export default function Home() {
 
   const ROLES = ['All Roles', 'Basic', 'Member', 'Admin'] as const;
 
-
   const handleExport = async (type: 'page' | 'all') => {
     await fetchExportUsers({
       exportType: type,
@@ -62,28 +67,60 @@ export default function Home() {
   if (error) return <div>Error loading users.</div>;
 
   return (
-    <div className="space-y-4">
+    <div className="w-full max-w-full overflow-x-hidden space-y-4">
       <div className="font-semibold text-2xl mb-4">Manage All Members</div>
 
-      {/* Role Filter */}
-      <Select
-        value={roleFilter}
-        onValueChange={(value: Role | 'All Roles') => setRoleFilter(value)}
-      >
-        <SelectTrigger className="w-[140px]">
-          <SelectValue placeholder="Filter by role" />
-        </SelectTrigger>
-        <SelectContent>
-          {ROLES.map((type) => (
-            <SelectItem key={type} value={type}>
-              {type}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+      <div className='flex flex-wrap md:justify-between gap-4'>
+        <div className="flex items-center gap-2">
+          {/* Search */}
+          <SearchBar
+            placeholder="Search by name or email..."
+            searchParamKey="search"
+          />
+          {/* Role Filter */}
+          <Select
+            value={roleFilter}
+            onValueChange={(value: Role | 'All Roles') => setRoleFilter(value)}
+          >
+            <SelectTrigger className="w-[140px]">
+              <SelectValue placeholder="Filter by role" />
+            </SelectTrigger>
+            <SelectContent>
+              {ROLES.map((type) => (
+                <SelectItem key={type} value={type}>
+                  {type}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button className="flex items-center gap-2 bg-blue-500 text-white hover:bg-blue-600">
+              <Download size={16} />
+              Download CSV
+              <ChevronDown size={16} />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start">
+            <DropdownMenuItem onClick={() => handleExport('page')}>
+              This Page
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleExport('all')}>
+              All Results
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+
+      {/* Table */}
+      <div className="relative overflow-x-auto">
+        <DataTable columns={membersColumns} data={users} />
+      </div>
 
       {/* Pagination Controls */}
-      <div className="flex items-center justify-between py-4">
+      <div className="flex items-center justify-between">
         <div className="text-sm text-muted-foreground">
           Showing {(page - 1) * pageSize + 1}-
           {Math.min(page * pageSize, totalCount)} of {totalCount} results (Page{' '}
@@ -93,7 +130,9 @@ export default function Home() {
         <div className="flex items-center space-x-4">
           {/* Page size */}
           <div className="flex items-center space-x-2">
-            <span className="text-sm text-muted-foreground">Rows per page:</span>
+            <span className="text-sm text-muted-foreground">
+              Rows per page:
+            </span>
             <Select
               value={pageSize.toString()}
               onValueChange={(value) => {
@@ -134,39 +173,6 @@ export default function Home() {
             </Button>
           </div>
         </div>
-      </div>
-
-      {/* Search */}
-      <SearchBar
-        placeholder="Search by name or email..."
-        searchParamKey="search"
-      />
-
-      {/* Table */}
-      <DataTable columns={membersColumns} data={users} />
-
-      {/* Export */}
-      <div className="flex items-center gap-2">
-        <Select
-          value={exportMode}
-          onValueChange={(v) => setExportMode(v as 'all' | 'page')}
-        >
-          <SelectTrigger className="w-[120px]">
-            <SelectValue placeholder="Export scope" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="page">This Page</SelectItem>
-            <SelectItem value="all">All Results</SelectItem>
-          </SelectContent>
-        </Select>
-
-        <Button
-          onClick={() => handleExport(exportMode)}
-          className="text-sm flex flex-row w-fit gap-2 items-center bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors"
-        >
-          <Download size={16} />
-          Download CSV
-        </Button>
       </div>
     </div>
   );
