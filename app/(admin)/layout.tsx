@@ -24,7 +24,7 @@ export default async function AdminLayout({
       <ProtectedLayout>
         <MobileNav/>
         <AppSidebar />
-        <main className="w-full m-8 md:m-12">
+        <main className="flex-1 w-full overflow-x-hidden p-8 md:p-12">
           <Breadcrumbs />
           {children}
         </main>

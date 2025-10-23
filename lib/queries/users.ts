@@ -27,19 +27,26 @@ export function useGetAllUsersQuery(
   return useQuery<PaginatedResponse<UserProfileData>>({
     queryKey: ['users', page, pageSize, role, search],
     queryFn: async () => {
-      const res = await fetchFromAPI('/api/users', {
+      const params = new URLSearchParams();
+
+      params.append('page', page.toString());
+      params.append('pageSize', pageSize.toString());
+
+      if (role && role !== 'All Roles') params.append('role', role);
+      if (search && search.trim().length > 0) params.append('search', search);
+
+      const res = await fetchFromAPI(`/api/users?${params.toString()}`, {
         method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
       });
 
-      const data = (await res.json()) as UserProfileData[];
-
+      if (!res.ok) throw new Error(`Failed to fetch users: ${res.statusText}`);
+      const data = (await res.json()) as PaginatedResponse<UserProfileData>;
       return data;
     },
     retry: 1,
+    placeholderData: keepPreviousData, 
     staleTime: 5 * 60 * 1000,
   });
 }
