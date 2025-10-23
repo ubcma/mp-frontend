@@ -13,6 +13,8 @@ import CheckoutEventForm from '@/components/forms/CheckoutEventForm';
 import { useGetEventQuery } from '@/lib/queries/event';
 import { useClientSecret } from '@/lib/queries/stripe';
 import CheckoutEventFormFree from '@/components/forms/CheckoutEventFormFree';
+import { getEventStatus, isEventFull } from '@/lib/utils';
+import { useRouter } from 'next/navigation';
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY!);
 
@@ -21,7 +23,7 @@ export default function PurchaseEventPage() {
   const searchParams = useSearchParams();
   const eventSlug = searchParams.get('eventSlug')!;
 
-  // keep user fresh (side-effect)
+
   useEffect(() => {
     queryClient.invalidateQueries({ queryKey: ['user'] });
   }, [queryClient]);
@@ -34,7 +36,6 @@ export default function PurchaseEventPage() {
 
   const event = data?.event;
 
-  // Loading UI while event is loading
   if (isEventLoading) {
     return (
       <div className="min-h-screen flex flex-col gap-2 items-center justify-center">
@@ -50,6 +51,37 @@ export default function PurchaseEventPage() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <p className="text-red-600">Could not load event details.</p>
+      </div>
+    );
+  }
+
+  const eventFull = event ? isEventFull(event) : false;
+  const status = event ? getEventStatus(event.startsAt) : 'Upcoming';
+
+  if (eventFull) {
+  return (
+    <div className="min-h-screen flex flex-col items-center justify-center text-center px-4">
+      <h2 className="text-2xl font-bold text-ma-red">Event is Full</h2>
+      <p className="text-neutral-600 mt-2">
+        Unfortunately, this event has reached capacity.
+      </p>
+      <Link href="/events" className="mt-4 text-ma-red underline">
+        Back to events
+      </Link>
+    </div>
+  );
+}
+
+  if (status === 'Past') {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center text-center px-4">
+        <h2 className="text-2xl font-bold text-neutral-800">Registration Closed</h2>
+        <p className="text-neutral-600 mt-2">
+          This event has already passed and is no longer open for registration.
+        </p>
+        <Link href="/events" className="mt-4 text-ma-red underline">
+          Back to events
+        </Link>
       </div>
     );
   }
@@ -83,7 +115,6 @@ export default function PurchaseEventPage() {
   const body = useMemo(
     () => ({
       purchaseType: 'event',
-      // amount can be omitted if your backend derives from eventId
       amount: event?.price,
       currency: 'cad',
       eventId: event?.id,
