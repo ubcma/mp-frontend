@@ -216,6 +216,8 @@ export const registrationsColumns = (
       cell: ({ row }) => {
         const response = row.original.responses[question.label];
 
+        console.log('Rendering response for question:', question.label, 'Response:', response);
+
         if (!response) {
           return <span className="text-gray-400">-</span>;
         }

@@ -72,6 +72,10 @@ export default function CheckoutEventForm({ clientSecret }: { clientSecret: stri
       } else {
         ev.complete('success');
         // You can also redirect to /event-purchase-success if that's your convention
+
+        // TODO: Persist question responses and send in request body to create eventRegistrationResponse
+        // body: { responses: Array<{ questionId: number; response: string }>, stripeTransactionId: string }
+
         window.location.href = `/success?payment_intent=${paymentIntent?.id}&redirect_status=${paymentIntent?.status}`;
       }
     });
@@ -130,7 +134,7 @@ export default function CheckoutEventForm({ clientSecret }: { clientSecret: stri
 
       {/* Event Summary */}
       <div className="rounded-xl bg-gradient-to-r from-ma-red/10 via-rose-50 to-ma-red/5 border border-rose-200 p-6 shadow-inner">
-        <h2 className="text-2xl font-bold text-neutral-900">{event.title}</h2>
+        <h2 className="text-2xl font-bold text-neutral-900">{event.title} {event.pricingTier && `(${event.pricingTier})`}</h2>
         <div className="flex items-center gap-3 mt-3">
           <span className="text-xl font-semibold text-ma-red">{priceLabel} CAD</span>
           <div className="flex items-center gap-1 text-xs bg-white border border-ma-red rounded-full px-2 py-0.5 shadow-sm">

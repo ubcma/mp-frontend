@@ -31,6 +31,7 @@ export type EventDetails = {
   isVisible: boolean;
   membersOnly: boolean;
   attendeeCap?: number;  
+  pricingTier?: string;
   currentAttendeeCount?: number;  
   createdAt: string | null;
   updatedAt: string | null;
@@ -117,6 +118,7 @@ export type BaseEventForm = {
   isVisible: boolean;
   membersOnly: boolean;
   attendeeCap?: number;
+  pricingTier?: string;
   startsAt: string;
   endsAt: string;
 };

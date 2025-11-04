@@ -33,12 +33,14 @@ export default function CheckoutEventFormFree() {
     setErrorMsg('');
 
     try {
-
       const res = await fetchFromAPI(`/api/events/${event?.id}/registrations/create`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: {},
+        body: {
+          // TODO: Persist question responses and send in request body to create eventRegistrationResponse
+          // body: { responses: Array<{ questionId: number; response: string }>, stripeTransactionId: string }
+        }
       });
 
       if (res.ok) {

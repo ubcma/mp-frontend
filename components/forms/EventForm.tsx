@@ -118,6 +118,7 @@ export default function EventForm({
       isVisible: initialValues?.isVisible ?? false,
       membersOnly: initialValues?.membersOnly ?? true,
       attendeeCap: initialValues?.attendeeCap ?? undefined,
+      pricingTier: initialValues?.pricingTier ?? '',
       startsAt: initialValues?.startsAt ?? '',
       endsAt: initialValues?.endsAt ?? '',
     },
@@ -254,7 +255,7 @@ export default function EventForm({
               );
             }}
           </form.Field>
-          <div className="grid md:grid-cols-3 grid-cols-1 gap-4 mt-4">
+          <div className="grid md:grid-cols-2 grid-cols-1 gap-4 mt-4">
             <form.Field name="title" validators={requiredValidator('Title')}>
               {(field) => (
                 <RenderInputField
@@ -283,18 +284,6 @@ export default function EventForm({
                 />
               )}
             </form.Field>
-
-            <form.Field
-              name="price"
-              validators={requiredValidator('Price')}
-              children={(fieldApi) => (
-                <RenderInputField
-                  type="number"
-                  label="Price (CAD)"
-                  field={fieldApi}
-                />
-              )}
-            />
           </div>
 
           <form.Field
@@ -336,17 +325,43 @@ export default function EventForm({
             />
           </div>
 
-          <form.Field
-            name="attendeeCap"
-            children={(fieldApi) => (
-              <RenderInputField
-                type="number"
-                label="Attendee Cap (Optional)"
-                field={fieldApi}
-                placeholder="Leave empty for unlimited capacity"
-              />
-            )}
-          />
+          <div className="grid md:grid-cols-3 grid-cols-1 gap-4">
+            <form.Field
+              name="price"
+              validators={requiredValidator('Price')}
+              children={(fieldApi) => (
+                <RenderInputField
+                  type="number"
+                  label="Price (CAD)"
+                  field={fieldApi}
+                />
+              )}
+            />
+
+            <form.Field
+              name="pricingTier"
+              children={(fieldApi) => (
+                <RenderInputField
+                  type="text"
+                  label="Pricing Tier (Optional)"
+                  field={fieldApi}
+                  placeholder="e.g. Early Bird, Regular"
+                />
+              )}
+            />
+
+            <form.Field
+              name="attendeeCap"
+              children={(fieldApi) => (
+                <RenderInputField
+                  type="number"
+                  label="Attendee Cap (Optional)"
+                  field={fieldApi}
+                  placeholder="Leave empty for unlimited capacity"
+                />
+              )}
+            />
+          </div>
 
           <form.Field
             name="isVisible"
@@ -386,8 +401,8 @@ export default function EventForm({
             <div>
               <div className="text-md font-medium"> Questions </div>
               <div className="text-xs text-muted-foreground">
-                Note: Questions cannot be edited later - ensure there are
-                no spelling mistakes.
+                Note: Questions cannot be edited later - ensure there are no
+                spelling mistakes.
               </div>
             </div>
             <div className="flex flex-col gap-4">
