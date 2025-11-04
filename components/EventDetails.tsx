@@ -144,6 +144,8 @@ const RenderEventDetails: React.FC<EventDetailsProps> = ({
         <p className="text-sm text-muted-foreground">{event.description}</p>
       )}
 
+      <hr></hr>
+
       {new Date(event.startsAt) < new Date() ? (
         new Date(event.endsAt) < new Date() ? (
           <EventStatusMessage
@@ -197,41 +199,37 @@ const RenderEventDetails: React.FC<EventDetailsProps> = ({
         />
       ) : (
         <div className="flex flex-col relative gap-4 py-1">
-          <Card>
-            <CardContent className="p-6">
-              <h2 className="text-xl font-semibold mb-6">Event Registration</h2>
-              <form onSubmit={handleSubmit} className="space-y-6">
-                {questions.map((q) => (
-                  <DynamicFormField
-                    key={q.id}
-                    question={q}
-                    value={responses[q.id]}
-                    onChange={(value) => handleChange(q.id, value)}
-                    error={
-                      q.isRequired &&
-                      (!responses[q.id] ||
-                        (Array.isArray(responses[q.id]) &&
-                          responses[q.id].length === 0) ||
-                        (typeof responses[q.id] === 'string' &&
-                          responses[q.id].trim() === ''))
-                        ? `${q.label} is required.`
-                        : undefined
-                    }
-                  />
-                ))}
+          <h2 className="text-xl font-semibold">Event Registration</h2>
+          <form onSubmit={handleSubmit} className="space-y-4 max-w-[32rem]">
+            {questions.map((q) => (
+              <DynamicFormField
+                key={q.id}
+                question={q}
+                value={responses[q.id]}
+                onChange={(value) => handleChange(q.id, value)}
+                error={
+                  q.isRequired &&
+                  (!responses[q.id] ||
+                    (Array.isArray(responses[q.id]) &&
+                      responses[q.id].length === 0) ||
+                    (typeof responses[q.id] === 'string' &&
+                      responses[q.id].trim() === ''))
+                    ? `${q.label} is required.`
+                    : undefined
+                }
+              />
+            ))}
 
-                <Button
-                  type="submit"
-                  disabled={!isFormValid || isSubmitting}
-                  className="w-full bg-[#ef3050] hover:bg-[#ef3050]/90 text-white"
-                >
-                  {isSubmitting
-                    ? 'Submitting...'
-                    : `Continue to Purchase ($${Number(event.price).toFixed(2)})`}
-                </Button>
-              </form>
-            </CardContent>
-          </Card>
+            <Button
+              type="submit"
+              disabled={!isFormValid || isSubmitting}
+              className="flex flex-wrap whitespace-normal break-words text-left w-fit h-fit max-w-full bg-[#ef3050] hover:bg-[#ef3050]/90 text-white"
+            >
+              {isSubmitting
+                ? 'Submitting...'
+                : `Continue to Purchase (${event.pricingTier && event.pricingTier + ", "}$${Number(event.price).toFixed(2)})`}
+            </Button>
+          </form>
         </div>
       )}
     </div>

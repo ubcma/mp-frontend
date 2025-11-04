@@ -29,10 +29,13 @@ export function EventCard({
   const month = eventStartsAt.format('MMM');
 
   return (
-    <button
+    <div
       onClick={() => router.push(`/events/${event.slug}`)}
-      className="transition-all duration-200 w-full h-full"
-      disabled={status !== 'Upcoming' || eventFull}
+      className={`transition-all duration-200 w-full h-full ${
+        status !== 'Upcoming' || eventFull
+          ? 'pointer-events-none opacity-50'
+          : ''
+      }`}
     >
       <Card
         className={cn(
@@ -112,6 +115,6 @@ export function EventCard({
           </div>
         </CardContent>
       </Card>
-    </button>
+    </div>
   );
 }
