@@ -15,7 +15,7 @@ export const signInWithGoogle = async () => {
   );
 
   if (response.error) {
-    handleServerError('Error signing in with Google:', response.error);
+    handleServerError('Error signing in with Google, please contact our team for support');
     throw new Error(response.error.message);
   }
 

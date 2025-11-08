@@ -38,7 +38,7 @@ export default function SignInForm() {
 
       } catch (error) {
         console.error('Submit error:', error);
-        handleClientError('Error', error);
+        handleClientError('Error: ', error);
       }
     },
   });

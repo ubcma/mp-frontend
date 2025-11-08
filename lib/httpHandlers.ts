@@ -52,7 +52,7 @@ export async function fetchFromAPI(
       );
     }
 
-    handleServerError('Error', errorMessage);
+    handleServerError('An error occured, please contact our team for support');
     throw new Error(errorMessage);
   }
 
