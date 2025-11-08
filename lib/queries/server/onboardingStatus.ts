@@ -24,7 +24,7 @@ export async function getOnboardingStatus() {
 
     return data.onboardingComplete;
   } catch (error) {
-    handleServerError('Error fetching user role:', error);
+    handleServerError('Error fetching user role');
     throw error;
   }
 }

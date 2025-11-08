@@ -227,7 +227,7 @@ const RenderEventDetails: React.FC<EventDetailsProps> = ({
             >
               {isSubmitting
                 ? 'Submitting...'
-                : `Continue to Purchase (${event.pricingTier && event.pricingTier + ", "}$${Number(event.price).toFixed(2)})`}
+                : `Continue to Purchase (${event.pricingTier ? event.pricingTier + ", " : ''}$${Number(event.price).toFixed(2)})`}
             </Button>
           </form>
         </div>

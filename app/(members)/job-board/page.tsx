@@ -20,8 +20,8 @@ export default function JobBoard() {
           This feature is exclusive for members.
         </h1>
         <p className="text-muted-foreground">
-          Please upgrade your account
-          to access job listings and other exclusive perks.
+          Please upgrade your account to access job listings and other exclusive
+          perks.
         </p>
       </div>
     );
@@ -34,7 +34,12 @@ export default function JobBoard() {
       {isLoading ? (
         <p>Loading jobs...</p>
       ) : activeJobs.length > 0 ? (
-        activeJobs.map((job, idx) => <JobCard job={job} key={idx} />)
+        activeJobs
+          .sort(
+            (a, b) =>
+              new Date(b.postedAt).getTime() - new Date(a.postedAt).getTime()
+          )
+          .map((job, idx) => <JobCard job={job} key={idx} />)
       ) : (
         <p className="text-muted-foreground">
           No active jobs available at the moment.

@@ -9,7 +9,7 @@ export const sendForgotPasswordEmail = async (email: string) => {
   });
 
   if (error) {
-    handleServerError('Error sending forgot password email', error);
+    handleServerError('Error sending forgot password email, please contact our team for support');
     throw new Error(error.message);
   }
   
@@ -23,7 +23,7 @@ export const resetPassword = async (token: string, password: string) => {
   });
 
   if (error) {
-    handleServerError('Error resetting password', error);
+    handleServerError('Error resetting password, please contact our team for support');
     throw new Error(error.message);
   }
   
