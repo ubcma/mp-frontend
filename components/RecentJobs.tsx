@@ -18,7 +18,7 @@ const CompactJobCard = ({ job }: JobCardProps) => {
           height={80}
           src={job.companyLogo || ''}
           alt={job.companyName + ' Logo'}
-          className="aspect-square w-12 h-12 object-cover rounded-full"
+          className="aspect-square w-12 h-12 object-contain rounded-full"
         />
 
         <div className="flex flex-col">
