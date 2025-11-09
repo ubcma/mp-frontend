@@ -11,7 +11,7 @@ import Link from 'next/link';
 
 const CompactJobCard = ({ job }: JobCardProps) => {
   return (
-    <div className="border border-gray-200 rounded-lg p-4 pr-6 transition-shadow w-fit">
+    <div className="border-b last:border-b-0 border-gray-200 p-4 pr-6 transition-shadow w-full">
       <div className="flex flex-row justify-start items-center gap-4">
         <Image
           width={80}
@@ -45,7 +45,8 @@ export default function RecentJobs() {
           This feature is exclusive for members.
         </h1>
         <p className="text-muted-foreground">
-          Please upgrade your account to access job listings and other exclusive perks.
+          Please upgrade your account to access job listings and other exclusive
+          perks.
         </p>
       </div>
     );
@@ -53,25 +54,31 @@ export default function RecentJobs() {
 
   return (
     <div className="w-full h-full flex flex-col gap-4">
-      <h2 className="text-lg font-medium text-muted-foreground">Recent job postings</h2>
+      <h2 className="text-lg font-medium text-muted-foreground">
+        Recent job postings
+      </h2>
 
       {/* Container for the list */}
-      <div className="relative group flex flex-row gap-2 flex-wrap">
-        {/* Actual job cards */}
-        {isLoading ? (
-          <Spinner />
-        ) : activeJobs.length > 0 ? (
-          activeJobs
-            .sort(
-              (a, b) => new Date(b.postedAt).getTime() - new Date(a.postedAt).getTime()
-            )
-            .slice(0, 7)
-            .map((job, idx) => <CompactJobCard job={job} key={idx} />)
-        ) : (
-          <p className="text-muted-foreground">
-            No active jobs available at the moment.
-          </p>
-        )}
+      <div className="relative group flex flex-col border-gray-200 border rounded-md overflow-clip">
+        <div className="flex flex-col">
+          {/* Actual job cards */}
+          {isLoading ? (
+            <Spinner />
+          ) : activeJobs.length > 0 ? (
+            activeJobs
+              .sort(
+                (a, b) =>
+                  new Date(b.postedAt).getTime() -
+                  new Date(a.postedAt).getTime()
+              )
+              .slice(0, 3)
+              .map((job, idx) => <CompactJobCard job={job} key={idx} />)
+          ) : (
+            <p className="text-muted-foreground">
+              No active jobs available at the moment.
+            </p>
+          )}
+        </div>
 
         {/* Full overlay covering the entire job list */}
         <Link
@@ -83,11 +90,12 @@ export default function RecentJobs() {
             flex items-center justify-center
             transition-all duration-300
             group-hover:opacity-100
+            rounded-md
           "
           href={'/job-board'}
         >
           <p className="flex flex-row items-center text-ma-red font-bold text-2xl text-center px-6 group">
-            View all opportunities in our job board 
+            View all opportunities in our job board
             <ArrowUpRight className="w-8 h-8 inline-block ml-2 group-hover:rotate-45 ease-out transition-transform duration-200 " />
           </p>
         </Link>
