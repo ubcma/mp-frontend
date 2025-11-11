@@ -141,7 +141,7 @@ const RenderEventDetails: React.FC<EventDetailsProps> = ({
 
       {/* Description */}
       {event.description && (
-        <p className="text-sm text-muted-foreground">{event.description}</p>
+        <p className="text-sm text-muted-foreground whitespace-pre-line">{event.description}</p>
       )}
 
       <hr></hr>
