@@ -31,26 +31,26 @@ const itemVariants: Variants = {
 };
 
 const highlightCards = [
-  // {
-  //   image:
-  //     'https://gs42emtt45.ufs.sh/f/qeDSywamz1NxH4tQ5JT6W5MP98mJjURL4xkwFTZOQiGbpShA',
-  //   heading: 'Gateways tickets now available',
-  //   subheading: "UBCMA's flagship marketing conference",
-  //   url: '/events/gateways',
-  //   color: '#000000',
-  //   highlightTags: [
-  //     {
-  //       icon: Calendar,
-  //       text: 'Sunday, November 23',
-  //       color: '#9FC5FF',
-  //     },
-  //     {
-  //       icon: Award,
-  //       text: 'Members only',
-  //       color: '#FF5370',
-  //     },
-  //   ],
-  // },
+  {
+    image:
+      'https://3ou0u5266t.ufs.sh/f/icFgxUjDNp9SZFGZP2uq9Sbrijsp83wdyznfRJ5C1XIxUeHF',
+    heading: 'Gateways tickets now available',
+    subheading: "UBCMA's flagship marketing conference",
+    url: '/events/gateways',
+    color: '#000000',
+    highlightTags: [
+      {
+        icon: Calendar,
+        text: 'Sunday, November 23',
+        color: '#9FC5FF',
+      },
+      {
+        icon: Award,
+        text: 'MA Member Exclusive',
+        color: '#FF5370',
+      },
+    ],
+  },
   {
     image:
       'https://gs42emtt45.ufs.sh/f/qeDSywamz1NxnEfYPdoHpX2NmeMbcOv7uC06IdP1w5839oBh',
@@ -61,7 +61,7 @@ const highlightCards = [
     highlightTags: [
       {
         icon: Award,
-        text: 'Members only',
+        text: 'MA Member Exclusive',
         color: '#FF5370',
       },
     ],
