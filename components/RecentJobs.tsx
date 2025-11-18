@@ -5,9 +5,8 @@ import { useGetJobsQuery } from '@/lib/queries/jobs';
 import { useUserQuery } from '@/lib/queries/user';
 import Image from 'next/image';
 import Spinner from './common/Spinner';
-import { Button } from './ui/button';
 import { ArrowUpRight } from 'lucide-react';
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 const CompactJobCard = ({ job }: JobCardProps) => {
   return (
@@ -35,22 +34,9 @@ const CompactJobCard = ({ job }: JobCardProps) => {
 export default function RecentJobs() {
   const { data, isLoading } = useGetJobsQuery();
   const { data: user } = useUserQuery();
+  const router = useRouter();
 
   const activeJobs = data?.filter((job) => job.isActive) || [];
-
-  if (user?.role === 'Basic') {
-    return (
-      <div className="w-full h-full flex flex-col gap-4">
-        <h1 className="font-bold text-2xl text-ma-red">
-          This feature is exclusive for members.
-        </h1>
-        <p className="text-muted-foreground">
-          Please upgrade your account to access job listings and other exclusive
-          perks.
-        </p>
-      </div>
-    );
-  }
 
   return (
     <div className="w-full h-full flex flex-col gap-4">
@@ -81,7 +67,7 @@ export default function RecentJobs() {
         </div>
 
         {/* Full overlay covering the entire job list */}
-        <Link
+        <button
           className="
             absolute inset-0
             bg-white/70
@@ -92,13 +78,28 @@ export default function RecentJobs() {
             group-hover:opacity-100
             rounded-md
           "
-          href={'/job-board'}
+          onClick={() => router.push('/job-board')}
+          disabled={user?.role === 'Basic'}
         >
-          <p className="flex flex-row items-center text-ma-red font-bold text-2xl text-center px-6 group">
-            View all opportunities in our job board
-            <ArrowUpRight className="w-8 h-8 inline-block ml-2 group-hover:rotate-45 ease-out transition-transform duration-200 " />
-          </p>
-        </Link>
+          <div className="flex flex-row items-center text-center px-6 group">
+            {user?.role === 'Basic' ? (
+              <div className="flex-col items-start">
+                <h1 className="font-bold text-2xl text-ma-red">
+                  Our job board is exclusive for members!
+                </h1>
+                <p className="text-muted-foreground">
+                  Please upgrade your account to access these job listings and more
+                  exclusive perks.
+                </p>
+              </div>
+            ) : (
+              <span className='text-ma-red font-bold text-2xl '>
+                View all opportunities in our job board
+                <ArrowUpRight className="w-8 h-8 inline-block ml-2 group-hover:rotate-45 ease-out transition-transform duration-200 " />
+              </span>
+            )}
+          </div>
+        </button>
       </div>
     </div>
   );

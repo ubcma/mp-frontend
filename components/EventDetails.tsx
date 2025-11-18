@@ -180,24 +180,26 @@ const RenderEventDetails: React.FC<EventDetailsProps> = ({
           title="This event is for members only!"
           description="Purchase a membership to gain access to this event and many other perks."
         />
-      ) : !user?.onboardingComplete ? (
-        <EventStatusMessage
-          variant="error"
-          title="You haven't completed your profile yet!"
-          description={
-            <>
-              Complete your{' '}
-              <a
-                href="/onboarding"
-                className="hover:underline transition-transform duration-200 text-blue-500"
-              >
-                portal onboarding
-              </a>{' '}
-              to register for this event
-            </>
-          }
-        />
-      ) : (
+      ) 
+      // : !user?.onboardingComplete ? (
+      //   <EventStatusMessage
+      //     variant="error"
+      //     title="You haven't completed your profile yet!"
+      //     description={
+      //       <>
+      //         Complete your{' '}
+      //         <a
+      //           href="/onboarding"
+      //           className="hover:underline transition-transform duration-200 text-blue-500"
+      //         >
+      //           portal onboarding
+      //         </a>{' '}
+      //         to register for this event
+      //       </>
+      //     }
+      //   />
+      // ) 
+      : (
         <div className="flex flex-col relative gap-4 py-1">
           <h2 className="text-xl font-semibold">Event Registration</h2>
           <form onSubmit={handleSubmit} className="space-y-4 max-w-[32rem]">

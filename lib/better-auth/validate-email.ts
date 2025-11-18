@@ -10,16 +10,15 @@ export async function validateEmail(email: string) {
     body: { email },
   });
 
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.message || 'Failed to validate email');
-  }
+  const data = await response.json();
 
-  const data = (await response.json()) as ValidateEmailResponse;
+  if (!response.ok) {
+    throw new Error('Failed to validate email');
+  }
 
   if (!data.hasAccount) {
     throw new Error('No account found for this email');
   }
 
-  return data;
+  return data as ValidateEmailResponse;
 }

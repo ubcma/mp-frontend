@@ -37,8 +37,7 @@ export default function SignInForm() {
         }
 
       } catch (error) {
-        console.error('Submit error:', error);
-        handleClientError('Error: ', error);
+        handleClientError('Error: No account found for this email', new Error());
       }
     },
   });
