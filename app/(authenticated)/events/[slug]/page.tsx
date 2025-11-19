@@ -17,5 +17,5 @@ export default function EventPage() {
     return <div>Error loading event details.</div>;
   }
 
-  return <RenderEventDetails event={data.event} questions={data.questions} />;
+  return <RenderEventDetails event={data.event} questions={data.questions}/>;
 }
