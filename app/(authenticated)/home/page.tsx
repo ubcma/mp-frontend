@@ -44,11 +44,11 @@ const highlightCards = [
         text: 'Sunday, November 23',
         color: '#9FC5FF',
       },
-      {
-        icon: Award,
-        text: 'MA Member Exclusive',
-        color: '#FF5370',
-      },
+      // {
+      //   icon: Award,
+      //   text: 'MA Member Exclusive',
+      //   color: '#FF5370',
+      // },
     ],
   },
   {
