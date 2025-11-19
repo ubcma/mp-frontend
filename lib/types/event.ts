@@ -25,6 +25,7 @@ export type EventDetails = {
   description: string;
   imageUrl: string;
   price: number;
+  nonMemberPrice: number;
   location: string;
   startsAt: Date;
   endsAt: Date;
@@ -121,6 +122,7 @@ export type BaseEventForm = {
   pricingTier?: string;
   startsAt: string;
   endsAt: string;
+  nonMemberPrice?: number;
 };
 
 export type CreateEventPayload = Omit<BaseEventForm, 'startsAt' | 'endsAt'> & {

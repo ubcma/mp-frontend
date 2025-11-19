@@ -121,6 +121,7 @@ export default function EventForm({
       pricingTier: initialValues?.pricingTier ?? '',
       startsAt: initialValues?.startsAt ?? '',
       endsAt: initialValues?.endsAt ?? '',
+      nonMemberPrice: initialValues?.nonMemberPrice ?? 0,
     },
     onSubmit: async ({ value }) => {
       let imageUrl = value.imageUrl;
@@ -325,7 +326,7 @@ export default function EventForm({
             />
           </div>
 
-          <div className="grid md:grid-cols-3 grid-cols-1 gap-4">
+          <div className="grid md:grid-cols-4 grid-cols-2 gap-4">
             <form.Field
               name="price"
               validators={requiredValidator('Price')}
@@ -333,6 +334,18 @@ export default function EventForm({
                 <RenderInputField
                   type="number"
                   label="Price (CAD)"
+                  field={fieldApi}
+                />
+              )}
+            />
+
+            <form.Field
+              name="nonMemberPrice"
+              validators={requiredValidator('Non-Member Price')}
+              children={(fieldApi) => (
+                <RenderInputField
+                  type="number"
+                  label="Non-member Price (CAD)"
                   field={fieldApi}
                 />
               )}
