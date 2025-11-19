@@ -122,7 +122,7 @@ export type BaseEventForm = {
   pricingTier?: string;
   startsAt: string;
   endsAt: string;
-  nonMemberPrice?: number;
+  nonMemberPrice: number;
 };
 
 export type CreateEventPayload = Omit<BaseEventForm, 'startsAt' | 'endsAt'> & {
