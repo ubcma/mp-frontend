@@ -17,7 +17,10 @@ import {
   BadgeCheck,
   ChevronDown,
   Briefcase,
-  BookOpen
+  BookOpen,
+  Network,
+  ExternalLink,
+  ArrowUpRight,
 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
@@ -86,12 +89,12 @@ export function AppSidebar() {
       label: 'Job Board',
       disabled: false,
     },
-    // {
-    //   href: '/alumni-network',
-    //   icon: Handshake,
-    //   label: 'Alumni Network (Coming Soon)',
-    //   disabled: true,
-    // },
+    {
+      href: 'https://network.ubcma.ca/directory',
+      icon: Network,
+      label: 'Mentorship Hub',
+      disabled: false,
+    },
     // {
     //   href: '/discounts',
     //   icon: BadgePercent,
@@ -157,7 +160,6 @@ export function AppSidebar() {
   };
 
   useEffect(() => {
-
     const skip = localStorage.getItem('onboarding_skipped');
 
     if (pathname !== '/onboarding') {
@@ -309,7 +311,12 @@ export function SidebarSection({
                     prefetch={true}
                   >
                     <item.icon className="h-4 w-4" />
-                    <span>{item.label}</span>
+                    <span className='flex flex-row justify-between w-full items-start h-fit'>
+                      {item.label}
+                      {item.href.startsWith('http') && (
+                        <ExternalLink className="h-4 w-4" />
+                      )}
+                    </span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
