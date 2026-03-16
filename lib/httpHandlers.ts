@@ -2,7 +2,7 @@ import { handleServerError } from './error/handleServer';
 
 type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE';
 
-const DEFAULT_TIMEOUT_MS = 8000;
+const DEFAULT_TIMEOUT_MS = 5000;
 
 interface FetchOptions {
   method?: HttpMethod;
