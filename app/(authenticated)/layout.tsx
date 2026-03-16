@@ -21,12 +21,14 @@ export default async function Layout({
     .map(({ name, value }) => `${name}=${value}`)
     .join('; ');
 
-  const [session, userRole] = await Promise.all([
-    getServerSession(cookieHeader).catch(() => null),
+  const [sessionResult, userRole] = await Promise.all([
+    getServerSession(cookieHeader)
+      .then((s) => ({ data: s, error: false as const }))
+      .catch(() => ({ data: null, error: true as const })),
     getUserRole().catch(() => null),
   ]);
 
-  if (!session) {
+  if (!sessionResult.data && !sessionResult.error) {
     redirect('/sign-in');
   }
 
