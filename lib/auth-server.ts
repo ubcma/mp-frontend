@@ -1,18 +1,25 @@
 import { cache } from 'react';
-import { unstable_cache } from 'next/cache';
 import { fetchFromAPI } from './httpHandlers';
 
+function extractSessionToken(cookieHeader: string): string {
+  const prefix =
+    process.env.NODE_ENV === 'production'
+      ? '__Secure-membership-portal.session_token'
+      : 'membership-portal.session_token';
+  const match = cookieHeader.match(
+    new RegExp(`(?:^|;\\s*)${prefix.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}=([^;]+)`)
+  );
+  return match?.[1] ?? '';
+}
+
 export const getServerSession = cache(async (cookieHeader: string) => {
-  return unstable_cache(
-    async () => {
-      const res = await fetchFromAPI('/api/auth/get-session', {
-        method: 'GET',
-        headers: { cookie: cookieHeader },
-        credentials: 'include',
-      });
-      return res.json();
-    },
-    ['session', cookieHeader],
-    { revalidate: 60 } 
-  )();
+  const token = extractSessionToken(cookieHeader);
+  if (!token) return null;
+
+  const res = await fetchFromAPI('/api/auth/get-session', {
+    method: 'GET',
+    headers: { cookie: cookieHeader },
+    credentials: 'include',
+  });
+  return res.json();
 });
