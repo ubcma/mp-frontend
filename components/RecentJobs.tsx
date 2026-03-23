@@ -12,13 +12,19 @@ const CompactJobCard = ({ job }: JobCardProps) => {
   return (
     <div className="border-b last:border-b-0 border-gray-200 p-4 pr-6 transition-shadow w-full">
       <div className="flex flex-row justify-start items-center gap-4">
-        <Image
-          width={80}
-          height={80}
-          src={job.companyLogo || ''}
-          alt={job.companyName + ' Logo'}
-          className="aspect-square w-12 h-12 object-contain rounded-full"
-        />
+        {job.companyLogo ? (
+          <Image
+            width={80}
+            height={80}
+            src={job.companyLogo}
+            alt={job.companyName + ' Logo'}
+            className="aspect-square w-12 h-12 object-contain rounded-full"
+          />
+        ) : (
+          <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 font-semibold text-lg shrink-0">
+            {job.companyName?.charAt(0)?.toUpperCase() || '?'}
+          </div>
+        )}
 
         <div className="flex flex-col">
           <h3 className="text-lg font-semibold">{job.title}</h3>

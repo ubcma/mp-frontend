@@ -790,13 +790,22 @@ export default function OnboardingModal(): JSX.Element {
     },
   });
 
+  // const avatars: string[] = [
+  //   'https://3ou0u5266t.ufs.sh/f/icFgxUjDNp9SHfSpARavrBaOy879hQLYlq2tTDxSFN56uAVk',
+  //   'https://3ou0u5266t.ufs.sh/f/icFgxUjDNp9SWuHx1AIQ5Jxnu8htDbYe6BEljCiZRS1HX90r',
+  //   'https://3ou0u5266t.ufs.sh/f/icFgxUjDNp9STlSXPGKtWjXZ5CV1loKvErcSBGzukR43NPpY',
+  //   'https://3ou0u5266t.ufs.sh/f/icFgxUjDNp9SYLGttR8WgoQTZvmMRLxUD3d2ja49SHG8IXPn',
+  //   'https://3ou0u5266t.ufs.sh/f/icFgxUjDNp9S4ckwUOew3HDuqnmEMpvOCSxlzFiXboeg842Z',
+  //   'https://3ou0u5266t.ufs.sh/f/icFgxUjDNp9St4uv7XDdOFLQW0GzgHKq8hCcUxNP5wuAVjiR',
+  // ];
+
   const avatars: string[] = [
-    'https://3ou0u5266t.ufs.sh/f/icFgxUjDNp9SHfSpARavrBaOy879hQLYlq2tTDxSFN56uAVk',
-    'https://3ou0u5266t.ufs.sh/f/icFgxUjDNp9SWuHx1AIQ5Jxnu8htDbYe6BEljCiZRS1HX90r',
-    'https://3ou0u5266t.ufs.sh/f/icFgxUjDNp9STlSXPGKtWjXZ5CV1loKvErcSBGzukR43NPpY',
-    'https://3ou0u5266t.ufs.sh/f/icFgxUjDNp9SYLGttR8WgoQTZvmMRLxUD3d2ja49SHG8IXPn',
-    'https://3ou0u5266t.ufs.sh/f/icFgxUjDNp9S4ckwUOew3HDuqnmEMpvOCSxlzFiXboeg842Z',
-    'https://3ou0u5266t.ufs.sh/f/icFgxUjDNp9St4uv7XDdOFLQW0GzgHKq8hCcUxNP5wuAVjiR',
+    '/profile-photos/apple.png',
+    '/profile-photos/clapperboard.png',
+    '/profile-photos/coffee.png',
+    '/profile-photos/oscar.png',
+    '/profile-photos/phone.png',
+    '/profile-photos/studios.png',
   ];
 
   const selectedFaculty = useStore(
