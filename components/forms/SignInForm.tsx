@@ -36,7 +36,7 @@ export default function SignInForm() {
           setStep('password');
         }
 
-      } catch (error) {
+      } catch {
         handleClientError('Error: No account found for this email', new Error());
       }
     },

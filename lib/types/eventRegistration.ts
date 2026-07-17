@@ -30,7 +30,7 @@ export interface EventQuestion {
   isRequired: boolean;
   sortOrder: number;
   options: string[] | null;
-  validation: any;
+  validation: Record<string, unknown>;
 }
 
 export interface EventRegistrationsResponse {

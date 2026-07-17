@@ -29,7 +29,7 @@ import {
 import { useQueryClient } from '@tanstack/react-query';
 
 interface RegistrationStatusDropdownProps {
-  userRegistration: any;
+  userRegistration: EventRegistration;
   eventId: string;
 }
 

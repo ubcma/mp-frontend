@@ -3,7 +3,6 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import { format } from 'date-fns';
-import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { BadgeCheckIcon, Calendar, MapPin, Shirt } from 'lucide-react';
 import { EventDetails, EventQuestion } from '@/lib/types';
@@ -250,7 +249,7 @@ const RenderEventDetails: React.FC<EventDetailsProps> = ({
                   </span>
                 ) : (
                   <span className="text-muted-foreground text-sm italic">
-                    You're saving{' '}
+                    You&apos;re saving{' '}
                     <span className="inline text-ma-red font-semibold">
                       ${saving.toFixed(2)}
                     </span>{' '}

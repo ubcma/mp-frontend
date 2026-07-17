@@ -1,6 +1,3 @@
-import { keepPreviousData, useQuery } from '@tanstack/react-query';
-import { fetchFromAPI } from '../httpHandlers';
-import { UserProfileData } from '../types';
 
 export async function fetchExportUsers({
   exportType,

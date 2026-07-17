@@ -19,7 +19,6 @@ interface ImageUploadProps {
 }
 
 export default function ImageUpload({
-  currentImageUrl,
   onImageUpload,
   buttonVariant = 'floating',
   acceptedFileTypes = 'image/*',
@@ -68,7 +67,7 @@ export default function ImageUpload({
 
       setPreviewUrl(preview!);
       startUpload([compressedFile]);
-    } catch (error) {
+    } catch {
       setIsUploading(false);
       // Error is already handled in processImageFile
     }

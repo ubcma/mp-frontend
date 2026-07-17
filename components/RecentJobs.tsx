@@ -1,6 +1,6 @@
 'use client';
 
-import { JobCard, JobCardProps } from '@/components/JobCard';
+import { JobCardProps } from '@/components/JobCard';
 import { useGetJobsQuery } from '@/lib/queries/jobs';
 import { useUserQuery } from '@/lib/queries/user';
 import Image from 'next/image';

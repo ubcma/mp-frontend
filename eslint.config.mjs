@@ -6,26 +6,21 @@ import { defineConfig } from "eslint/config";
 import next from "@next/eslint-plugin-next";
 
 export default defineConfig([
-  
-  {
-    files: ["**/*.{js,mjs,cjs,ts,mts,cts,jsx,tsx}"],
-    plugins: { next, js },
-    extends: ["js/recommended"],
-  },
+  js.configs.recommended,
 
   {
     files: ["**/*.{js,mjs,cjs,ts,mts,cts,jsx,tsx}"],
     languageOptions: {
       globals: globals.browser,
       parserOptions: {
-        ecmaVersion: 'latest',
-        sourceType: 'module',
+        ecmaVersion: "latest",
+        sourceType: "module",
       },
     },
   },
 
-  tseslint.configs.recommended,
-  next.configs.recommended,
+  ...tseslint.configs.recommended,
+  next.flatConfig.recommended,
 
   {
     ...pluginReact.configs.flat.recommended,
@@ -33,11 +28,11 @@ export default defineConfig([
       ...pluginReact.configs.flat.recommended.rules,
       "react/react-in-jsx-scope": "off",
       "react/no-children-prop": "off",
-      "react/prop-types": "off"
+      "react/prop-types": "off",
     },
     settings: {
       react: {
-        version: 'detect',
+        version: "detect",
       },
     },
   },

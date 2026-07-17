@@ -13,15 +13,8 @@ import { fetchFromAPI } from '@/lib/httpHandlers';
 import { handleClientError } from '@/lib/error/handleClient';
 import { useState } from 'react';
 import ProfileEditForm from '@/components/forms/ProfileEditForm';
-import { useGetUserRegistrationsQuery } from '@/lib/queries/registrations';
-
 export default function ProfilePage() {
   const { data: user, isLoading, isError, refetch } = useUserQuery();
-  const {
-    data: registrations,
-    isLoading: registrationsLoading,
-    isError: registrationsError,
-  } = useGetUserRegistrationsQuery();
 
   const [isEditMode, setIsEditMode] = useState(false);
 
@@ -52,7 +45,7 @@ export default function ProfilePage() {
   };
 
   // Handle profile update
-  const updateUserProfile = async (profileData: any) => {
+  const updateUserProfile = async (profileData: Record<string, unknown>) => {
     try {
       const response = await fetchFromAPI('/api/me', {
         method: 'PUT',

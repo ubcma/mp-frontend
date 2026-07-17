@@ -39,7 +39,7 @@ export const signInWithEmail = async (email: string, password: string) => {
       rememberMe: true,
     },
     {
-      onSuccess(ctx) {
+      onSuccess() {
         toast.success('Sign in successful!');
       },
     }

@@ -3,10 +3,9 @@
 import { JobCard } from '@/components/JobCard';
 import { useGetJobsQuery } from '@/lib/queries/jobs';
 import { useUserQuery } from '@/lib/queries/user';
-import { use } from 'react';
 
 export default function JobBoard() {
-  const { data, isLoading, isError } = useGetJobsQuery();
+  const { data, isLoading } = useGetJobsQuery();
 
   const { data: user } = useUserQuery();
 

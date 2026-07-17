@@ -3,7 +3,7 @@
 import * as React from 'react';
 import { useForm } from '@tanstack/react-form';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Mail, CheckCircle } from 'lucide-react';
+import { ArrowLeft, Mail } from 'lucide-react';
 import Link from 'next/link';
 import { toast } from 'sonner';
 import { motion } from 'framer-motion';
@@ -51,7 +51,7 @@ export default function ForgotPasswordForm() {
           <div className="space-y-2">
             <h2 className="text-2xl font-semibold">Check your email</h2>
             <p className="text-gray-600">
-              We've sent a password reset link to <strong>{userEmail}</strong>
+              We&apos;ve sent a password reset link to <strong>{userEmail}</strong>
             </p>
           </div>
 
@@ -84,7 +84,7 @@ export default function ForgotPasswordForm() {
           </div>
 
           <p className="text-xs text-gray-500">
-            Can't find the email? Check your spam folder
+            Can&apos;t find the email? Check your spam folder
           </p>
         </motion.div>
       </div>

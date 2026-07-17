@@ -43,7 +43,7 @@ interface JobFormValues {
 type JobFormProps = {
   mode: 'create' | 'update';
   initialValues?: Partial<JobFormValues>;
-  onSubmit: (values: any) => Promise<void>;
+  onSubmit: (values: JobFormValues) => Promise<void>;
 };
 
 const JOB_TYPES: { value: JobType; label: string }[] = [
@@ -86,7 +86,7 @@ export default function JobForm({
           if (uploadedUrl) {
             companyLogo = uploadedUrl;
           }
-        } catch (error) {
+        } catch {
           return;
         }
       }
@@ -114,7 +114,7 @@ export default function JobForm({
   });
 
   const requiredValidator = (fieldName: string) => ({
-    onChange: ({ value }: { value: any }) =>
+    onChange: ({ value }: { value: string }) =>
       !value ? `${fieldName} is required.` : undefined,
   });
 
@@ -154,7 +154,7 @@ export default function JobForm({
                   <AdminImageUpload
                     ref={logoUploadRef}
                     existingImageUrl={logoUrl}
-                    onImageSelect={(hasFile) => {
+                    onImageSelect={() => {
                       field.validate('change');
                     }}
                     maxFileSizeMB={5}

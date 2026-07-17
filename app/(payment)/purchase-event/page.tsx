@@ -14,7 +14,6 @@ import { useGetEventQuery } from '@/lib/queries/event';
 import { useClientSecret } from '@/lib/queries/stripe';
 import CheckoutEventFormFree from '@/components/forms/CheckoutEventFormFree';
 import { getEventStatus, isEventFull } from '@/lib/utils';
-import { useRouter } from 'next/navigation';
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY!);
 

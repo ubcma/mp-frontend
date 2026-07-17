@@ -1,13 +1,12 @@
 'use client';
 
-import { Card } from '@/components/ui/card';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { MoreHorizontal, Calendar, Tag, MapPin, ChartLine, LucideSettings, Users } from 'lucide-react';
+import { Calendar, Tag, MapPin, LucideSettings, Users } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { EventDetails } from '@/lib/types';

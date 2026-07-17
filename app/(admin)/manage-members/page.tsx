@@ -28,13 +28,8 @@ export default function Home() {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(25);
   const [roleFilter, setRoleFilter] = useState<Role | 'All Roles'>('All Roles');
-  const [exportMode, setExportMode] = useState<'all' | 'page'>('all');
-  const [isClient, setIsClient] = useState(false);
-
   const searchParams = useSearchParams();
   const search = searchParams.get('search') || '';
-
-  useEffect(() => setIsClient(true), []);
 
   // Reset pagination when filters change
   useEffect(() => setPage(1), [roleFilter, search]);

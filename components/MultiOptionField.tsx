@@ -104,7 +104,7 @@ export function MultiOptionField({options}: {options: Framework[]}) {
                         e.preventDefault();
                         e.stopPropagation();
                       }}
-                      onSelect={(value) => {
+                      onSelect={() => {
                         setInputValue("");
                         setSelected((prev) => [...prev, framework]);
                       }}

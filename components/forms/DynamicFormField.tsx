@@ -1,7 +1,7 @@
 // components/forms/DynamicFormField.tsx
 import React from 'react';
 import { EventQuestion } from '@/lib/types';
-import { FieldApi } from '@tanstack/react-form'; // Adjust import based on your form library
+import { AnyFieldApi } from '@tanstack/react-form';
 import {
   RenderInputField,
   RenderTextArea,
@@ -17,8 +17,8 @@ import {
 
 interface DynamicFormFieldProps {
   question: EventQuestion;
-  value: any;
-  onChange: (value: any) => void;
+  value: string | string[] | undefined;
+  onChange: (value: string | string[]) => void;
   onBlur?: () => void;
   error?: string;
 }
@@ -43,7 +43,7 @@ const DynamicFormField: React.FC<DynamicFormFieldProps> = ({
     },
     handleChange: onChange,
     handleBlur: onBlur || (() => {}),
-  } as any; // Type assertion
+  } as AnyFieldApi;
 
   const renderField = () => {
     switch (question.type) {

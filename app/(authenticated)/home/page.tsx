@@ -2,14 +2,11 @@
 
 import { ActionButtons } from '@/components/ActionButtons';
 import { HighlightCarousel } from '@/components/HighlightCarousel';
-import OnboardingModal from '@/components/OnboardingModal';
 import RecentJobs from '@/components/RecentJobs';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useUserQuery } from '@/lib/queries/user';
 import { motion, AnimatePresence, Variants } from 'framer-motion';
-import { Award, Calendar, Globe, MapPin } from 'lucide-react';
-import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { Award, Globe } from 'lucide-react';
 
 const containerVariants = {
   hidden: { opacity: 0 },

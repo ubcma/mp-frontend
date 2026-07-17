@@ -1,11 +1,11 @@
 'use client';
 
 import { useState, useEffect, JSX } from 'react';
-import { useForm, useStore, FieldApi, AnyFieldApi } from '@tanstack/react-form';
+import { useForm, useStore, AnyFieldApi } from '@tanstack/react-form';
 import Confetti from 'react-confetti';
 import { useWindowSize } from 'react-use';
 import { Button } from '@/components/ui/button';
-import { motion, AnimatePresence, easeInOut, easeOut } from 'motion/react';
+import { motion, AnimatePresence, easeOut } from 'motion/react';
 import {
   RenderComboBoxField,
   RenderInputField,
@@ -16,7 +16,6 @@ import {
   DIETARY_RESTRICTIONS,
   FACULTIES,
   Faculty,
-  FacultyMajors,
   getMajorsForFaculty,
   INTEREST_OPTIONS,
   YEAR_OPTIONS,
@@ -34,7 +33,6 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { fetchFromAPI } from '@/lib/httpHandlers';
 import { useIsMobile } from '@/hooks/use-mobile';
-import ProgressLineMobile from './ProgressLineMobile';
 
 interface Step {
   title: string;
@@ -57,7 +55,7 @@ interface StepProps {
   isMobile: boolean;
   handleNext: () => void;
   handleBack: () => void;
-  form: ReturnType<any>;
+  form: ReturnType<typeof useForm<FormValues>>;
   values: FormValues;
   step: number;
   steps: Step[];
@@ -377,7 +375,7 @@ const DietaryStep: React.FC<
     StepProps,
     'isMobile' | 'handleNext' | 'handleBack' | 'form' | 'values' | 'steps'
   >
-> = ({ isMobile, handleNext, handleBack, form, values, steps }) => (
+> = ({ isMobile, handleNext, handleBack, form, steps }) => (
   <div className={`w-full max-w-2xl px-4 ${isMobile ? 'py-8' : 'py-16'}`}>
     <h1
       className={`font-bold text-white text-center ${isMobile ? 'text-3xl mb-4' : 'text-6xl mb-8'}`}
@@ -525,7 +523,7 @@ const DietaryStep: React.FC<
         Go back
       </Button>
       <form.Subscribe
-        selector={(state: { values: { diet: any } }) => [state.values.diet]}
+        selector={(state: { values: { diet: string[] } }) => [state.values.diet]}
         children={([diet]: [string[]]) => {
           const hasDietarySelection = diet && diet.length > 0;
           return (
@@ -557,7 +555,7 @@ const InterestsStep: React.FC<
     | 'steps'
     | 'setStep'
   >
-> = ({ isMobile, handleNext, handleBack, form, values, steps, setStep }) => (
+> = ({ isMobile, handleBack, form, steps, setStep }) => (
   <div className={`w-full max-w-2xl px-4 ${isMobile ? 'py-8' : 'py-16'}`}>
     <h1
       className={`font-bold text-white text-center ${isMobile ? 'text-3xl mb-4' : 'text-6xl mb-8'}`}
@@ -610,11 +608,11 @@ const InterestsStep: React.FC<
         </Button>
         <form.Subscribe
           selector={(state: {
-            canSubmit: any;
-            isSubmitting: any;
-            values: { interests: any };
+            canSubmit: boolean;
+            isSubmitting: boolean;
+            values: { interests: string[] };
           }) => [state.canSubmit, state.isSubmitting, state.values.interests]}
-          children={([canSubmit, isSubmitting, interests]: [
+          children={([, isSubmitting, interests]: [
             boolean,
             boolean,
             string[],

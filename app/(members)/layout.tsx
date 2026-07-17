@@ -44,7 +44,7 @@ export default async function Layout({
             <div className="mb-8">
               <AlertBanner color="blue">
                 <div>
-                  Looks like you're not a member yet!{' '}
+                  Looks like you&apos;re not a member yet!{' '}
                   <a
                     href="/purchase-membership"
                     className="underline underline-offset-2 font-semibold hover:opacity-80 transition"

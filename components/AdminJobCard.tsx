@@ -1,33 +1,28 @@
 'use client';
 
-import { Card } from '@/components/ui/card';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { 
-  MoreHorizontal, 
-  Briefcase, 
-  MapPin, 
+import {
+  Briefcase,
+  MapPin,
   LucideSettings,
   Building2,
   CheckCircle2,
   XCircle,
   ExternalLink,
-  Mail,
 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { toast } from 'sonner';
 import { fetchFromAPI } from '@/lib/httpHandlers';
 import dayjs from 'dayjs';
 import { handleClientError } from '@/lib/error/handleClient';
 import { useQueryClient } from '@tanstack/react-query';
-import { useRouter } from 'next/navigation';
 
 interface Job {
   id: string;
@@ -51,8 +46,7 @@ interface AdminJobCardProps {
   onEdit?: (id: string) => void;
 }
 
-export function AdminJobCard({ job, onEdit }: AdminJobCardProps) {
-  const router = useRouter();
+export function AdminJobCard({ job }: AdminJobCardProps) {
   const queryClient = useQueryClient();
 
   const postedDate = dayjs(job.postedAt).format('MMMM D, YYYY');
