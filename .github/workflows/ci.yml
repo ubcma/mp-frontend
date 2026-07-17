@@ -1,0 +1,55 @@
+name: CI
+
+# Triggers: runs on every PR targeting main
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  ci:
+    name: Frontend CI
+    runs-on: ubuntu-latest  # GitHub spins up a fresh Ubuntu VM for every run
+
+    steps:
+      # 1. Pull the code from the branch being tested
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 2. Install pnpm (GitHub runners don't have it by default)
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.8.0
+
+      # 3. Install Node.js — cache: 'pnpm' speeds up future runs by caching node_modules
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+
+      # 4. Install dependencies (--frozen-lockfile ensures exact versions from lockfile)
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # 5. Type check — catches TypeScript errors without building
+      - name: Type check
+        run: pnpm exec tsc --noEmit
+
+      # 6. Lint — runs Next.js ESLint rules
+      - name: Lint
+        run: pnpm lint
+
+      # 7. Security audit — fails only on high or critical vulnerabilities
+      - name: Audit dependencies
+        run: pnpm audit --audit-level=high
+        continue-on-error: true  # warnings are common; only flag, don't block
+
+      # 8. Build — catches any errors that only appear at build time
+      #    NEXT_PUBLIC_* vars must exist at build time even in CI
+      - name: Build
+        run: pnpm build
+        env:
+          NEXT_PUBLIC_BACKEND_URL: ${{ secrets.NEXT_PUBLIC_BACKEND_URL }}
+          NEXT_PUBLIC_STRIPE_PUBLIC_KEY: ${{ secrets.NEXT_PUBLIC_STRIPE_PUBLIC_KEY }}
