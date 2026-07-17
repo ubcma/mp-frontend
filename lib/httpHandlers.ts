@@ -35,7 +35,10 @@ export async function fetchFromAPI(
 
   let res: Response;
   try {
-    res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}${endpoint}`, {
+    const baseUrl = typeof window === 'undefined'
+      ? process.env.BACKEND_URL
+      : process.env.NEXT_PUBLIC_BACKEND_URL;
+    res = await fetch(`${baseUrl}${endpoint}`, {
       method,
       headers,
       credentials: credentials || 'include',
