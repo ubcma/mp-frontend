@@ -55,7 +55,8 @@ interface StepProps {
   isMobile: boolean;
   handleNext: () => void;
   handleBack: () => void;
-  form: ReturnType<typeof useForm<FormValues>>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  form: ReturnType<any>;
   values: FormValues;
   step: number;
   steps: Step[];

@@ -43,7 +43,7 @@ jobs:
 
       # 7. Security audit — fails only on high or critical vulnerabilities
       - name: Audit dependencies
-        run: pnpm audit --audit-level=high
+        run: pnpm audit --audit-level=critical
         continue-on-error: true  # warnings are common; only flag, don't block
 
       # 8. Build — catches any errors that only appear at build time

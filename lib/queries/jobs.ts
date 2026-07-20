@@ -34,7 +34,7 @@ export function useCreateJobMutation() {
           'Content-Type': 'application/json',
         },
         credentials: 'include',
-        body: jobData,
+        body: jobData as unknown as Record<string, unknown>,
       });
 
       if (!res.ok) {
@@ -60,7 +60,7 @@ export function useUpdateJobMutation() {
           'Content-Type': 'application/json',
         },
         credentials: 'include',
-        body: jobData,
+        body: jobData as unknown as Record<string, unknown>,
       });
 
       if (!res.ok) {

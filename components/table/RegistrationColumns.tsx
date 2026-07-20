@@ -58,7 +58,7 @@ export default function RegistrationStatusDropdown({
         throw new Error('Failed to update status');
       }
 
-      setStatus(newStatus);
+      setStatus(newStatus as EventRegistration['status']);
 
       queryClient.invalidateQueries({
         queryKey: ['event-registrations', eventId],

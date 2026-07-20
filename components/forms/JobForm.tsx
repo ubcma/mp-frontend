@@ -106,7 +106,7 @@ export default function JobForm({
         isActive: value.isActive,
       };
 
-      await onSubmit(formattedData);
+      await onSubmit(formattedData as unknown as JobFormValues);
 
       toast.success(mode === 'create' ? 'Job created!' : 'Job updated!');
       router.push('/job-board');

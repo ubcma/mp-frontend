@@ -32,11 +32,11 @@ const RenderEventDetails: React.FC<EventDetailsProps> = ({
     .map((registration) => registration.eventId)
     .includes(event.id);
 
-  const [responses, setResponses] = useState<{ [key: number]: string }>({});
+  const [responses, setResponses] = useState<{ [key: number]: string | string[] }>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
 
-  const handleChange = (questionId: number, value: string) => {
+  const handleChange = (questionId: number, value: string | string[]) => {
     setResponses((prev) => ({ ...prev, [questionId]: value }));
   };
 
@@ -210,7 +210,7 @@ const RenderEventDetails: React.FC<EventDetailsProps> = ({
                     (Array.isArray(responses[q.id]) &&
                       responses[q.id].length === 0) ||
                     (typeof responses[q.id] === 'string' &&
-                      responses[q.id].trim() === ''))
+                      (responses[q.id] as string).trim() === ''))
                     ? `${q.label} is required.`
                     : undefined
                 }
