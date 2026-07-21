@@ -6,6 +6,10 @@ import { defineConfig } from "eslint/config";
 import next from "@next/eslint-plugin-next";
 
 export default defineConfig([
+  {
+    ignores: [".next/**", "node_modules/**", "dist/**", "out/**", "next-env.d.ts"],
+  },
+
   js.configs.recommended,
 
   {
