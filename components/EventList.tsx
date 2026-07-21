@@ -5,7 +5,6 @@ import { EventDetails } from '@/lib/types';
 import { EventCard } from './EventCard';
 import { useEventContext } from '@/context/EventContext';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Registration } from '@/lib/queries/registrations';
 
 export function EventList() {
   const { events, filteredEvents, registeredEvents, isLoading } = useEventContext();

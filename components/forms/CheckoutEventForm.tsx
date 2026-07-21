@@ -14,9 +14,8 @@ import { Lock, CreditCard, Zap, ShieldCheck, Calendar } from 'lucide-react';
 import { Button } from '../ui/button';
 import Spinner from '../common/Spinner';
 import TermsCheckbox from '@/components/forms/TermsCheckbox';
-import { cn, getEventStatus, isEventFull } from '@/lib/utils';
+import { getEventStatus, isEventFull } from '@/lib/utils';
 import { useRouter } from 'next/navigation';
-import { getUserRole } from '@/lib/queries/server/userRole';
 import { useUserQuery } from '@/lib/queries/user';
 
 export default function CheckoutEventForm({

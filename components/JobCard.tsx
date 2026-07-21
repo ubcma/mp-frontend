@@ -3,8 +3,7 @@
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Bookmark, BookmarkCheck, ExternalLink, Mail } from 'lucide-react';
-import { useState } from 'react';
+import { ExternalLink, Mail } from 'lucide-react';
 import { toast } from 'sonner';
 import Image from 'next/image';
 
@@ -31,7 +30,7 @@ export interface JobCardProps {
   tags?: string[];
 }
 
-export function JobCard({ job, tags = [] }: JobCardProps) {
+export function JobCard({ job }: JobCardProps) {
   const getTimeAgo = (dateString: string) => {
     const date = new Date(dateString);
     const now = new Date();

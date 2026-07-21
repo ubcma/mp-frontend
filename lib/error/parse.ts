@@ -12,8 +12,8 @@ export const parseError = (error: unknown): string => {
       return error.message;
     }
 
-    if ('error' in error && typeof (error as any).error?.message === 'string') {
-      return (error as any).error.message;
+    if ('error' in error && typeof (error as { error?: { message?: string } }).error?.message === 'string') {
+      return (error as { error: { message: string } }).error.message;
     }
 
     try {

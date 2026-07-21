@@ -6,7 +6,7 @@ import {
   PaymentElement,
   PaymentRequestButtonElement,
 } from '@stripe/react-stripe-js';
-import type { PaymentRequest as StripePaymentRequest } from '@stripe/stripe-js';
+import type { PaymentRequest as StripePaymentRequest, PaymentRequestPaymentMethodEvent } from '@stripe/stripe-js';
 import { useEffect, useRef, useState } from 'react';
 import { Lock, CreditCard, Zap, Check } from 'lucide-react';
 import { MEMBERSHIP_PRICE } from '@/lib/constants';
@@ -50,7 +50,7 @@ export default function CheckoutForm({ clientSecret }: { clientSecret: string })
   useEffect(() => {
     if (!paymentRequest || !stripe) return;
 
-    const onPaymentMethod = async (ev: any) => {
+    const onPaymentMethod = async (ev: PaymentRequestPaymentMethodEvent) => {
       if (!clientSecret) {
         ev.complete('fail');
         setErrorMsg('Payment session not ready. Please refresh.');

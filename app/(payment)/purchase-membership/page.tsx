@@ -29,7 +29,6 @@ export default function PurchaseMembershipPage() {
   const {
     data: user,
     isLoading: isUserLoading,
-    isError: isUserError,
   } = useUserQuery();
 
   const userRole = user?.role;

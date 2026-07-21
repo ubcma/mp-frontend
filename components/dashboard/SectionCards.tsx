@@ -6,7 +6,6 @@ import {
   CardAction,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
@@ -16,7 +15,7 @@ import { TrendingDown, TrendingUp } from "lucide-react"
 
 export function SectionCards() {
 
-  const { data: revenue, isLoading: isRevenueLoading, isError: isRevenueError} = useRevenueQuery();
+  const { data: revenue } = useRevenueQuery();
 
   const details = [
   {

@@ -6,7 +6,6 @@ import { cn, getEventStatus, isEventFull } from '@/lib/utils';
 import { EventDetails } from '@/lib/types';
 import { useRouter } from 'next/navigation';
 import { ArrowUpRight, CheckCircle } from 'lucide-react';
-import Link from 'next/link';
 import dayjs from 'dayjs';
 import Image from 'next/image';
 import { isValidImageUrl } from '@/lib/uploadthing';
@@ -108,7 +107,7 @@ export function EventCard({
               ) : (
                 <Button className="w-full bg-emerald-500 hover:bg-emerald-500">
                   <CheckCircle className="h-4 w-4" />
-                  You're registered!
+                  You&apos;re registered!
                 </Button>
               )}
             </div>

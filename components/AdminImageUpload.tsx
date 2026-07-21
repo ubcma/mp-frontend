@@ -3,7 +3,7 @@
 
 import { useState, useRef, useImperativeHandle, forwardRef } from 'react';
 import { Button } from '@/components/ui/button';
-import { Upload, X, Check, ImageIcon, Loader2 } from 'lucide-react';
+import { X, Check, ImageIcon, Loader2 } from 'lucide-react';
 import { useUploadThing } from '@/helpers/uploadThing';
 import { handleClientError } from '@/lib/error/handleClient';
 import { processImageFile } from '@/lib/uploadthing';
@@ -109,7 +109,7 @@ const AdminImageUpload = forwardRef<AdminImageUploadRef, Props>(
         setPreviewUrl(preview!);
         onImageSelect(true);
         setProcessing(false);
-      } catch (error) {
+      } catch {
         setProcessing(false);
       }
     };

@@ -3,7 +3,6 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import { format } from 'date-fns';
-import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { BadgeCheckIcon, Calendar, MapPin, Shirt } from 'lucide-react';
 import { EventDetails, EventQuestion } from '@/lib/types';
@@ -33,11 +32,11 @@ const RenderEventDetails: React.FC<EventDetailsProps> = ({
     .map((registration) => registration.eventId)
     .includes(event.id);
 
-  const [responses, setResponses] = useState<{ [key: number]: string }>({});
+  const [responses, setResponses] = useState<{ [key: number]: string | string[] }>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
 
-  const handleChange = (questionId: number, value: string) => {
+  const handleChange = (questionId: number, value: string | string[]) => {
     setResponses((prev) => ({ ...prev, [questionId]: value }));
   };
 
@@ -211,7 +210,7 @@ const RenderEventDetails: React.FC<EventDetailsProps> = ({
                     (Array.isArray(responses[q.id]) &&
                       responses[q.id].length === 0) ||
                     (typeof responses[q.id] === 'string' &&
-                      responses[q.id].trim() === ''))
+                      (responses[q.id] as string).trim() === ''))
                     ? `${q.label} is required.`
                     : undefined
                 }
@@ -250,7 +249,7 @@ const RenderEventDetails: React.FC<EventDetailsProps> = ({
                   </span>
                 ) : (
                   <span className="text-muted-foreground text-sm italic">
-                    You're saving{' '}
+                    You&apos;re saving{' '}
                     <span className="inline text-ma-red font-semibold">
                       ${saving.toFixed(2)}
                     </span>{' '}

@@ -1,13 +1,12 @@
 import { useQuery } from '@tanstack/react-query';
 import { fetchFromAPI } from '../httpHandlers';
-import { UserProfileData } from '../types';
 
 interface PaymentIntentResponse {
   clientSecret: string;
 }
 
 export function useClientSecret(
-  body: Record<string, any>,
+  body: Record<string, unknown>,
   enabled: boolean = true
 ) {
   return useQuery<PaymentIntentResponse>({
@@ -22,7 +21,7 @@ export function useClientSecret(
       });
 
       if (!userRoleResponse.ok) throw new Error('Failed to fetch user role');
-      const user = (await userRoleResponse.json()) as UserProfileData;
+      await userRoleResponse.json();
 
       // 2. create payment intent
       const res = await fetchFromAPI('/api/stripe/create-payment-intent', {
@@ -41,7 +40,7 @@ export function useClientSecret(
 }
 
 
-type VerifyPaymentResponse = { verified: boolean; paymentIntent?: any };
+type VerifyPaymentResponse = { verified: boolean; paymentIntent?: Record<string, unknown> };
 
 export function useVerifyUserPayment(paymentIntentId: string | null, enabled = true) {
   return useQuery<VerifyPaymentResponse>({

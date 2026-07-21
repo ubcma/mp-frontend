@@ -29,7 +29,7 @@ import {
 import { useQueryClient } from '@tanstack/react-query';
 
 interface RegistrationStatusDropdownProps {
-  userRegistration: any;
+  userRegistration: EventRegistration;
   eventId: string;
 }
 
@@ -58,7 +58,7 @@ export default function RegistrationStatusDropdown({
         throw new Error('Failed to update status');
       }
 
-      setStatus(newStatus);
+      setStatus(newStatus as EventRegistration['status']);
 
       queryClient.invalidateQueries({
         queryKey: ['event-registrations', eventId],

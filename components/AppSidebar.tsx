@@ -10,23 +10,15 @@ import {
   CalendarCog,
   BadgeDollarSign,
   BriefcaseBusiness,
-  Handshake,
-  BadgePercent,
-  UserCircle2,
-  Settings2,
-  BadgeCheck,
   ChevronDown,
   Briefcase,
   BookOpen,
   Network,
   ExternalLink,
-  ArrowUpRight,
 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
   Sidebar,
-  SIDEBAR_WIDTH,
-  SIDEBAR_WIDTH_MOBILE,
   SidebarContent,
   SidebarGroup,
   SidebarGroupContent,
@@ -52,7 +44,6 @@ export function AppSidebar() {
   const {
     state,
     // open,
-    setOpen,
     // openMobile,
     setOpenMobile,
     isMobile,

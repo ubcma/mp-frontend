@@ -52,7 +52,7 @@ export default function EventForm({
 }: EventFormProps) {
   const [hasManuallyEditedSlug, setHasManuallyEditedSlug] = useState(false);
   const [questions, setQuestions] = useState<QuestionInput[]>([]);
-  const [hasSelectedImage, setHasSelectedImage] = useState(false);
+  const [, setHasSelectedImage] = useState(false);
   const eventImageUploadRef = useRef<AdminImageUploadRef>(null);
 
   const sensors = useSensors(useSensor(PointerSensor));
@@ -134,7 +134,7 @@ export default function EventForm({
           if (uploadedUrl) {
             imageUrl = uploadedUrl;
           }
-        } catch (error) {
+        } catch {
           // Upload failed, don't proceed with form submission
           return;
         }
@@ -170,7 +170,7 @@ export default function EventForm({
               endsAt: new Date(value.endsAt),
             };
 
-      const response = await onSubmit(formattedData);
+      await onSubmit(formattedData);
 
       toast.success(mode === 'create' ? 'Event created!' : 'Event updated!');
       queryClient.invalidateQueries({ queryKey: ['events'] });

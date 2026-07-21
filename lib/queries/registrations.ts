@@ -66,7 +66,7 @@ export function useUpdateRegistrationMutation() {
           'Content-Type': 'application/json',
         },
         credentials: 'include',
-        body: JSON.stringify(updateData) as any,
+        body: updateData,
       });
 
       if (!res.ok) {
@@ -102,7 +102,7 @@ export function useCreateRegistrationMutation() {
           'Content-Type': 'application/json',
         },
         credentials: 'include',
-        body: JSON.stringify(registrationData) as any,
+        body: registrationData,
       });
 
       if (!res.ok) {

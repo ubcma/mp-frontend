@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { fetchFromAPI } from '../httpHandlers';
 import { JobListing } from '@/components/JobCard';
+import type { CreateJobInput, UpdateJobInput } from '@/lib/types/job';
 
 export function useGetJobsQuery() {
   return useQuery({
@@ -26,14 +27,14 @@ export function useCreateJobMutation() {
   const queryClient = useQueryClient();
   
   return useMutation({
-    mutationFn: async (jobData: any) => {
+    mutationFn: async (jobData: CreateJobInput) => {
       const res = await fetchFromAPI('/api/jobs/create', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         credentials: 'include',
-        body: jobData,
+        body: jobData as unknown as Record<string, unknown>,
       });
 
       if (!res.ok) {
@@ -52,14 +53,14 @@ export function useUpdateJobMutation() {
   const queryClient = useQueryClient();
   
   return useMutation({
-    mutationFn: async (jobData: any) => {
+    mutationFn: async (jobData: UpdateJobInput) => {
       const res = await fetchFromAPI('/api/jobs/update', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
         credentials: 'include',
-        body: jobData,
+        body: jobData as unknown as Record<string, unknown>,
       });
 
       if (!res.ok) {

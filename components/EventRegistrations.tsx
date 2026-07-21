@@ -210,7 +210,7 @@ export default function EventRegistrations({
               No registrations yet
             </h3>
             <p className="text-gray-500">
-              This event doesn't have any registrations yet.
+              This event doesn&apos;t have any registrations yet.
             </p>
           </div>
         </div>

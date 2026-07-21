@@ -1,10 +1,11 @@
 'use client';
 
 import { motion } from 'motion/react';
+import type { LucideIcon } from 'lucide-react';
 
 interface ProgressLineMobileProps {
   step: number;
-  steps: Array<{ title: string; description: string; icon: any }>;
+  steps: Array<{ title: string; description: string; icon: LucideIcon }>;
   stepEmojiMap: Record<number, string>;
   handleBack: () => void;
   isMobile: boolean;

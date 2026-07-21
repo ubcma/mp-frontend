@@ -3,14 +3,12 @@
 import * as React from 'react';
 import { useForm } from '@tanstack/react-form';
 import { Button } from '@/components/ui/button';
-import { CreditCardIcon, CheckCircle, Mail } from 'lucide-react';
+import { Mail } from 'lucide-react';
 import Link from 'next/link';
 import { toast } from 'sonner';
 import { motion } from 'framer-motion';
 import Spinner from '../common/Spinner';
 import {
-  FieldInfo,
-  RenderCheckboxField,
   RenderInputField,
 } from './FormComponents';
 import { signUpWithEmail } from '@/lib/better-auth/sign-up';
@@ -104,7 +102,7 @@ export default function SignUpForm() {
           <div className="space-y-2">
             <h2 className="text-2xl font-semibold">Check your email</h2>
             <p className="text-gray-600">
-              We've sent a verification link to <strong>{userEmail}</strong>
+              We&apos;ve sent a verification link to <strong>{userEmail}</strong>
             </p>
           </div>
 
@@ -135,7 +133,7 @@ export default function SignUpForm() {
           </div> */}
 
           <p className="text-xs text-gray-500">
-            Can't find the email? Check your spam folder or{' '}
+            Can&apos;t find the email? Check your spam folder or{' '}
             <button 
               className="text-ma-red hover:underline"
               onClick={() => setIsWaitingForVerification(false)}
