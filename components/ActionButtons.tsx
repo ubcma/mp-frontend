@@ -77,13 +77,13 @@ export function ActionButtons() {
       </ActionButton>
 
       <ActionButton
-        href="/alumni-network"
+        href="https://network.ubcma.ca/directory"
         className="bg-[#D5FFBA] text-[#507D33]"
         icon={Handshake}
-        disabled={true}
+        disabled={false}
       >
         <div className="space-y-1 text-3xl font-bold z-[5]">
-          <div>Alumni</div>
+          <div>MA</div>
           <div>Network</div>
         </div>
       </ActionButton>

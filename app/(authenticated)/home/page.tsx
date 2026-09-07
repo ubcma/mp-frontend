@@ -49,6 +49,20 @@ const highlightCards = [
   //   ],
   // },
   {
+    image: '/ma-network.jpg',
+    heading: 'MA network is now open',
+    subheading: 'Find your next connection',
+    url: 'https://network.ubcma.ca/directory',
+    color: '#202E43',
+    highlightTags: [
+      {
+        icon: Award,
+        text: 'MA Member Exclusive',
+        color: '#FF5370',
+      },
+    ],
+  },
+  {
     image:
       'https://gs42emtt45.ufs.sh/f/qeDSywamz1NxnEfYPdoHpX2NmeMbcOv7uC06IdP1w5839oBh',
     heading: 'Job board now open',

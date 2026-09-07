@@ -83,7 +83,7 @@ export function AppSidebar() {
     {
       href: 'https://network.ubcma.ca/directory',
       icon: Network,
-      label: 'Mentorship Hub',
+      label: 'MA Network',
       disabled: false,
     },
     // {
