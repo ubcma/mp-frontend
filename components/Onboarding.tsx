@@ -18,6 +18,8 @@ import {
   Faculty,
   getMajorsForFaculty,
   INTEREST_OPTIONS,
+  STUDENT_NUMBER_MIN_LENGTH,
+  UBC_STUDENT_OPTIONS,
   YEAR_OPTIONS,
 } from '@/lib/constants';
 import {
@@ -44,6 +46,8 @@ interface FormValues {
   year: string;
   major: string;
   faculty: string;
+  isUbcStudent: string;
+  studentNumber: string;
   linkedinUrl: string;
   avatar: string;
   interests: string[];
@@ -65,6 +69,8 @@ interface StepProps {
   avatars: string[];
   selectedFaculty: Faculty;
   majors: string[];
+  showStudentNumberError: boolean;
+  setShowStudentNumberError: (show: boolean) => void;
 }
 
 const steps: Step[] = [
@@ -108,6 +114,25 @@ const stepEmojiMap: Record<number, string> = {
   4: '⚽️',
   5: '🎉',
 } as const;
+
+const validateStudentNumber = (
+  studentNumber: string,
+  isUbcStudent: string
+): string | undefined => {
+  if (isUbcStudent !== 'Yes') return undefined;
+  if (!studentNumber) return 'Student number is required.';
+  if (studentNumber.trim().length < STUDENT_NUMBER_MIN_LENGTH) {
+    return `Student number must be at least ${STUDENT_NUMBER_MIN_LENGTH} characters.`;
+  }
+  return undefined;
+};
+
+const hasRequiredAcademicSelections = (values: FormValues): boolean =>
+  Boolean(values.year && values.faculty && values.major && values.isUbcStudent);
+
+const isAcademicStepComplete = (values: FormValues): boolean =>
+  hasRequiredAcademicSelections(values) &&
+  !validateStudentNumber(values.studentNumber, values.isUbcStudent);
 
 // Individual step components
 const WelcomeStep: React.FC<
@@ -181,6 +206,7 @@ const AcademicStep: React.FC<
     | 'steps'
     | 'majors'
     | 'selectedFaculty'
+    | 'showStudentNumberError'
   >
 > = ({
   isMobile,
@@ -191,6 +217,7 @@ const AcademicStep: React.FC<
   steps,
   majors,
   selectedFaculty,
+  showStudentNumberError,
 }) => (
   <div className={`w-full max-w-2xl px-4 ${isMobile ? 'py-8' : 'py-16'}`}>
     <h1
@@ -205,6 +232,66 @@ const AcademicStep: React.FC<
       }}
       className="space-y-6"
     >
+      <div
+        className={`flex gap-4 w-full ${isMobile ? 'flex-col' : 'flex-row'}`}
+      >
+        <div className={isMobile ? 'flex-1' : 'flex-[0_0_30%]'}>
+          <form.Field
+            name="isUbcStudent"
+            validators={{
+              onChange: ({ value }: { value: string }) =>
+                !value ? 'This field is required.' : undefined,
+            }}
+            listeners={{
+              onChange: ({ value }: { value: string }) => {
+                if (value !== 'Yes') {
+                  form.setFieldValue('studentNumber', '');
+                }
+              },
+            }}
+            children={(field: AnyFieldApi) => (
+              <RenderSelectField
+                options={UBC_STUDENT_OPTIONS}
+                label="Are you a UBC student?"
+                field={field}
+                labelClassName="text-white whitespace-nowrap"
+              />
+            )}
+          />
+        </div>
+        <AnimatePresence initial={false}>
+          {values.isUbcStudent === 'Yes' && (
+            <motion.div
+              key="studentNumber"
+              className="flex-1"
+              initial={{ opacity: 0, x: isMobile ? 0 : -16 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: isMobile ? 0 : -16 }}
+              transition={{ duration: 0.25, ease: easeOut }}
+            >
+              <form.Field
+                name="studentNumber"
+                children={(field: AnyFieldApi) => (
+                  <RenderInputField
+                    label="Student Number"
+                    placeholder="12345678"
+                    field={field}
+                    labelClassName="text-white"
+                    error={
+                      showStudentNumberError
+                        ? validateStudentNumber(
+                            values.studentNumber,
+                            values.isUbcStudent
+                          )
+                        : undefined
+                    }
+                  />
+                )}
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
       <div
         className={`flex gap-4 w-full ${isMobile ? 'flex-col' : 'flex-row'}`}
       >
@@ -288,7 +375,7 @@ const AcademicStep: React.FC<
         type="button"
         onClick={handleNext}
         className="bg-white text-[#EF3050] hover:bg-white/90"
-        disabled={!values.year || !values.faculty || !values.major}
+        disabled={!hasRequiredAcademicSelections(values)}
       >
         Next
       </Button>
@@ -555,8 +642,16 @@ const InterestsStep: React.FC<
     | 'values'
     | 'steps'
     | 'setStep'
+    | 'setShowStudentNumberError'
   >
-> = ({ isMobile, handleBack, form, steps, setStep }) => (
+> = ({
+  isMobile,
+  handleBack,
+  form,
+  steps,
+  setStep,
+  setShowStudentNumberError,
+}) => (
   <div className={`w-full max-w-2xl px-4 ${isMobile ? 'py-8' : 'py-16'}`}>
     <h1
       className={`font-bold text-white text-center ${isMobile ? 'text-3xl mb-4' : 'text-6xl mb-8'}`}
@@ -634,13 +729,12 @@ const InterestsStep: React.FC<
 
                   // Check required fields before submission
                   const formValues = form.store.state.values;
-                  if (
-                    !formValues.year ||
-                    !formValues.faculty ||
-                    !formValues.major
-                  ) {
+                  if (!isAcademicStepComplete(formValues)) {
                     // Trigger validation on all fields to show error messages
                     form.validateAllFields('submit');
+                    // The student number field is unmounted here, so its error
+                    // is surfaced on the step itself rather than by the form.
+                    setShowStudentNumberError(true);
                     // Navigate back to step 1 where required fields are
                     setStep(1);
                     return;
@@ -702,6 +796,8 @@ export default function OnboardingModal(): JSX.Element {
   const [showConfetti, setShowConfetti] = useState<boolean>(false);
   const [step, setStep] = useState<number>(0);
   const [isClient, setIsClient] = useState<boolean>(false);
+  const [showStudentNumberError, setShowStudentNumberError] =
+    useState<boolean>(false);
   const router = useRouter();
   const isMobile = useIsMobile();
 
@@ -768,6 +864,8 @@ export default function OnboardingModal(): JSX.Element {
       year: '',
       major: '',
       faculty: '',
+      isUbcStudent: '',
+      studentNumber: '',
       linkedinUrl: '',
       avatar: '',
       interests: [] as string[],
@@ -776,9 +874,14 @@ export default function OnboardingModal(): JSX.Element {
     },
     onSubmit: async ({ value }) => {
       try {
+        const { isUbcStudent, studentNumber, ...profile } = value;
         await fetchFromAPI('/api/me/', {
           method: 'POST',
-          body: value,
+          body: {
+            ...profile,
+            studentNumber:
+              isUbcStudent === 'Yes' ? studentNumber.trim() : '',
+          },
         });
         setStep(5);
         document.cookie =
@@ -840,6 +943,8 @@ export default function OnboardingModal(): JSX.Element {
       avatars,
       selectedFaculty,
       majors,
+      showStudentNumberError,
+      setShowStudentNumberError,
     };
 
     switch (step) {

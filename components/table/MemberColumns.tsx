@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { MoreHorizontal } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 
 
@@ -24,6 +25,18 @@ export const membersColumns: ColumnDef<UserProfileData>[] = [
   {
     accessorKey: 'email',
     header: 'Email',
+  },
+  {
+    accessorKey: 'studentNumber',
+    header: 'Student #',
+    cell: ({ row }) => {
+      const studentNumber = row.original.studentNumber;
+      return studentNumber ? (
+        <Badge variant="outline">{studentNumber}</Badge>
+      ) : (
+        <span className="text-gray-400">-</span>
+      );
+    },
   },
   {
     accessorKey: 'role',

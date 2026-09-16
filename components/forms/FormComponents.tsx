@@ -50,6 +50,7 @@ export function RenderInputField({
   field,
   onChange,
   labelClassName,
+  error,
 }: {
   type?: string;
   placeholder?: string;
@@ -57,6 +58,8 @@ export function RenderInputField({
   field: AnyFieldApi;
   onChange?: (value: string) => void;
   labelClassName?: string;
+  /** Error shown independently of the field's own validators. */
+  error?: string;
 }) {
   const isMobile = useIsMobile();
   
@@ -77,7 +80,11 @@ export function RenderInputField({
         placeholder={placeholder ?? label}
         className={`bg-white ${isMobile ? 'h-9 text-sm' : 'h-10'}`}
       />
-      <FieldInfo field={field} />
+      {error ? (
+        <p className="text-ma-red text-xs">{error}</p>
+      ) : (
+        <FieldInfo field={field} />
+      )}
     </div>
   );
 }
