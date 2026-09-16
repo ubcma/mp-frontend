@@ -10,6 +10,7 @@ export interface UserProfileData {
     year: string,
     faculty: string,
     major: string,
+    studentNumber: string | null,
     linkedinUrl: string,
     diet: string[],
     interests: string[],
@@ -20,6 +21,7 @@ export type UpdateMeInput = {
     year?: string;
     major?: string;
     faculty?: string;
+    studentNumber?: string;
     linkedinUrl?: string;
     interests?: string[];
     diet?: string[];

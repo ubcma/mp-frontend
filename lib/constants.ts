@@ -25,6 +25,13 @@ export const DIETARY_RESTRICTIONS = [
   'None'
 ];
 
+export const UBC_STUDENT_OPTIONS = [
+    'Yes',
+    'No',
+]
+
+export const STUDENT_NUMBER_MIN_LENGTH = 8;
+
 export const YEAR_OPTIONS = [
     '1',
     '2',
