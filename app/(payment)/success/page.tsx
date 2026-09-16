@@ -1,8 +1,6 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { handleClientError } from '@/lib/error/handleClient';
-import { fetchFromAPI } from '@/lib/httpHandlers';
 import { useVerifyUserPayment} from '@/lib/queries/stripe';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -90,7 +88,7 @@ const { data, isLoading, isError, error } =
               </h2>
 
               <p className="text-xl text-black/80 font-semibold">
-                Welcome to <span className="text-maRed">UBCMA</span> — you're
+                Welcome to <span className="text-maRed">UBCMA</span> — you&apos;re
                 all set!
               </p>
 

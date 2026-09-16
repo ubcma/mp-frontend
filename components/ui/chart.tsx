@@ -5,22 +5,22 @@ import * as RechartsPrimitive from 'recharts';
 interface ChartConfig {
   [key: string]: {
     label?: string;
-    icon?: React.ComponentType<any>;
+    icon?: React.ComponentType;
     color?: string;
   };
 }
 
 interface PayloadItem {
-  value?: any;
+  value?: unknown;
   name?: string;
   dataKey?: string;
   color?: string;
-  payload?: any;
+  payload?: Record<string, unknown>;
   fill?: string;
 }
 
 interface TooltipPayload extends PayloadItem {
-  payload: any;
+  payload: Record<string, unknown>;
 }
 
 interface LegendPayload {
@@ -38,8 +38,8 @@ interface ChartTooltipContentProps extends Omit<React.ComponentProps<'div'>, 'co
   indicator?: 'line' | 'dot' | 'dashed';
   nameKey?: string;
   labelKey?: string;
-  labelFormatter?: (value: any, payload: TooltipPayload[]) => React.ReactNode;
-  formatter?: (value: any, name: string, props: any, index: number, payload: any) => React.ReactNode;
+  labelFormatter?: (value: unknown, payload: TooltipPayload[]) => React.ReactNode;
+  formatter?: (value: unknown, name: string, props: unknown, index: number, payload: unknown) => React.ReactNode;
   color?: string;
   labelClassName?: string;
 }
@@ -176,9 +176,9 @@ function ChartTooltipContent({
                         {itemConfig?.label || item.name}
                       </span>
                     </div>
-                    {item.value && (
+                    {item.value !== undefined && item.value !== null && (
                       <span className="text-foreground font-mono font-medium tabular-nums">
-                        {typeof item.value === 'number' ? item.value.toLocaleString() : item.value}
+                        {typeof item.value === 'number' ? item.value.toLocaleString() : String(item.value)}
                       </span>
                     )}
                   </div>

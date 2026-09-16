@@ -15,7 +15,7 @@ export const signInWithGoogle = async () => {
   );
 
   if (response.error) {
-    handleServerError('Error signing in with Google:', response.error);
+    handleServerError('Error signing in with Google, please contact our team for support');
     throw new Error(response.error.message);
   }
 
@@ -39,7 +39,7 @@ export const signInWithEmail = async (email: string, password: string) => {
       rememberMe: true,
     },
     {
-      onSuccess(ctx) {
+      onSuccess() {
         toast.success('Sign in successful!');
       },
     }

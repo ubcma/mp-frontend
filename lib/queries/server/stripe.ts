@@ -2,7 +2,7 @@ import { cookies } from 'next/headers';
 import { fetchFromAPI } from '../../httpHandlers';
 import { handleServerError } from '../../error/handleServer';
 
-export async function createPaymentIntent(body: Record<string, any>) {
+export async function createPaymentIntent(body: Record<string, unknown>) {
   try {
 
     console.log('here')

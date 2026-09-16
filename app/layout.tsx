@@ -4,7 +4,6 @@ import './globals.css';
 import { Toaster } from 'sonner';
 import { QueryProvider } from './providers/query-provider';
 import { ThemeProvider } from './providers/theme-provider';
-import { ThemeToggle } from '@/components/ThemeToggle';
 
 const onest = Onest({
   subsets: ['latin'],

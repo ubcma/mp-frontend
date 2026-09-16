@@ -10,14 +10,8 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
-import { SidebarTrigger, useSidebar } from './ui/sidebar';
-import { cn } from '@/lib/utils';
-import { PanelLeft } from 'lucide-react';
-import { Button } from './ui/button';
 
 export function Breadcrumbs() {
-  const { toggleSidebar } = useSidebar();
-
   const pathname = usePathname();
   const segments = pathname.split('/').filter(Boolean);
 

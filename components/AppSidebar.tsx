@@ -10,18 +10,15 @@ import {
   CalendarCog,
   BadgeDollarSign,
   BriefcaseBusiness,
-  Handshake,
-  BadgePercent,
-  UserCircle2,
-  Settings2,
-  BadgeCheck,
   ChevronDown,
+  Briefcase,
+  BookOpen,
+  Network,
+  ExternalLink,
 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
   Sidebar,
-  SIDEBAR_WIDTH,
-  SIDEBAR_WIDTH_MOBILE,
   SidebarContent,
   SidebarGroup,
   SidebarGroupContent,
@@ -47,7 +44,6 @@ export function AppSidebar() {
   const {
     state,
     // open,
-    setOpen,
     // openMobile,
     setOpenMobile,
     isMobile,
@@ -81,21 +77,21 @@ export function AppSidebar() {
     {
       href: '/job-board',
       icon: BriefcaseBusiness,
-      label: 'Job Board (Coming Soon)',
-      disabled: true,
+      label: 'Job Board',
+      disabled: false,
     },
     {
-      href: '/alumni-network',
-      icon: Handshake,
-      label: 'Alumni Network (Coming Soon)',
-      disabled: true,
+      href: 'https://network.ubcma.ca/directory',
+      icon: Network,
+      label: 'MA Network',
+      disabled: false,
     },
-    {
-      href: '/discounts',
-      icon: BadgePercent,
-      label: 'Member Discounts (Coming Soon)',
-      disabled: true,
-    },
+    // {
+    //   href: '/discounts',
+    //   icon: BadgePercent,
+    //   label: 'Member Discounts (Coming Soon)',
+    //   disabled: true,
+    // },
   ];
 
   const adminMenu = [
@@ -115,6 +111,18 @@ export function AppSidebar() {
       href: '/manage-events',
       icon: CalendarCog,
       label: 'Manage Events',
+      disabled: false,
+    },
+    {
+      href: '/create-job',
+      icon: Briefcase,
+      label: 'Create New Job',
+      disabled: false,
+    },
+    {
+      href: '/manage-jobs',
+      icon: BookOpen,
+      label: 'Manage Jobs',
       disabled: false,
     },
     {
@@ -143,7 +151,6 @@ export function AppSidebar() {
   };
 
   useEffect(() => {
-
     const skip = localStorage.getItem('onboarding_skipped');
 
     if (pathname !== '/onboarding') {
@@ -196,14 +203,14 @@ export function AppSidebar() {
             activeMatch="startsWith"
           />
 
-          {/* <SidebarSection
-            label="Member Apps"
+          <SidebarSection
+            label="Members"
             menuItems={memberMenu}
             pathname={pathname}
             setOpenMobile={setOpenMobile}
             isVisible={user?.role === 'Member' || user?.role === 'Admin'}
             activeMatch="startsWith"
-          /> */}
+          />
 
           <SidebarSection
             label="Admin"
@@ -211,7 +218,7 @@ export function AppSidebar() {
             pathname={pathname}
             setOpenMobile={setOpenMobile}
             isVisible={user?.role === 'Admin'}
-            activeMatch="exact"
+            activeMatch="startsWith"
           />
         </div>
 
@@ -295,7 +302,12 @@ export function SidebarSection({
                     prefetch={true}
                   >
                     <item.icon className="h-4 w-4" />
-                    <span>{item.label}</span>
+                    <span className='flex flex-row justify-between w-full items-start h-fit'>
+                      {item.label}
+                      {item.href.startsWith('http') && (
+                        <ExternalLink className="h-4 w-4" />
+                      )}
+                    </span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>

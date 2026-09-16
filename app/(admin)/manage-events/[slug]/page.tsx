@@ -24,7 +24,7 @@ export default function EventRegistrationsPage() {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-2">Event Not Found</h1>
-          <p className="text-gray-600">The event you're looking for doesn't exist or you don't have permission to view it.</p>
+          <p className="text-gray-600">The event you&apos;re looking for doesn&apos;t exist or you don&apos;t have permission to view it.</p>
         </div>
       </div>
     );

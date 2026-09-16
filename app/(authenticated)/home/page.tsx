@@ -2,13 +2,11 @@
 
 import { ActionButtons } from '@/components/ActionButtons';
 import { HighlightCarousel } from '@/components/HighlightCarousel';
-import OnboardingModal from '@/components/OnboardingModal';
+import RecentJobs from '@/components/RecentJobs';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useUserQuery } from '@/lib/queries/user';
 import { motion, AnimatePresence, Variants } from 'framer-motion';
-import { Award, Calendar, Globe, MapPin } from 'lucide-react';
-import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { Award, Globe } from 'lucide-react';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -32,39 +30,53 @@ const itemVariants: Variants = {
 const highlightCards = [
   // {
   //   image:
-  //     'https://gs42emtt45.ufs.sh/f/qeDSywamz1NxH4tQ5JT6W5MP98mJjURL4xkwFTZOQiGbpShA',
+  //     'https://3ou0u5266t.ufs.sh/f/icFgxUjDNp9SZFGZP2uq9Sbrijsp83wdyznfRJ5C1XIxUeHF',
   //   heading: 'Gateways tickets now available',
   //   subheading: "UBCMA's flagship marketing conference",
-  //   url: '/gateways',
+  //   url: '/events/gateways',
   //   color: '#000000',
   //   highlightTags: [
   //     {
   //       icon: Calendar,
-  //       text: 'Wednesday, November 20 @ 8:00 AM',
+  //       text: 'Sunday, November 23',
   //       color: '#9FC5FF',
   //     },
   //     {
-  //       icon: MapPin,
-  //       text: 'AMS Great Hall',
-  //       color: '#DBCCFF',
-  //     },
-  //   ],
-  // },
-  // {
-  //   image:
-  //     'https://gs42emtt45.ufs.sh/f/qeDSywamz1NxnEfYPdoHpX2NmeMbcOv7uC06IdP1w5839oBh',
-  //   heading: 'Job board now open',
-  //   subheading: 'Delivering opportunities to your doorstep',
-  //   url: '/jobs',
-  //   color: '#202E43',
-  //   highlightTags: [
-  //     {
   //       icon: Award,
-  //       text: 'Members only',
+  //       text: 'MA Member Exclusive',
   //       color: '#FF5370',
   //     },
   //   ],
   // },
+  {
+    image: '/ma-network.jpg',
+    heading: 'MA network is now open',
+    subheading: 'Find your next connection',
+    url: 'https://network.ubcma.ca/directory',
+    color: '#202E43',
+    highlightTags: [
+      {
+        icon: Award,
+        text: 'MA Member Exclusive',
+        color: '#FF5370',
+      },
+    ],
+  },
+  {
+    image:
+      'https://gs42emtt45.ufs.sh/f/qeDSywamz1NxnEfYPdoHpX2NmeMbcOv7uC06IdP1w5839oBh',
+    heading: 'Job board now open',
+    subheading: 'Delivering opportunities to your doorstep',
+    url: '/job-board',
+    color: '#202E43',
+    highlightTags: [
+      {
+        icon: Award,
+        text: 'MA Member Exclusive',
+        color: '#FF5370',
+      },
+    ],
+  },
   {
     image:
       'https://gs42emtt45.ufs.sh/f/qeDSywamz1Nx5d0JzlLAyEGpJWNOfhraPBzoqbQT0MFdgi9H',
@@ -83,7 +95,6 @@ const highlightCards = [
 ];
 
 export default function Home() {
-
   const { data: user } = useUserQuery();
   const userFirstName = user?.name.split(' ')[0];
 
@@ -120,6 +131,11 @@ export default function Home() {
         {/* Highlight Cards Carousel */}
         <motion.div variants={itemVariants}>
           <HighlightCarousel cards={highlightCards} />
+        </motion.div>
+
+        {/* Recent Job Postings */}
+        <motion.div variants={itemVariants} className="space-y-4 mb-4">
+          <RecentJobs />
         </motion.div>
 
         {/* Action Buttons */}

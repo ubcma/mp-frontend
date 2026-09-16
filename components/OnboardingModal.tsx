@@ -38,7 +38,6 @@ import {
 } from 'lucide-react';
 import { fetchFromAPI } from '@/lib/httpHandlers';
 import { UserProfileData } from '@/lib/types';
-import { Select } from './ui/select';
 
 const steps = [
   {

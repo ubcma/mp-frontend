@@ -13,33 +13,70 @@ import { useGetEventQuery } from '@/lib/queries/event';
 import { Lock, CreditCard, Zap, ShieldCheck, Calendar } from 'lucide-react';
 import { Button } from '../ui/button';
 import Spinner from '../common/Spinner';
-// ⬇️ adjust the import path to where you placed the component
 import TermsCheckbox from '@/components/forms/TermsCheckbox';
+import { getEventStatus, isEventFull } from '@/lib/utils';
+import { useRouter } from 'next/navigation';
+import { useUserQuery } from '@/lib/queries/user';
 
-export default function CheckoutEventForm({ clientSecret }: { clientSecret: string }) {
+export default function CheckoutEventForm({
+  clientSecret,
+}: {
+  clientSecret: string;
+}) {
   const stripe = useStripe();
   const elements = useElements();
+  const {data: user} = useUserQuery();
 
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
-  const [paymentRequest, setPaymentRequest] = useState<StripePaymentRequest | null>(null);
-  const [agreed, setAgreed] = useState(false); // 
-
+  const [paymentRequest, setPaymentRequest] =
+    useState<StripePaymentRequest | null>(null);
+  const [agreed, setAgreed] = useState(false);
   const searchParams = useSearchParams();
   const eventSlug = searchParams.get('eventSlug');
-  const { data, isLoading: isEventLoading, isError } = useGetEventQuery({ eventSlug: eventSlug! });
+  const router = useRouter();
+
+  const {
+    data,
+    isLoading: isEventLoading,
+    isError,
+  } = useGetEventQuery({ eventSlug: eventSlug! });
   const event = data?.event;
 
-  // Setup Payment Request (Apple/Google Pay)
+  const eventFull = event ? isEventFull(event) : false;
+  const status = event ? getEventStatus(event.startsAt) : 'Upcoming';
+
+  // render form unless there are associated
   useEffect(() => {
+    if (isError || !event) {
+      setErrorMsg('404 Event not Found');
+      return;
+    }
+    if (eventFull) {
+      setErrorMsg('404 Event not Found');
+      router.replace(`/events/${event.slug}/full`);
+      return;
+    } else if (status === 'Past') {
+      router.replace(`/events/${event.slug}`);
+      return;
+    }
+
     if (!stripe || !clientSecret || !event) return;
+
+    const eventPriceInCents = Math.round(
+      Number(
+        user?.role === 'Basic'
+          ? (event.nonMemberPrice ?? event.price)
+          : event.price
+      ) * 100
+    );
 
     const pr = stripe.paymentRequest({
       country: 'CA',
       currency: 'cad',
       total: {
         label: event.title,
-        amount: Math.round(Number(event.price) * 100), //
+        amount: eventPriceInCents,
       },
       requestPayerName: true,
       requestPayerEmail: true,
@@ -48,7 +85,7 @@ export default function CheckoutEventForm({ clientSecret }: { clientSecret: stri
     pr.canMakePayment().then((result) => {
       if (result) setPaymentRequest(pr);
     });
-  }, [stripe, clientSecret, event]);
+  }, [stripe, clientSecret, event, eventFull, status, event?.slug, router]);
 
   // Handle PaymentRequest events
   useEffect(() => {
@@ -56,15 +93,17 @@ export default function CheckoutEventForm({ clientSecret }: { clientSecret: stri
 
     paymentRequest.on('paymentmethod', async (ev) => {
       if (!agreed) {
-        // Block quick pay if TOS not accepted
         ev.complete('fail');
         setErrorMsg('Please accept the Terms before paying.');
         return;
       }
 
-      const { paymentIntent, error } = await stripe.confirmCardPayment(clientSecret, {
-        payment_method: ev.paymentMethod.id,
-      });
+      const { paymentIntent, error } = await stripe.confirmCardPayment(
+        clientSecret,
+        {
+          payment_method: ev.paymentMethod.id,
+        }
+      );
 
       if (error) {
         ev.complete('fail');
@@ -72,12 +111,15 @@ export default function CheckoutEventForm({ clientSecret }: { clientSecret: stri
       } else {
         ev.complete('success');
         // You can also redirect to /event-purchase-success if that's your convention
+
+        // TODO: Persist question responses and send in request body to create eventRegistrationResponse
+        // body: { responses: Array<{ questionId: number; response: string }>, stripeTransactionId: string }
+
         window.location.href = `/success?payment_intent=${paymentIntent?.id}&redirect_status=${paymentIntent?.status}`;
       }
     });
   }, [paymentRequest, stripe, clientSecret, agreed]);
 
-  // Handle manual card submission
   const handleSubmit = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     if (!stripe || !elements) return;
@@ -114,7 +156,15 @@ export default function CheckoutEventForm({ clientSecret }: { clientSecret: stri
     return <p className="text-red-500">Could not load event details.</p>;
   }
 
-  const priceLabel = `$${Number(event.price).toFixed(2)}`;
+  const eventPrice = Math.round(
+    Number(
+      user?.role === 'Basic'
+        ? (event.nonMemberPrice ?? event.price)
+        : event.price
+    )
+  );
+
+  const priceLabel = `$${eventPrice.toFixed(2)}`;
 
   return (
     <form
@@ -130,9 +180,16 @@ export default function CheckoutEventForm({ clientSecret }: { clientSecret: stri
 
       {/* Event Summary */}
       <div className="rounded-xl bg-gradient-to-r from-ma-red/10 via-rose-50 to-ma-red/5 border border-rose-200 p-6 shadow-inner">
-        <h2 className="text-2xl font-bold text-neutral-900">{event.title}</h2>
+        <h2 className="text-2xl font-bold text-neutral-900">
+          {event.title}
+        </h2>
+        <p className="text-sm text-neutral-700 mt-1">
+          {event.pricingTier && `(${user?.role === 'Basic' ? 'Non-member Price, ' : 'Member Price, '}${event.pricingTier})`}
+        </p>
         <div className="flex items-center gap-3 mt-3">
-          <span className="text-xl font-semibold text-ma-red">{priceLabel} CAD</span>
+          <span className="text-xl font-semibold text-ma-red">
+            {priceLabel} CAD
+          </span>
           <div className="flex items-center gap-1 text-xs bg-white border border-ma-red rounded-full px-2 py-0.5 shadow-sm">
             <Calendar className="w-3 h-3 text-ma-red" />
             {new Date(event.startsAt).toLocaleDateString()}
@@ -175,7 +232,9 @@ export default function CheckoutEventForm({ clientSecret }: { clientSecret: stri
       <div className="space-y-5">
         <div className="flex items-center gap-2">
           <CreditCard className="w-4 h-4 text-blue-600" />
-          <h4 className="text-sm font-medium text-neutral-800">Pay with Card</h4>
+          <h4 className="text-sm font-medium text-neutral-800">
+            Pay with Card
+          </h4>
         </div>
         <div className="rounded-lg border border-neutral-200 p-4 bg-neutral-50 shadow-inner">
           <PaymentElement />

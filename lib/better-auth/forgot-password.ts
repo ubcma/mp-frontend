@@ -3,13 +3,13 @@ import { authClient } from '../auth-client';
 import { handleServerError } from '../error/handleServer';
 
 export const sendForgotPasswordEmail = async (email: string) => {
-  const { data, error } = await authClient.forgetPassword({
+  const { data, error } = await authClient.requestPasswordReset({
     email,
     redirectTo: `${process.env.NEXT_PUBLIC_FRONTEND_URL}/reset-password`,
   });
 
   if (error) {
-    handleServerError('Error sending forgot password email', error);
+    handleServerError('Error sending forgot password email, please contact our team for support');
     throw new Error(error.message);
   }
   
@@ -23,7 +23,7 @@ export const resetPassword = async (token: string, password: string) => {
   });
 
   if (error) {
-    handleServerError('Error resetting password', error);
+    handleServerError('Error resetting password, please contact our team for support');
     throw new Error(error.message);
   }
   

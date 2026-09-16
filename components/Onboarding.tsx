@@ -1,11 +1,11 @@
 'use client';
 
 import { useState, useEffect, JSX } from 'react';
-import { useForm, useStore, FieldApi, AnyFieldApi } from '@tanstack/react-form';
+import { useForm, useStore, AnyFieldApi } from '@tanstack/react-form';
 import Confetti from 'react-confetti';
 import { useWindowSize } from 'react-use';
 import { Button } from '@/components/ui/button';
-import { motion, AnimatePresence, easeInOut, easeOut } from 'motion/react';
+import { motion, AnimatePresence, easeOut } from 'motion/react';
 import {
   RenderComboBoxField,
   RenderInputField,
@@ -16,7 +16,6 @@ import {
   DIETARY_RESTRICTIONS,
   FACULTIES,
   Faculty,
-  FacultyMajors,
   getMajorsForFaculty,
   INTEREST_OPTIONS,
   YEAR_OPTIONS,
@@ -34,7 +33,6 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { fetchFromAPI } from '@/lib/httpHandlers';
 import { useIsMobile } from '@/hooks/use-mobile';
-import ProgressLineMobile from './ProgressLineMobile';
 
 interface Step {
   title: string;
@@ -57,6 +55,7 @@ interface StepProps {
   isMobile: boolean;
   handleNext: () => void;
   handleBack: () => void;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   form: ReturnType<any>;
   values: FormValues;
   step: number;
@@ -377,7 +376,7 @@ const DietaryStep: React.FC<
     StepProps,
     'isMobile' | 'handleNext' | 'handleBack' | 'form' | 'values' | 'steps'
   >
-> = ({ isMobile, handleNext, handleBack, form, values, steps }) => (
+> = ({ isMobile, handleNext, handleBack, form, steps }) => (
   <div className={`w-full max-w-2xl px-4 ${isMobile ? 'py-8' : 'py-16'}`}>
     <h1
       className={`font-bold text-white text-center ${isMobile ? 'text-3xl mb-4' : 'text-6xl mb-8'}`}
@@ -525,7 +524,7 @@ const DietaryStep: React.FC<
         Go back
       </Button>
       <form.Subscribe
-        selector={(state: { values: { diet: any } }) => [state.values.diet]}
+        selector={(state: { values: { diet: string[] } }) => [state.values.diet]}
         children={([diet]: [string[]]) => {
           const hasDietarySelection = diet && diet.length > 0;
           return (
@@ -557,7 +556,7 @@ const InterestsStep: React.FC<
     | 'steps'
     | 'setStep'
   >
-> = ({ isMobile, handleNext, handleBack, form, values, steps, setStep }) => (
+> = ({ isMobile, handleBack, form, steps, setStep }) => (
   <div className={`w-full max-w-2xl px-4 ${isMobile ? 'py-8' : 'py-16'}`}>
     <h1
       className={`font-bold text-white text-center ${isMobile ? 'text-3xl mb-4' : 'text-6xl mb-8'}`}
@@ -610,11 +609,11 @@ const InterestsStep: React.FC<
         </Button>
         <form.Subscribe
           selector={(state: {
-            canSubmit: any;
-            isSubmitting: any;
-            values: { interests: any };
+            canSubmit: boolean;
+            isSubmitting: boolean;
+            values: { interests: string[] };
           }) => [state.canSubmit, state.isSubmitting, state.values.interests]}
-          children={([canSubmit, isSubmitting, interests]: [
+          children={([, isSubmitting, interests]: [
             boolean,
             boolean,
             string[],
@@ -790,13 +789,22 @@ export default function OnboardingModal(): JSX.Element {
     },
   });
 
+  // const avatars: string[] = [
+  //   'https://3ou0u5266t.ufs.sh/f/icFgxUjDNp9SHfSpARavrBaOy879hQLYlq2tTDxSFN56uAVk',
+  //   'https://3ou0u5266t.ufs.sh/f/icFgxUjDNp9SWuHx1AIQ5Jxnu8htDbYe6BEljCiZRS1HX90r',
+  //   'https://3ou0u5266t.ufs.sh/f/icFgxUjDNp9STlSXPGKtWjXZ5CV1loKvErcSBGzukR43NPpY',
+  //   'https://3ou0u5266t.ufs.sh/f/icFgxUjDNp9SYLGttR8WgoQTZvmMRLxUD3d2ja49SHG8IXPn',
+  //   'https://3ou0u5266t.ufs.sh/f/icFgxUjDNp9S4ckwUOew3HDuqnmEMpvOCSxlzFiXboeg842Z',
+  //   'https://3ou0u5266t.ufs.sh/f/icFgxUjDNp9St4uv7XDdOFLQW0GzgHKq8hCcUxNP5wuAVjiR',
+  // ];
+
   const avatars: string[] = [
-    'https://3ou0u5266t.ufs.sh/f/icFgxUjDNp9SHfSpARavrBaOy879hQLYlq2tTDxSFN56uAVk',
-    'https://3ou0u5266t.ufs.sh/f/icFgxUjDNp9SWuHx1AIQ5Jxnu8htDbYe6BEljCiZRS1HX90r',
-    'https://3ou0u5266t.ufs.sh/f/icFgxUjDNp9STlSXPGKtWjXZ5CV1loKvErcSBGzukR43NPpY',
-    'https://3ou0u5266t.ufs.sh/f/icFgxUjDNp9SYLGttR8WgoQTZvmMRLxUD3d2ja49SHG8IXPn',
-    'https://3ou0u5266t.ufs.sh/f/icFgxUjDNp9S4ckwUOew3HDuqnmEMpvOCSxlzFiXboeg842Z',
-    'https://3ou0u5266t.ufs.sh/f/icFgxUjDNp9SVR5N6u4TuQAht02xaiNg36ZLWwscPMYoCfRG',
+    '/profile-photos/apple.png',
+    '/profile-photos/clapperboard.png',
+    '/profile-photos/coffee.png',
+    '/profile-photos/oscar.png',
+    '/profile-photos/phone.png',
+    '/profile-photos/studios.png',
   ];
 
   const selectedFaculty = useStore(

@@ -3,7 +3,6 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import { format } from 'date-fns';
-import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { BadgeCheckIcon, Calendar, MapPin, Shirt } from 'lucide-react';
 import { EventDetails, EventQuestion } from '@/lib/types';
@@ -12,30 +11,32 @@ import TagPill from '@/components/TagPill';
 import { useRouter } from 'next/navigation';
 import { useUserQuery } from '@/lib/queries/user';
 import { useGetUserRegistrationsQuery } from '@/lib/queries/registrations';
+import { EventStatusMessage } from './EventStatusMessage';
+import Link from 'next/link';
 
 interface EventDetailsProps {
   event: EventDetails;
   questions: EventQuestion[];
-  memberPrice?: number;
   dressCode?: string;
 }
 
 const RenderEventDetails: React.FC<EventDetailsProps> = ({
   event,
   questions,
-  memberPrice,
   dressCode,
 }) => {
   const { data: user } = useUserQuery();
   const { data: registrations } = useGetUserRegistrationsQuery();
 
-  const isRegistered = registrations?.registrations.map((registration) => registration.eventId).includes(event.id)
+  const isRegistered = registrations?.registrations
+    .map((registration) => registration.eventId)
+    .includes(event.id);
 
-  const [responses, setResponses] = useState<{ [key: number]: string }>({});
+  const [responses, setResponses] = useState<{ [key: number]: string | string[] }>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
 
-  const handleChange = (questionId: number, value: string) => {
+  const handleChange = (questionId: number, value: string | string[]) => {
     setResponses((prev) => ({ ...prev, [questionId]: value }));
   };
 
@@ -55,6 +56,8 @@ const RenderEventDetails: React.FC<EventDetailsProps> = ({
 
     router.push(`/purchase-event?eventSlug=${event.slug}`);
   };
+
+  const saving = event.nonMemberPrice - event.price;
 
   const formatEventDate = () => {
     const startDate = new Date(event.startsAt);
@@ -90,17 +93,11 @@ const RenderEventDetails: React.FC<EventDetailsProps> = ({
       <div className="space-y-1">
         <h1 className="text-3xl font-semibold">{event.title}</h1>
         <div className="text-base text-muted-foreground">
-          {memberPrice ? (
-            <p>
-              ${memberPrice.toFixed(2)} for members (
-              <span className="font-medium">
-                ${Number(event.price).toFixed(2)} for non-members
-              </span>
-              )
-            </p>
-          ) : (
-            <p className="font-medium">${Number(event.price).toFixed(2)}</p>
-          )}
+          <p className="font-medium">
+            ${Number(event.price).toFixed(2)} for members, $
+            {Number(event.nonMemberPrice ?? event.price).toFixed(2)} for
+            non-members
+          </p>
         </div>
         <div className="flex flex-wrap gap-2 mt-2">
           <TagPill
@@ -138,69 +135,129 @@ const RenderEventDetails: React.FC<EventDetailsProps> = ({
 
       {/* Description */}
       {event.description && (
-        <p className="text-sm text-muted-foreground">{event.description}</p>
+        <p className="text-sm text-muted-foreground whitespace-pre-line">
+          {event.description}
+        </p>
       )}
 
-      {user?.role === 'Basic' && event.membersOnly ? (
-        <div className='flex flex-col justify-center items-center text-center rounded-xl w-full h-48 bg-ma-red/10 border-dashed border-ma-red border-2 gap-2'>
-          <h3 className='font-semibold text-ma-red text-2xl capitalize'> This event is for members only! </h3>
-          <p className='text-ma-red/80'>
-            Purchase a membership to gain access to this event and many other perks.
-          </p>
-        </div>
-      ) : isRegistered ? (
-              <div className='flex flex-col justify-center items-center text-center rounded-xl w-full h-48 bg-emerald-300/10 border-dashed border-emerald-700 border-2 gap-2'>
-          <h3 className='font-semibold text-emerald-700 text-2xl capitalize'> You're already registered for this event! </h3>
-          <p className='text-emerald-700/80'>
-            We look forward to seeing you there.
-          </p>
-        </div>
-      
-      ): !user?.onboardingComplete ? (
-            <div className='flex flex-col justify-center items-center text-center rounded-xl w-full h-48 bg-ma-red/10 border-dashed border-ma-red border-2 gap-2'>
-          <h3 className='font-semibold text-ma-red text-2xl capitalize'> You haven't completed your profile yet! </h3>
-          <p className='text-ma-red/80'>
-            Complete your <a href="/onboarding" className='hover:underline transition-transform duration-200 text-blue-500'> portal onboarding  </a> to register for this event
-          </p>
-        </div>
-      ):(
-        <div className="flex flex-col relative gap-4 py-1">
-          {/* Registration Form */}
-          <Card>
-            <CardContent className="p-6">
-              <h2 className="text-xl font-semibold mb-6">Event Registration</h2>
-              <form onSubmit={handleSubmit} className="space-y-6">
-                {questions.map((q) => (
-                  <DynamicFormField
-                    key={q.id}
-                    question={q}
-                    value={responses[q.id]}
-                    onChange={(value) => handleChange(q.id, value)}
-                    error={
-                      q.isRequired &&
-                      (!responses[q.id] ||
-                        (Array.isArray(responses[q.id]) &&
-                          responses[q.id].length === 0) ||
-                        (typeof responses[q.id] === 'string' &&
-                          responses[q.id].trim() === ''))
-                        ? `${q.label} is required.`
-                        : undefined
-                    }
-                  />
-                ))}
+      <hr></hr>
 
-                <Button
-                  type="submit"
-                  disabled={!isFormValid || isSubmitting}
-                  className="w-full bg-[#ef3050] hover:bg-[#ef3050]/90 text-white"
-                >
-                  {isSubmitting
-                    ? 'Submitting...'
-                    : `Continue to Purchase ($${Number(event.price).toFixed(2)})`}
-                </Button>
-              </form>
-            </CardContent>
-          </Card>
+      {new Date(event.startsAt) < new Date() ? (
+        new Date(event.endsAt) < new Date() ? (
+          <EventStatusMessage
+            variant="error"
+            title="Event has passed."
+            description="This event has ended. Check out our upcoming events to find other opportunities."
+          />
+        ) : (
+          <EventStatusMessage
+            variant="error"
+            title="Registration has closed!"
+            description="This event has already started. Check out our upcoming events to find other opportunities."
+          />
+        )
+      ) : isRegistered ? (
+        <EventStatusMessage
+          variant="success"
+          title="You're already registered for this event!"
+          description="We look forward to seeing you there."
+        />
+      ) : event.attendeeCap &&
+        event.currentAttendeeCount &&
+        event.currentAttendeeCount >= event.attendeeCap ? (
+        <EventStatusMessage
+          variant="warning"
+          title="This event is sold out!"
+          description="Follow our socials to keep up to date with our next events, we look forward to seeing you there."
+        />
+      ) : user?.role === 'Basic' && event.membersOnly ? (
+        <EventStatusMessage
+          variant="error"
+          title="This event is for members only!"
+          description="Purchase a membership to gain access to this event and many other perks."
+        />
+      ) : (
+        // : !user?.onboardingComplete ? (
+        //   <EventStatusMessage
+        //     variant="error"
+        //     title="You haven't completed your profile yet!"
+        //     description={
+        //       <>
+        //         Complete your{' '}
+        //         <a
+        //           href="/onboarding"
+        //           className="hover:underline transition-transform duration-200 text-blue-500"
+        //         >
+        //           portal onboarding
+        //         </a>{' '}
+        //         to register for this event
+        //       </>
+        //     }
+        //   />
+        // )
+        <div className="flex flex-col relative gap-4 py-1 w-full">
+          <h2 className="text-xl font-semibold">Event Registration</h2>
+          <form onSubmit={handleSubmit} className="space-y-4 max-w-[64rem]">
+            {questions.map((q) => (
+              <DynamicFormField
+                key={q.id}
+                question={q}
+                value={responses[q.id]}
+                onChange={(value) => handleChange(q.id, value)}
+                error={
+                  q.isRequired &&
+                  (!responses[q.id] ||
+                    (Array.isArray(responses[q.id]) &&
+                      responses[q.id].length === 0) ||
+                    (typeof responses[q.id] === 'string' &&
+                      (responses[q.id] as string).trim() === ''))
+                    ? `${q.label} is required.`
+                    : undefined
+                }
+              />
+            ))}
+
+            <div className="flex flex-col gap-4 w-full">
+              <Button
+                type="submit"
+                disabled={!isFormValid || isSubmitting}
+                className="flex flex-wrap whitespace-normal break-words text-left w-fit h-fit max-w-full bg-[#ef3050] hover:bg-[#ef3050]/90 text-white"
+              >
+                {isSubmitting
+                  ? 'Submitting...'
+                  : user?.role === 'Basic'
+                    ? `Continue to Purchase (Non-member Price, ${event.pricingTier ? event.pricingTier + ' - ' : ''}$${Number(event.nonMemberPrice).toFixed(2)})`
+                    : `Continue to Purchase (Member Price, ${event.pricingTier ? event.pricingTier + ' - ' : ''}$${Number(event.price).toFixed(2)})`}
+              </Button>
+
+              {Number(saving) > 1 &&
+                (user?.role === 'Basic' ? (
+                  <span className="text-muted-foreground text-sm italic">
+                    Members save{' '}
+                    <span className="inline text-ma-red font-semibold">
+                      ${saving.toFixed(2)}
+                    </span>{' '}
+                    on this event.{' '}
+                    <Link
+                      className="inline text-blue-500 font-semibold"
+                      href="/purchase-membership"
+                    >
+                      {' '}
+                      Become a member
+                    </Link>{' '}
+                    to enjoy discounted pricing!
+                  </span>
+                ) : (
+                  <span className="text-muted-foreground text-sm italic">
+                    You&apos;re saving{' '}
+                    <span className="inline text-ma-red font-semibold">
+                      ${saving.toFixed(2)}
+                    </span>{' '}
+                    by being an MA member!
+                  </span>
+                ))}
+            </div>
+          </form>
         </div>
       )}
     </div>

@@ -32,7 +32,7 @@ import { nanoid } from 'nanoid';
 import { Plus } from 'lucide-react';
 import { useState, useRef } from 'react';
 import { generateSlug } from '@/lib/utils';
-import EventImageUpload, { EventImageUploadRef } from '../EventImageUpload';
+import AdminImageUpload, { AdminImageUploadRef } from '../AdminImageUpload';
 import { Switch } from '../ui/switch';
 import { Label } from '../ui/label';
 import { toast } from 'sonner';
@@ -52,8 +52,8 @@ export default function EventForm({
 }: EventFormProps) {
   const [hasManuallyEditedSlug, setHasManuallyEditedSlug] = useState(false);
   const [questions, setQuestions] = useState<QuestionInput[]>([]);
-  const [hasSelectedImage, setHasSelectedImage] = useState(false);
-  const eventImageUploadRef = useRef<EventImageUploadRef>(null);
+  const [, setHasSelectedImage] = useState(false);
+  const eventImageUploadRef = useRef<AdminImageUploadRef>(null);
 
   const sensors = useSensors(useSensor(PointerSensor));
 
@@ -117,8 +117,11 @@ export default function EventForm({
       location: initialValues?.location ?? '',
       isVisible: initialValues?.isVisible ?? false,
       membersOnly: initialValues?.membersOnly ?? true,
+      attendeeCap: initialValues?.attendeeCap ?? undefined,
+      pricingTier: initialValues?.pricingTier ?? '',
       startsAt: initialValues?.startsAt ?? '',
       endsAt: initialValues?.endsAt ?? '',
+      nonMemberPrice: initialValues?.nonMemberPrice ?? 0,
     },
     onSubmit: async ({ value }) => {
       let imageUrl = value.imageUrl;
@@ -131,7 +134,7 @@ export default function EventForm({
           if (uploadedUrl) {
             imageUrl = uploadedUrl;
           }
-        } catch (error) {
+        } catch {
           // Upload failed, don't proceed with form submission
           return;
         }
@@ -167,7 +170,7 @@ export default function EventForm({
               endsAt: new Date(value.endsAt),
             };
 
-      const response = await onSubmit(formattedData);
+      await onSubmit(formattedData);
 
       toast.success(mode === 'create' ? 'Event created!' : 'Event updated!');
       queryClient.invalidateQueries({ queryKey: ['events'] });
@@ -236,7 +239,7 @@ export default function EventForm({
                     Image
                   </label>
 
-                  <EventImageUpload
+                  <AdminImageUpload
                     ref={eventImageUploadRef}
                     existingImageUrl={imageUrl}
                     onImageSelect={(hasFile) => {
@@ -253,7 +256,7 @@ export default function EventForm({
               );
             }}
           </form.Field>
-          <div className="grid md:grid-cols-3 grid-cols-1 gap-4 mt-4">
+          <div className="grid md:grid-cols-2 grid-cols-1 gap-4 mt-4">
             <form.Field name="title" validators={requiredValidator('Title')}>
               {(field) => (
                 <RenderInputField
@@ -282,18 +285,6 @@ export default function EventForm({
                 />
               )}
             </form.Field>
-
-            <form.Field
-              name="price"
-              validators={requiredValidator('Price')}
-              children={(fieldApi) => (
-                <RenderInputField
-                  type="number"
-                  label="Price (CAD)"
-                  field={fieldApi}
-                />
-              )}
-            />
           </div>
 
           <form.Field
@@ -331,6 +322,56 @@ export default function EventForm({
               validators={endDateValidator('End Date & Time')}
               children={(fieldApi) => (
                 <RenderDateTimeField label="End Date & Time" field={fieldApi} />
+              )}
+            />
+          </div>
+
+          <div className="grid md:grid-cols-4 grid-cols-2 gap-4">
+            <form.Field
+              name="price"
+              validators={requiredValidator('Price')}
+              children={(fieldApi) => (
+                <RenderInputField
+                  type="number"
+                  label="Price (CAD)"
+                  field={fieldApi}
+                />
+              )}
+            />
+
+            <form.Field
+              name="nonMemberPrice"
+              validators={requiredValidator('Non-Member Price')}
+              children={(fieldApi) => (
+                <RenderInputField
+                  type="number"
+                  label="Non-member Price (CAD)"
+                  field={fieldApi}
+                />
+              )}
+            />
+
+            <form.Field
+              name="pricingTier"
+              children={(fieldApi) => (
+                <RenderInputField
+                  type="text"
+                  label="Pricing Tier (Optional)"
+                  field={fieldApi}
+                  placeholder="e.g. Early Bird, Regular"
+                />
+              )}
+            />
+
+            <form.Field
+              name="attendeeCap"
+              children={(fieldApi) => (
+                <RenderInputField
+                  type="number"
+                  label="Attendee Cap (Optional)"
+                  field={fieldApi}
+                  placeholder="Leave empty for unlimited capacity"
+                />
               )}
             />
           </div>
@@ -373,8 +414,8 @@ export default function EventForm({
             <div>
               <div className="text-md font-medium"> Questions </div>
               <div className="text-xs text-muted-foreground">
-                Note: Questions cannot be edited later - ensure there are
-                no spelling mistakes.
+                Note: Questions cannot be edited later - ensure there are no
+                spelling mistakes.
               </div>
             </div>
             <div className="flex flex-col gap-4">

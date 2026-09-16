@@ -15,7 +15,6 @@ import {
   Bar,
   XAxis,
   YAxis,
-  CartesianGrid,
   Tooltip,
   ResponsiveContainer,
 } from 'recharts';
@@ -64,7 +63,7 @@ const data: Record<DemographicKey, { category: string; count: number }[]> = {
   ],
 };
 
-const tickFormatter = (value: string, index: number) => {
+const tickFormatter = (value: string) => {
   if (typeof value !== 'string') return String(value);
 
   const limit = 10;
@@ -81,7 +80,7 @@ export default function MemberDemographics() {
 
         <Select
           value={demoType}
-          onValueChange={(val) => setDemoType(val as any)}
+          onValueChange={(val) => setDemoType(val as DemographicKey)}
         >
           <SelectTrigger className="w-32">
             <SelectValue placeholder="Select category" />

@@ -140,7 +140,7 @@ export function RevenueChart() {
             <div className="flex justify-end mb-4">
               <Tabs
                 value={timeRange}
-                onValueChange={(val) => setTimeRange(val as any)}
+                onValueChange={(val) => setTimeRange(val as '6mo' | '3mo' | '1wk')}
               >
                 <TabsList>
                   <TabsTrigger value="6mo">6 Months</TabsTrigger>
@@ -209,7 +209,7 @@ export function RevenueChart() {
             <div className="flex justify-end mb-4">
               <Select
                 value={demoType}
-                onValueChange={(val) => setDemoType(val as any)}
+                onValueChange={(val) => setDemoType(val as DemographicKey)}
               >
                 <SelectTrigger className="w-32">
                   <SelectValue placeholder="Select category" />

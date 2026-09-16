@@ -2,11 +2,14 @@ import { handleServerError } from './error/handleServer';
 
 type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE';
 
+const DEFAULT_TIMEOUT_MS = 8000;
+
 interface FetchOptions {
   method?: HttpMethod;
   body?: Record<string, unknown>;
   headers?: Record<string, string>;
   credentials?: RequestCredentials;
+  timeoutMs?: number;
 }
 
 export async function fetchFromAPI(
@@ -18,6 +21,7 @@ export async function fetchFromAPI(
     body,
     credentials,
     headers: customHeaders = {},
+    timeoutMs = DEFAULT_TIMEOUT_MS,
   } = options;
 
   const headers: Record<string, string> = {
@@ -26,12 +30,29 @@ export async function fetchFromAPI(
     ...customHeaders,
   };
 
-  const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}${endpoint}`, {
-    method,
-    headers,
-    credentials: credentials || 'include',
-    body: body ? JSON.stringify(body) : undefined,
-  });
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), timeoutMs);
+
+  let res: Response;
+  try {
+    const baseUrl = typeof window === 'undefined'
+      ? process.env.BACKEND_URL
+      : process.env.NEXT_PUBLIC_BACKEND_URL;
+    res = await fetch(`${baseUrl}${endpoint}`, {
+      method,
+      headers,
+      credentials: credentials || 'include',
+      body: body ? JSON.stringify(body) : undefined,
+      signal: controller.signal,
+    });
+  } catch (error: unknown) {
+    clearTimeout(timeout);
+    if (error instanceof Error && error.name === 'AbortError') {
+      throw new Error(`Request to ${endpoint} timed out after ${timeoutMs}ms`);
+    }
+    throw error;
+  }
+  clearTimeout(timeout);
 
   if (!res.ok) {
     const errorText = await res.text();
@@ -50,7 +71,7 @@ export async function fetchFromAPI(
       );
     }
 
-    handleServerError('Error', errorMessage);
+    handleServerError('An error occured, please contact our team for support');
     throw new Error(errorMessage);
   }
 

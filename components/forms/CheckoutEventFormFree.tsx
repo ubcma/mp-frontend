@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useGetEventQuery } from '@/lib/queries/event';
-import { Lock, Zap, ShieldCheck, Calendar } from 'lucide-react';
+import { Lock, ShieldCheck, Calendar } from 'lucide-react';
 import { Button } from '../ui/button';
 import Spinner from '../common/Spinner';
 import TermsCheckbox from '@/components/forms/TermsCheckbox';
@@ -33,12 +33,14 @@ export default function CheckoutEventFormFree() {
     setErrorMsg('');
 
     try {
-
       const res = await fetchFromAPI(`/api/events/${event?.id}/registrations/create`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: {},
+        body: {
+          // TODO: Persist question responses and send in request body to create eventRegistrationResponse
+          // body: { responses: Array<{ questionId: number; response: string }>, stripeTransactionId: string }
+        }
       });
 
       if (res.ok) {
@@ -47,7 +49,7 @@ export default function CheckoutEventFormFree() {
         throw new Error("Failed to register for event.")
       }
 
-    } catch (err) {
+    } catch {
       handleClientError("Failed to register for event.", new Error());
       setErrorMsg('Something went wrong. Please try again.');
       setIsLoading(false);

@@ -66,7 +66,8 @@ export const compressImageFile = async (
   try {
     return await imageCompression(file, defaultOptions);
   } catch (error) {
-    throw new Error('Failed to compress image');
+    const message = error instanceof Error ? error.message : String(error);
+    throw new Error(`Failed to compress image: ${message}`);
   }
 };
 
