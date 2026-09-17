@@ -50,7 +50,7 @@ const highlightCards = [
   // },
   {
     image: '/ma-network.jpg',
-    heading: 'MA network is now open',
+    heading: 'MA Mentorship Hub is now open',
     subheading: 'Find your next connection',
     url: 'https://network.ubcma.ca/directory',
     color: '#202E43',
