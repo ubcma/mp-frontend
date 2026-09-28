@@ -8,18 +8,33 @@ import {
 } from '@stripe/react-stripe-js';
 import type { PaymentRequest as StripePaymentRequest, PaymentRequestPaymentMethodEvent } from '@stripe/stripe-js';
 import { useEffect, useRef, useState } from 'react';
-import { Lock, CreditCard, Zap, Check } from 'lucide-react';
+import { Lock, CreditCard, Zap, Check, Tag } from 'lucide-react';
 import { MEMBERSHIP_PRICE } from '@/lib/constants';
 import { Button } from '../ui/button';
-import TermsCheckbox from '@/components/forms/TermsCheckbox'; // ⬅️ ensure this exports onChange: (checked:boolean) => void
+import { Input } from '../ui/input';
+import TermsCheckbox from '@/components/forms/TermsCheckbox';
+import { useApplyPromotionCode } from '@/lib/queries/stripe';
 
-export default function CheckoutForm({ clientSecret }: { clientSecret: string }) {
+export default function CheckoutForm({
+  clientSecret,
+  paymentIntentId,
+}: {
+  clientSecret: string;
+  paymentIntentId: string;
+}) {
   const stripe = useStripe();
   const elements = useElements();
 
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [paymentRequest, setPaymentRequest] = useState<StripePaymentRequest | null>(null);
+
+  const [amountCents, setAmountCents] = useState(MEMBERSHIP_PRICE);
+  const [promoInput, setPromoInput] = useState('');
+  const [appliedPromo, setAppliedPromo] = useState<string | null>(null);
+  const [promoError, setPromoError] = useState('');
+
+  const applyPromo = useApplyPromotionCode();
 
   // TOS gate
   const [agreed, setAgreed] = useState(false);
@@ -35,7 +50,7 @@ export default function CheckoutForm({ clientSecret }: { clientSecret: string })
       currency: 'cad',
       total: {
         label: 'UBCMA Membership',
-        amount: MEMBERSHIP_PRICE, // cents
+        amount: amountCents,
       },
       requestPayerName: true,
       requestPayerEmail: true,
@@ -44,7 +59,24 @@ export default function CheckoutForm({ clientSecret }: { clientSecret: string })
     pr.canMakePayment().then((result) => {
       if (result) setPaymentRequest(pr);
     });
+    // Only recreate when stripe/clientSecret change — amount updates via .update()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [stripe, clientSecret]);
+
+  // Keep Apple/Google Pay total in sync with discounted amount
+  useEffect(() => {
+    if (!paymentRequest) return;
+    try {
+      paymentRequest.update({
+        total: {
+          label: 'UBCMA Membership',
+          amount: amountCents,
+        },
+      });
+    } catch {
+      // Payment Request may already be completed; ignore
+    }
+  }, [paymentRequest, amountCents]);
 
   // Attach PR handler once (don’t depend on `agreed`)
   useEffect(() => {
@@ -80,6 +112,35 @@ export default function CheckoutForm({ clientSecret }: { clientSecret: string })
     // Stripe’s PR object doesn’t expose .off reliably; ensure we only create/attach once by the deps above.
   }, [paymentRequest, stripe, clientSecret]);
 
+  const handleApplyPromo = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setPromoError('');
+    setErrorMsg('');
+
+    const code = promoInput.trim();
+    if (!code) {
+      setPromoError('Enter a promotion code');
+      return;
+    }
+
+    try {
+      const result = await applyPromo.mutateAsync({
+        paymentIntentId,
+        code,
+      });
+
+      setAmountCents(result.amount);
+      setAppliedPromo(result.promotionCode);
+
+      // Refresh Payment Element so it reflects the new amount
+      if (elements) {
+        await elements.fetchUpdates();
+      }
+    } catch (err) {
+      setPromoError(err instanceof Error ? err.message : 'Could not apply promotion code');
+    }
+  };
+
   // Manual card submission
   const handleSubmit = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
@@ -106,6 +167,9 @@ export default function CheckoutForm({ clientSecret }: { clientSecret: string })
     }
   };
 
+  const displayPrice = (amountCents / 100).toFixed(2);
+  const hasDiscount = amountCents < MEMBERSHIP_PRICE;
+
   return (
     <form
       onSubmit={handleSubmit}
@@ -114,13 +178,23 @@ export default function CheckoutForm({ clientSecret }: { clientSecret: string })
       <div className="space-y-4 bg-rose-50 border border-rose-200 rounded-xl p-5 shadow-md hover:shadow-lg transition-shadow">
         <h2 className="text-2xl font-bold text-neutral-900">UBCMA Annual Membership</h2>
 
-        <div className="flex items-center gap-2 text-ma-red">
+        <div className="flex items-center gap-2 text-ma-red flex-wrap">
+          {hasDiscount && (
+            <span className="text-lg font-medium text-neutral-400 line-through">
+              ${(MEMBERSHIP_PRICE / 100).toFixed(2)}
+            </span>
+          )}
           <span className="text-xl font-semibold">
-            ${(MEMBERSHIP_PRICE / 100).toFixed(2)} CAD
+            ${displayPrice} CAD
           </span>
           <span className="text-xs rounded-full border border-ma-red bg-ma-red/10 p-1 px-2">
             Valid until April 2026
           </span>
+          {appliedPromo && (
+            <span className="text-xs rounded-full border border-green-600 bg-green-50 text-green-700 p-1 px-2">
+              {appliedPromo} applied
+            </span>
+          )}
         </div>
 
         <p className="text-sm text-neutral-800">Your membership includes:</p>
@@ -136,6 +210,41 @@ export default function CheckoutForm({ clientSecret }: { clientSecret: string })
             </li>
           ))}
         </ul>
+      </div>
+
+      {/* Promotion code */}
+      <div className="space-y-2">
+        <div className="flex items-center gap-2">
+          <Tag className="w-4 h-4 text-neutral-600" />
+          <h4 className="text-sm font-medium text-neutral-800">Promotion code</h4>
+        </div>
+        <div className="flex gap-2">
+          <Input
+            value={promoInput}
+            onChange={(e) => setPromoInput(e.target.value)}
+            placeholder="Enter code"
+            disabled={!!appliedPromo || applyPromo.isPending}
+            className="uppercase"
+            autoComplete="off"
+          />
+          <Button
+            type="button"
+            variant="outline"
+            disabled={!!appliedPromo || applyPromo.isPending || !promoInput.trim()}
+            onClick={handleApplyPromo}
+            className="shrink-0"
+          >
+            {applyPromo.isPending ? 'Applying…' : appliedPromo ? 'Applied' : 'Apply'}
+          </Button>
+        </div>
+        {promoError && (
+          <p className="text-sm text-red-600">{promoError}</p>
+        )}
+        {appliedPromo && hasDiscount && (
+          <p className="text-sm text-green-700">
+            Discount applied — you save ${((MEMBERSHIP_PRICE - amountCents) / 100).toFixed(2)} CAD
+          </p>
+        )}
       </div>
 
       {/* Terms & Conditions */}
@@ -194,7 +303,7 @@ export default function CheckoutForm({ clientSecret }: { clientSecret: string })
             Processing...
           </>
         ) : (
-          <>Pay ${(MEMBERSHIP_PRICE / 100).toFixed(2)}</>
+          <>Pay ${displayPrice}</>
         )}
       </Button>
 

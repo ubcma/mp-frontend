@@ -58,6 +58,7 @@ export default function PurchaseMembershipPage() {
   } = useClientSecret(body, Boolean(!isUserLoading && userRole === 'Basic'));
 
   const clientSecret = clientSecretData?.clientSecret;
+  const paymentIntentId = clientSecretData?.paymentIntentId;
 
   // Loading states
   if (isUserLoading || userRole !== 'Basic') {
@@ -71,7 +72,7 @@ export default function PurchaseMembershipPage() {
     );
   }
 
-  if (isClientSecretLoading || !stripePromise || !clientSecret) {
+  if (isClientSecretLoading || !stripePromise || !clientSecret || !paymentIntentId) {
     return (
       <div className="min-h-screen flex flex-col gap-2 items-center justify-center">
         <Spinner />
@@ -109,7 +110,10 @@ export default function PurchaseMembershipPage() {
             height={128}
             width={128}
           />
-          <CheckoutForm clientSecret={clientSecret} />
+          <CheckoutForm
+            clientSecret={clientSecret}
+            paymentIntentId={paymentIntentId}
+          />
         </div>
       </Elements>
     </div>
