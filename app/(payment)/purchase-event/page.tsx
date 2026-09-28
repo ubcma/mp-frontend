@@ -22,7 +22,6 @@ export default function PurchaseEventPage() {
   const searchParams = useSearchParams();
   const eventSlug = searchParams.get('eventSlug')!;
 
-
   useEffect(() => {
     queryClient.invalidateQueries({ queryKey: ['user'] });
   }, [queryClient]);
@@ -34,6 +33,37 @@ export default function PurchaseEventPage() {
   } = useGetEventQuery({ eventSlug });
 
   const event = data?.event;
+  const eventFull = event ? isEventFull(event) : false;
+  const status = event ? getEventStatus(event.startsAt) : 'Upcoming';
+  const isFree = event ? Number(event.price) === 0 : false;
+
+  // Hooks must run unconditionally — gate the request with `enabled`
+  const body = useMemo(
+    () => ({
+      purchaseType: 'event',
+      amount: event?.price,
+      currency: 'cad',
+      eventId: event?.id,
+    }),
+    [event?.id, event?.price]
+  );
+
+  const shouldFetchClientSecret = Boolean(
+    event &&
+      !isEventLoading &&
+      !isEventError &&
+      !eventFull &&
+      status !== 'Past' &&
+      !isFree
+  );
+
+  const {
+    data: clientSecretData,
+    isLoading: isClientSecretLoading,
+    isError: isClientSecretError,
+  } = useClientSecret(body, shouldFetchClientSecret);
+
+  const clientSecret = clientSecretData?.clientSecret;
 
   if (isEventLoading) {
     return (
@@ -54,22 +84,19 @@ export default function PurchaseEventPage() {
     );
   }
 
-  const eventFull = event ? isEventFull(event) : false;
-  const status = event ? getEventStatus(event.startsAt) : 'Upcoming';
-
   if (eventFull) {
-  return (
-    <div className="min-h-screen flex flex-col items-center justify-center text-center px-4">
-      <h2 className="text-2xl font-bold text-ma-red">Event is Full</h2>
-      <p className="text-neutral-600 mt-2">
-        Unfortunately, this event has reached capacity.
-      </p>
-      <Link href="/events" className="mt-4 text-ma-red underline">
-        Back to events
-      </Link>
-    </div>
-  );
-}
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center text-center px-4">
+        <h2 className="text-2xl font-bold text-ma-red">Event is Full</h2>
+        <p className="text-neutral-600 mt-2">
+          Unfortunately, this event has reached capacity.
+        </p>
+        <Link href="/events" className="mt-4 text-ma-red underline">
+          Back to events
+        </Link>
+      </div>
+    );
+  }
 
   if (status === 'Past') {
     return (
@@ -86,7 +113,7 @@ export default function PurchaseEventPage() {
   }
 
   // If event is free, skip Stripe entirely
-  if (Number(event.price) === 0) {
+  if (isFree) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white py-12">
         <Link
@@ -109,25 +136,6 @@ export default function PurchaseEventPage() {
       </div>
     );
   }
-
-  // build request body only when inputs change
-  const body = useMemo(
-    () => ({
-      purchaseType: 'event',
-      amount: event?.price,
-      currency: 'cad',
-      eventId: event?.id,
-    }),
-    [event?.id, event?.price]
-  );
-
-  const {
-    data: clientSecretData,
-    isLoading: isClientSecretLoading,
-    isError: isClientSecretError,
-  } = useClientSecret(body, Boolean(event && !isEventLoading));
-
-  const clientSecret = clientSecretData?.clientSecret;
 
   // Wait for Stripe + client secret
   if (isClientSecretLoading || !stripePromise || !clientSecret) {
