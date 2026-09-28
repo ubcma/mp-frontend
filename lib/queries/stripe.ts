@@ -1,8 +1,9 @@
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { fetchFromAPI } from '../httpHandlers';
 
 interface PaymentIntentResponse {
   clientSecret: string;
+  paymentIntentId: string;
 }
 
 export function useClientSecret(
@@ -39,6 +40,33 @@ export function useClientSecret(
   });
 }
 
+export type ApplyPromotionCodeResponse = {
+  clientSecret: string;
+  paymentIntentId: string;
+  amount: number;
+  originalAmount: number;
+  promotionCode: string;
+  percentOff: number | null;
+  amountOff: number | null;
+};
+
+export function useApplyPromotionCode() {
+  return useMutation({
+    mutationFn: async (body: {
+      paymentIntentId: string;
+      code: string;
+    }): Promise<ApplyPromotionCodeResponse> => {
+      const res = await fetchFromAPI('/api/stripe/apply-promotion-code', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body,
+      });
+      return (await res.json()) as ApplyPromotionCodeResponse;
+    },
+  });
+}
+
 
 type VerifyPaymentResponse = { verified: boolean; paymentIntent?: Record<string, unknown> };
 
@@ -59,4 +87,3 @@ export function useVerifyUserPayment(paymentIntentId: string | null, enabled = t
     staleTime: 5 * 60 * 1000,
   });
 }
-
