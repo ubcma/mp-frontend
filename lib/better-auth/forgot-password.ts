@@ -3,7 +3,7 @@ import { authClient } from '../auth-client';
 import { handleServerError } from '../error/handleServer';
 
 export const sendForgotPasswordEmail = async (email: string) => {
-  const { data, error } = await authClient.requestPasswordReset({
+  const { data, error } = await authClient.forgetPassword({ // requestPasswordReset is for a newer version of better-auth I think? our backend is still using an older version.
     email,
     redirectTo: `${process.env.NEXT_PUBLIC_FRONTEND_URL}/reset-password`,
   });

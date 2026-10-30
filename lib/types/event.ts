@@ -34,6 +34,7 @@ export type EventDetails = {
   attendeeCap?: number;  
   pricingTier?: string;
   currentAttendeeCount?: number;  
+  requiresOnboarding?: boolean;
   createdAt: string | null;
   updatedAt: string | null;
 };
@@ -125,10 +126,18 @@ export type BaseEventForm = {
   nonMemberPrice: number;
 };
 
+export type WorkshopInput = {
+  title: string;
+  description: string | null;
+  capacity: number;
+  slot: number;
+};
+
 export type CreateEventPayload = Omit<BaseEventForm, 'startsAt' | 'endsAt'> & {
   startsAt: Date;
   endsAt: Date;
   questions: EventQuestion[];
+  workshops?: WorkshopInput[];
 };
 
 export type UpdateEventPayload = Omit<BaseEventForm, 'startsAt' | 'endsAt'> & {

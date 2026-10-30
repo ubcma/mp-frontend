@@ -62,6 +62,9 @@ export default function EventRegistrations({
 
   const registrations = data?.registrations || [];
   const questions = data?.questions || [];
+  const workshopSlots = [...new Set((data?.workshops || []).map((w) => w.slot))].sort(
+    (a, b) => a - b
+  );
 
   // Filter
   const filteredRegistrations = registrations.filter((r) => {
@@ -97,6 +100,10 @@ export default function EventRegistrations({
     { label: 'Year of Study', key: 'yearOfStudy' },
     { label: 'Faculty', key: 'faculty' },
     { label: 'Phone Number', key: 'phoneNumber' },
+    ...workshopSlots.map((slot) => ({
+      label: `Workshop (Slot ${slot})`,
+      key: `workshopSlot${slot}`,
+    })),
   ];
 
   // Format CSV data
@@ -120,7 +127,15 @@ export default function EventRegistrations({
         faculty,
         phoneNumber,
         responses,
+        workshops,
       } = r;
+
+      const workshopColumns = Object.fromEntries(
+        workshopSlots.map((slot) => [
+          `workshopSlot${slot}`,
+          workshops?.find((w) => w.slot === slot)?.title ?? 'Not picked',
+        ])
+      );
 
       const flatResponses = Object.fromEntries(
         Object.entries(responses ?? {}).map(([key, value]) => [
@@ -144,6 +159,7 @@ export default function EventRegistrations({
         yearOfStudy,
         faculty,
         phoneNumber,
+        ...workshopColumns,
         ...flatResponses,
       };
     });
@@ -216,7 +232,7 @@ export default function EventRegistrations({
         </div>
       ) : (
         <DataTable
-          columns={registrationsColumns(questions, eventId)}
+          columns={registrationsColumns(questions, eventId, workshopSlots)}
           data={paginatedRegistrations}
         />
       )}

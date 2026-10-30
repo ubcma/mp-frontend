@@ -1,6 +1,7 @@
 'use client';
 
 import { useGetEventQuery } from '@/lib/queries/event';
+import { useEventWorkshopsQuery } from '@/lib/queries/workshops';
 import { useParams } from 'next/navigation';
 import EventForm from '@/components/forms/EventForm';
 import { toast } from 'sonner';
@@ -12,15 +13,19 @@ export default function EventPage() {
   const { slug } = useParams<{ slug: string }>();
 
   const { data, isLoading } = useGetEventQuery({ eventSlug: slug });
+  const { data: workshopsData, isLoading: isWorkshopsLoading } = useEventWorkshopsQuery(
+    data?.event.id
+  );
 
   return (
     <div>
-      {isLoading ? (
+      {isLoading || isWorkshopsLoading ? (
         <Spinner />
       ) : (
         <EventForm
           mode="update"
           initialValues={data?.event}
+          initialWorkshops={workshopsData?.workshops ?? []}
           onSubmit={async (data) => {
             try {
 

@@ -14,97 +14,54 @@ import {
   EventQuestionResponse,
   QuestionInput,
 } from '@/lib/types';
-import { DraggableCard } from '../DraggableCard';
-import {
-  DndContext,
-  closestCenter,
-  DragEndEvent,
-  useSensors,
-  useSensor,
-  PointerSensor,
-} from '@dnd-kit/core';
-import {
-  arrayMove,
-  SortableContext,
-  verticalListSortingStrategy,
-} from '@dnd-kit/sortable';
-import { nanoid } from 'nanoid';
-import { Plus } from 'lucide-react';
-import { useState, useRef } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { generateSlug } from '@/lib/utils';
 import AdminImageUpload, { AdminImageUploadRef } from '../AdminImageUpload';
 import { Switch } from '../ui/switch';
 import { Label } from '../ui/label';
 import { toast } from 'sonner';
+import { handleClientError } from '@/lib/error/handleClient';
 import { redirect } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
+import { Workshop } from '@/lib/types/workshop';
+import WorkshopFields, {
+  formatWorkshopDrafts,
+  persistWorkshopDrafts,
+  toWorkshopDraft,
+  WorkshopDraft,
+  workshopDraftError,
+} from './WorkshopFields';
+import EventQuestionsFields from './EventQuestionsFields';
 
 type EventFormProps = {
   mode: 'create' | 'update';
   initialValues?: Partial<EventDetails>;
+  initialWorkshops?: Workshop[];
   onSubmit: (values: EventPayload) => Promise<void>;
 };
 
 export default function EventForm({
   mode,
   initialValues,
+  initialWorkshops = [],
   onSubmit,
 }: EventFormProps) {
   const [hasManuallyEditedSlug, setHasManuallyEditedSlug] = useState(false);
   const [questions, setQuestions] = useState<QuestionInput[]>([]);
+  const [workshops, setWorkshops] = useState<WorkshopDraft[]>(() =>
+    initialWorkshops.map(toWorkshopDraft)
+  );
   const [, setHasSelectedImage] = useState(false);
   const eventImageUploadRef = useRef<AdminImageUploadRef>(null);
-
-  const sensors = useSensors(useSensor(PointerSensor));
-
   const queryClient = useQueryClient();
 
-  const addQuestion = () => {
-    setQuestions((prev) => [
-      ...prev,
-      {
-        id: nanoid(),
-        label: '',
-        placeholder: '',
-        type: 'ShortText',
-        isRequired: false,
-        sortOrder: prev.length + 1,
-      },
-    ]);
-  };
+  const workshopSourceKey = initialWorkshops.map((w) => w.id).join(',');
 
-  const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event;
-    if (!over || active.id === over.id) return;
-
-    const oldIndex = questions.findIndex((q) => q.id === active.id);
-    const newIndex = questions.findIndex((q) => q.id === over.id);
-    const newArray = arrayMove(questions, oldIndex, newIndex);
-
-    const withUpdatedSortOrder = newArray.map((q, index) => ({
-      ...q,
-      sortOrder: index + 1,
-    }));
-
-    setQuestions(withUpdatedSortOrder);
-  };
-
-  const handleQuestionChange = (
-    index: number,
-    field: keyof QuestionInput,
-    value: EventQuestionResponse
-  ) => {
-    const updated = [...questions];
-    updated[index] = {
-      ...updated[index],
-      [field]: value,
-    };
-    setQuestions(updated);
-  };
-
-  const handleDeleteQuestion = (index: number) => {
-    setQuestions((prev) => prev.filter((_, i) => i !== index));
-  };
+  useEffect(() => {
+    if (mode === 'update') {
+      setWorkshops(initialWorkshops.map(toWorkshopDraft));
+    }
+  }, [mode, workshopSourceKey]);
 
   const form = useForm({
     defaultValues: {
@@ -126,7 +83,6 @@ export default function EventForm({
     onSubmit: async ({ value }) => {
       let imageUrl = value.imageUrl;
 
-      // Upload pending image file if exists
       if (eventImageUploadRef.current?.hasPendingFile()) {
         try {
           const uploadedUrl =
@@ -135,7 +91,22 @@ export default function EventForm({
             imageUrl = uploadedUrl;
           }
         } catch {
-          // Upload failed, don't proceed with form submission
+          return;
+        }
+      }
+
+      const workshopError = workshops.map(workshopDraftError).find(Boolean);
+      if (workshopError) {
+        toast.error(workshopError);
+        return;
+      }
+
+      if (mode === 'update' && initialValues?.id) {
+        try {
+          await persistWorkshopDrafts(initialValues.id, workshops, initialWorkshops);
+          queryClient.invalidateQueries({ queryKey: ['event-workshops', initialValues.id] });
+        } catch (err) {
+          handleClientError('Error saving workshops', err);
           return;
         }
       }
@@ -149,19 +120,18 @@ export default function EventForm({
               endsAt: new Date(value.endsAt),
               isVisible: value.isVisible,
               membersOnly: value.membersOnly,
-              ...(mode === 'create' && {
-                questions: questions.map((q, index) => ({
-                  label: q.label,
-                  placeholder: q.placeholder,
-                  type: q.type,
-                  isRequired: q.isRequired,
-                  options: q.options ?? null,
-                  validation: q.validation ?? {},
-                  sortOrder: index + 1,
-                  createdAt: new Date(),
-                  updatedAt: new Date(),
-                })),
-              }),
+              questions: questions.map((q, index) => ({
+                label: q.label,
+                placeholder: q.placeholder,
+                type: q.type,
+                isRequired: q.isRequired,
+                options: q.options ?? null,
+                validation: q.validation ?? {},
+                sortOrder: index + 1,
+                createdAt: new Date(),
+                updatedAt: new Date(),
+              })),
+              workshops: formatWorkshopDrafts(workshops),
             }
           : {
               ...value,
@@ -192,7 +162,6 @@ export default function EventForm({
           : undefined,
   });
 
-  // Custom image validation that considers both existing URL and selected file
   const imageValidator = {
     onChange: ({ value }: { value: string }) => {
       const hasExistingImage = !!value;
@@ -409,48 +378,10 @@ export default function EventForm({
           />
         </div>
 
-        {mode === 'create' && (
-          <>
-            <div>
-              <div className="text-md font-medium"> Questions </div>
-              <div className="text-xs text-muted-foreground">
-                Note: Questions cannot be edited later - ensure there are no
-                spelling mistakes.
-              </div>
-            </div>
-            <div className="flex flex-col gap-4">
-              <DndContext
-                sensors={sensors}
-                collisionDetection={closestCenter}
-                onDragEnd={handleDragEnd}
-              >
-                <SortableContext
-                  items={questions.map((q) => q.id)}
-                  strategy={verticalListSortingStrategy}
-                >
-                  {questions.map((q, index) => (
-                    <DraggableCard
-                      key={q.id}
-                      index={index}
-                      question={q}
-                      onChange={handleQuestionChange}
-                      onDelete={handleDeleteQuestion}
-                    />
-                  ))}
-                </SortableContext>
-              </DndContext>
+        <WorkshopFields workshops={workshops} onChange={setWorkshops} />
 
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => addQuestion()}
-                className="flex flex-row items-center justify-center w-full p-8 border border-dashed rounded-lg"
-              >
-                <Plus className="w-4 h-4" />
-                Add another question
-              </Button>
-            </div>
-          </>
+        {mode === 'create' && (
+          <EventQuestionsFields questions={questions} onChange={setQuestions} />
         )}
 
         <form.Subscribe

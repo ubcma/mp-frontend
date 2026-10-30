@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { fetchFromAPI } from '../httpHandlers';
-import { EventRegistrationsResponse } from '../types/eventRegistration';
+import { EventRegistrationsResponse, WorkshopPick } from '../types/eventRegistration';
 
 export type Registration = {
   id: string;
@@ -13,6 +13,7 @@ export type Registration = {
   eventEndsAt: string;
   eventLocation: string;
   responses: Record<string, string>;
+  workshops: WorkshopPick[];
 };
 
 export type RegistrationsResponse = {
@@ -118,8 +119,12 @@ export function useCreateRegistrationMutation() {
   });
 }
 
-export function useGetUserRegistrationsQuery() {
+export function useGetUserRegistrationsQuery(
+  options: { refetchInterval?: number | false; refetchOnMount?: boolean | 'always' } = {}
+) {
   return useQuery<RegistrationsResponse>({
+    refetchInterval: options.refetchInterval,
+    refetchOnMount: options.refetchOnMount,
     queryKey: ['user-registrations'],
     queryFn: async () => {
       const res = await fetchFromAPI(`/api/me/registrations`, {

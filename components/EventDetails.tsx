@@ -12,6 +12,7 @@ import { useRouter } from 'next/navigation';
 import { useUserQuery } from '@/lib/queries/user';
 import { useGetUserRegistrationsQuery } from '@/lib/queries/registrations';
 import { EventStatusMessage } from './EventStatusMessage';
+import WorkshopPicker from './WorkshopPicker';
 import Link from 'next/link';
 
 interface EventDetailsProps {
@@ -157,11 +158,14 @@ const RenderEventDetails: React.FC<EventDetailsProps> = ({
           />
         )
       ) : isRegistered ? (
-        <EventStatusMessage
-          variant="success"
-          title="You're already registered for this event!"
-          description="We look forward to seeing you there."
-        />
+        <div className="space-y-6">
+          <EventStatusMessage
+            variant="success"
+            title="You're already registered for this event!"
+            description="We look forward to seeing you there."
+          />
+          <WorkshopPicker eventId={event.id} />
+        </div>
       ) : event.attendeeCap &&
         event.currentAttendeeCount &&
         event.currentAttendeeCount >= event.attendeeCap ? (
@@ -176,25 +180,24 @@ const RenderEventDetails: React.FC<EventDetailsProps> = ({
           title="This event is for members only!"
           description="Purchase a membership to gain access to this event and many other perks."
         />
+      ) : event.requiresOnboarding && user && !user.onboardingComplete ? (
+        <EventStatusMessage
+          variant="error"
+          title="You haven't completed your profile yet!"
+          description={
+            <>
+              Complete your{' '}
+              <Link
+                href={`/onboarding?redirect=${encodeURIComponent(`/events/${event.slug}`)}`}
+                className="hover:underline transition-transform duration-200 text-blue-500"
+              >
+                portal onboarding
+              </Link>{' '}
+              to register for this event. We&apos;ll bring you right back here when you&apos;re done.
+            </>
+          }
+        />
       ) : (
-        // : !user?.onboardingComplete ? (
-        //   <EventStatusMessage
-        //     variant="error"
-        //     title="You haven't completed your profile yet!"
-        //     description={
-        //       <>
-        //         Complete your{' '}
-        //         <a
-        //           href="/onboarding"
-        //           className="hover:underline transition-transform duration-200 text-blue-500"
-        //         >
-        //           portal onboarding
-        //         </a>{' '}
-        //         to register for this event
-        //       </>
-        //     }
-        //   />
-        // )
         <div className="flex flex-col relative gap-4 py-1 w-full">
           <h2 className="text-xl font-semibold">Event Registration</h2>
           <form onSubmit={handleSubmit} className="space-y-4 max-w-[64rem]">
