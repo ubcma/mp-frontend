@@ -36,7 +36,9 @@ export default async function Layout({
 
   const showMembershipPrompt = userRole === 'Basic';
   const showOnboardingPrompt = onboardingStatus !== null && !onboardingStatus;
-  const showPrompts = showMembershipPrompt || showOnboardingPrompt;
+  const showGatewaysPrompt = userRole === 'Basic';
+  const showPrompts =
+    showMembershipPrompt || showOnboardingPrompt || showGatewaysPrompt;
 
   return (
     <SidebarProvider>
@@ -48,6 +50,7 @@ export default async function Layout({
             <Prompts
               showOnboardingPrompt={showOnboardingPrompt}
               showMembershipPrompt={showMembershipPrompt}
+              showGatewaysPrompt={showGatewaysPrompt}
             />
           ) : (
             <Breadcrumbs />
