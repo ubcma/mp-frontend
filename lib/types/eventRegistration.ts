@@ -19,6 +19,19 @@ export interface EventRegistration {
   faculty: string | null;
   phoneNumber: string | null;
   responses: Record<string, string>;
+  workshops: WorkshopPick[];
+}
+
+export interface WorkshopPick {
+  slot: number;
+  workshopId: number;
+  title: string;
+}
+
+export interface EventWorkshopSummary {
+  id: number;
+  slot: number;
+  title: string;
 }
 
 export interface EventQuestion {
@@ -36,4 +49,5 @@ export interface EventQuestion {
 export interface EventRegistrationsResponse {
   registrations: EventRegistration[];
   questions: EventQuestion[];
+  workshops: EventWorkshopSummary[];
 }

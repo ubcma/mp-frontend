@@ -115,10 +115,10 @@ export default function CheckoutEventForm({
         // TODO: Persist question responses and send in request body to create eventRegistrationResponse
         // body: { responses: Array<{ questionId: number; response: string }>, stripeTransactionId: string }
 
-        window.location.href = `/success?payment_intent=${paymentIntent?.id}&redirect_status=${paymentIntent?.status}`;
+        window.location.href = `/event-purchase-success?event=${eventSlug}&payment_intent=${paymentIntent?.id}&redirect_status=${paymentIntent?.status}`;
       }
     });
-  }, [paymentRequest, stripe, clientSecret, agreed]);
+  }, [paymentRequest, stripe, clientSecret, agreed, eventSlug]);
 
   const handleSubmit = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
@@ -133,7 +133,7 @@ export default function CheckoutEventForm({
       elements,
       confirmParams: {
         // Stripe will append ?payment_intent & redirect_status
-        return_url: `${window.location.origin}/event-purchase-success`,
+        return_url: `${window.location.origin}/event-purchase-success?event=${eventSlug}`,
       },
     });
 

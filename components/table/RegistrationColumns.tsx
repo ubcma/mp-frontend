@@ -111,7 +111,8 @@ export default function RegistrationStatusDropdown({
 
 export const registrationsColumns = (
   questions: EventQuestion[],
-  eventId: string
+  eventId: string,
+  workshopSlots: number[] = []
 ): ColumnDef<EventRegistration>[] => [
   // User Info Section
   {
@@ -208,6 +209,21 @@ export const registrationsColumns = (
       );
     },
   },
+  // One column per workshop slot, only for events with workshops
+  ...workshopSlots.map(
+    (slot): ColumnDef<EventRegistration> => ({
+      id: `workshop_slot_${slot}`,
+      header: `Workshop (Slot ${slot})`,
+      cell: ({ row }) => {
+        const pick = row.original.workshops?.find((w) => w.slot === slot);
+        return pick ? (
+          <Badge variant="outline">{pick.title}</Badge>
+        ) : (
+          <Badge variant="secondary">Not picked</Badge>
+        );
+      },
+    })
+  ),
   // Dynamic columns for custom questions
   ...questions.map(
     (question): ColumnDef<EventRegistration> => ({

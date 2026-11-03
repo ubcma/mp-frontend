@@ -765,10 +765,22 @@ const InterestsStep: React.FC<
   </div>
 );
 
+// Only same-site paths, so ?redirect= can't send users to another site.
+const getOnboardingRedirect = (): string | null => {
+  if (typeof window === 'undefined') return null;
+  const redirect = new URLSearchParams(window.location.search).get('redirect');
+  return redirect && redirect.startsWith('/') && !redirect.startsWith('//')
+    ? redirect
+    : null;
+};
+
 const CompletionStep: React.FC<Pick<StepProps, 'isMobile' | 'steps'>> = ({
   isMobile,
   steps,
-}) => (
+}) => {
+  const redirect = getOnboardingRedirect();
+
+  return (
   <div
     className={`w-full max-w-2xl text-center px-4 ${isMobile ? 'space-y-4 py-8' : 'space-y-6 py-16'}`}
   >
@@ -783,14 +795,15 @@ const CompletionStep: React.FC<Pick<StepProps, 'isMobile' | 'steps'>> = ({
     <Button
       onClick={() => {
         sessionStorage.removeItem('onboarding_skipped');
-        window.location.href = '/home';
+        window.location.href = redirect ?? '/home';
       }}
       className="bg-white text-[#EF3050] hover:bg-white/90"
     >
-      Go to Home
+      {redirect?.startsWith('/events/') ? 'Back to Event' : 'Go to Home'}
     </Button>
   </div>
-);
+  );
+};
 
 export default function OnboardingModal(): JSX.Element {
   const [showConfetti, setShowConfetti] = useState<boolean>(false);

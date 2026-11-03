@@ -2,9 +2,16 @@ import { useQuery } from '@tanstack/react-query';
 import { fetchFromAPI } from '../httpHandlers';
 import { EventDisplay } from '../types';
 
-export function useGetEventQuery({ eventSlug }: { eventSlug: string }) {
+export function useGetEventQuery({
+  eventSlug,
+  enabled = true,
+}: {
+  eventSlug: string;
+  enabled?: boolean;
+}) {
   return useQuery<EventDisplay>({
     queryKey: ['event', eventSlug],
+    enabled,
     queryFn: async () => {
       const res = await fetchFromAPI(`/api/events/${eventSlug}`, {
         method: 'GET',
