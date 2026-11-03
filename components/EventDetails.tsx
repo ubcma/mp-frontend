@@ -236,19 +236,13 @@ const RenderEventDetails: React.FC<EventDetailsProps> = ({
               {Number(saving) > 1 &&
                 (user?.role === 'Basic' ? (
                   <span className="text-muted-foreground text-sm italic">
-                    Members save{' '}
+                    Purchase a Gateways ticket as a non-member and{' '}
                     <span className="inline text-ma-red font-semibold">
-                      ${saving.toFixed(2)}
-                    </span>{' '}
-                    on this event.{' '}
-                    <Link
-                      className="inline text-blue-500 font-semibold"
-                      href="/purchase-membership"
-                    >
-                      {' '}
-                      Become a member
-                    </Link>{' '}
-                    to enjoy discounted pricing!
+                      get a free MA Membership
+                    </span>
+                    ! This one-time bundle offer gives you access to Gateways,
+                    along with exclusive perks, future events, and member-only
+                    features on our portal.
                   </span>
                 ) : (
                   <span className="text-muted-foreground text-sm italic">
