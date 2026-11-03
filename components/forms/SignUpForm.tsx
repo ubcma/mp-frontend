@@ -45,7 +45,11 @@ export default function SignUpForm() {
         if (data?.user) {
           setUserEmail(value.email);
           setIsWaitingForVerification(true);
-          toast.success('Account created! Please check your email for verification.');
+          toast.success(
+            data.user.emailVerified
+              ? 'Account created!'
+              : 'Check your email for a verification link.'
+          );
         }
       } catch (error) {
         handleClientError('Sign Up Error', error);
