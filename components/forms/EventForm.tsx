@@ -121,15 +121,8 @@ export default function EventForm({
               isVisible: value.isVisible,
               membersOnly: value.membersOnly,
               questions: questions.map((q, index) => ({
-                label: q.label,
-                placeholder: q.placeholder,
-                type: q.type,
-                isRequired: q.isRequired,
-                options: q.options ?? null,
-                validation: q.validation ?? {},
+                ...q,
                 sortOrder: index + 1,
-                createdAt: new Date(),
-                updatedAt: new Date(),
               })),
               workshops: formatWorkshopDrafts(workshops),
             }

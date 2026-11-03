@@ -17,7 +17,7 @@ import { Workshop, WorkshopSelection } from '@/lib/types/workshop';
 const KENVUE_DISCLAIMER = [
   "By signing up for the Kenvue case, you are committing to submitting a completed case.",
   "If participating as a group, please ensure all group members register for the same session (Session 1 or Session 2).",
-  "The case will be released on X, with submissions due by X.",
+  "The case will be released on November 6th, with submissions due by November 10th.",
   "For more details, please visit our Instagram or refer to the event description on our website.",
 ];
 

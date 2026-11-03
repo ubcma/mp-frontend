@@ -136,7 +136,7 @@ export type WorkshopInput = {
 export type CreateEventPayload = Omit<BaseEventForm, 'startsAt' | 'endsAt'> & {
   startsAt: Date;
   endsAt: Date;
-  questions: EventQuestion[];
+  questions: QuestionInput[];
   workshops?: WorkshopInput[];
 };
 

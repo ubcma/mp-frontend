@@ -3,7 +3,9 @@ import { authClient } from '../auth-client';
 import { handleServerError } from '../error/handleServer';
 
 export const sendForgotPasswordEmail = async (email: string) => {
-  const { data, error } = await authClient.forgetPassword({ // requestPasswordReset is for a newer version of better-auth I think? our backend is still using an older version.
+  // Backend is on an older veresion so expects forgetPassword; client types expect requestPasswordReset (frontend uses a newer better-auth).
+  // @ts-expect-error forgetPassword missing from AuthClient typings until versions align
+  const { data, error } = await authClient.forgetPassword({
     email,
     redirectTo: `${process.env.NEXT_PUBLIC_FRONTEND_URL}/reset-password`,
   });
