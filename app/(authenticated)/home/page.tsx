@@ -49,6 +49,21 @@ const highlightCards = [
   //   ],
   // },
   {
+    image: '/gateways-quiz.jpg',
+    heading: 'Discover your Gateways Route',
+    subheading:
+      'This quick, 6-question quiz is designed to help you uncover your interests, discover your strengths, and explore the many career paths within the world of marketing.',
+    url: 'https://gateways-2026-interest-quiz.vercel.app/',
+    color: '#000000',
+    highlightTags: [
+      {
+        icon: Globe,
+        text: 'External Link',
+        color: '#FFFFFF',
+      },
+    ],
+  },
+  {
     image: '/ma-network.jpg',
     heading: 'MA Mentorship Hub is now open',
     subheading: 'Find your next connection',

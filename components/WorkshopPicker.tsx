@@ -18,7 +18,7 @@ const KENVUE_DISCLAIMER = [
   "Kenvue can only be selected for one of the two workshop slots. If you choose Kenvue in Slot 1, you must select a different workshop in Slot 2 (and vice versa).",
   "By signing up for the Kenvue case, you are committing to submitting a completed case.",
   "If participating as a group, please ensure all group members register for the same session (Session 1 or Session 2). Please form groups of 3 - 4.",
-  "The case will be released on November 7th, with submissions due by November 11th at 12:00PM PST.",
+  "The case will be released on November 7th, with submissions due by November 12th at 12:00PM PST.",
   "For more details, please visit our Instagram or refer to the event description on our website.",
 ];
 
