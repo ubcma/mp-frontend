@@ -85,7 +85,11 @@ const RenderEventDetails: React.FC<EventDetailsProps> = ({
             src={event.imageUrl}
             alt={event.title}
             fill
-            className="object-cover"
+            className={`object-cover ${
+              Number(event.id) === 32
+                ? "object-[center_18%]"
+                : "object-center"
+            }`}
           />
         </div>
       )}
