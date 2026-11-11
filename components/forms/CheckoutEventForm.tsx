@@ -7,21 +7,25 @@ import {
   PaymentRequestButtonElement,
 } from '@stripe/react-stripe-js';
 import type { PaymentRequest as StripePaymentRequest } from '@stripe/stripe-js';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useGetEventQuery } from '@/lib/queries/event';
-import { Lock, CreditCard, Zap, ShieldCheck, Calendar } from 'lucide-react';
+import { Lock, CreditCard, Zap, ShieldCheck, Calendar, Tag } from 'lucide-react';
 import { Button } from '../ui/button';
+import { Input } from '../ui/input';
 import Spinner from '../common/Spinner';
 import TermsCheckbox from '@/components/forms/TermsCheckbox';
 import { getEventStatus, isEventFull } from '@/lib/utils';
 import { useRouter } from 'next/navigation';
 import { useUserQuery } from '@/lib/queries/user';
+import { useApplyPromotionCode, useRedeemFreeEventRegistration } from '@/lib/queries/stripe';
 
 export default function CheckoutEventForm({
   clientSecret,
+  paymentIntentId,
 }: {
   clientSecret: string;
+  paymentIntentId: string;
 }) {
   const stripe = useStripe();
   const elements = useElements();
@@ -32,6 +36,16 @@ export default function CheckoutEventForm({
   const [paymentRequest, setPaymentRequest] =
     useState<StripePaymentRequest | null>(null);
   const [agreed, setAgreed] = useState(false);
+  const agreedRef = useRef(false);
+  useEffect(() => { agreedRef.current = agreed; }, [agreed]);
+
+  const [discountedCents, setDiscountedCents] = useState<number | null>(null);
+  const [promoInput, setPromoInput] = useState('');
+  const [appliedPromo, setAppliedPromo] = useState<string | null>(null);
+  const [promoError, setPromoError] = useState('');
+  const applyPromo = useApplyPromotionCode();
+  const redeemFree = useRedeemFreeEventRegistration();
+
   const searchParams = useSearchParams();
   const eventSlug = searchParams.get('eventSlug');
   const router = useRouter();
@@ -46,6 +60,19 @@ export default function CheckoutEventForm({
   const eventFull = event ? isEventFull(event) : false;
   const status = event ? getEventStatus(event.startsAt) : 'Upcoming';
 
+  const basePriceCents = event
+    ? Math.round(
+        Number(
+          user?.role === 'Basic'
+            ? (event.nonMemberPrice ?? event.price)
+            : event.price
+        ) * 100
+      )
+    : 0;
+  const amountCents = discountedCents ?? basePriceCents;
+  const isFreeWithPromo = appliedPromo !== null && amountCents === 0;
+  const eventTitle = event?.title;
+
   // render form unless there are associated
   useEffect(() => {
     if (isError || !event) {
@@ -55,28 +82,21 @@ export default function CheckoutEventForm({
     if (eventFull) {
       setErrorMsg('404 Event not Found');
       router.replace(`/events/${event.slug}/full`);
-      return;
     } else if (status === 'Past') {
       router.replace(`/events/${event.slug}`);
-      return;
     }
+  }, [isError, event, eventFull, status, router]);
 
-    if (!stripe || !clientSecret || !event) return;
-
-    const eventPriceInCents = Math.round(
-      Number(
-        user?.role === 'Basic'
-          ? (event.nonMemberPrice ?? event.price)
-          : event.price
-      ) * 100
-    );
+  // Create Payment Request once — amount updates via .update()
+  useEffect(() => {
+    if (!stripe || !clientSecret || !eventTitle || eventFull || status === 'Past') return;
 
     const pr = stripe.paymentRequest({
       country: 'CA',
       currency: 'cad',
       total: {
-        label: event.title,
-        amount: eventPriceInCents,
+        label: eventTitle,
+        amount: amountCents,
       },
       requestPayerName: true,
       requestPayerEmail: true,
@@ -85,14 +105,30 @@ export default function CheckoutEventForm({
     pr.canMakePayment().then((result) => {
       if (result) setPaymentRequest(pr);
     });
-  }, [stripe, clientSecret, event, eventFull, status, event?.slug, router]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [stripe, clientSecret, eventTitle, eventFull, status]);
 
-  // Handle PaymentRequest events
+  // Keep Apple/Google Pay total in sync with the (possibly discounted) amount
+  useEffect(() => {
+    if (!paymentRequest || !eventTitle || amountCents === 0) return;
+    try {
+      paymentRequest.update({
+        total: {
+          label: eventTitle,
+          amount: amountCents,
+        },
+      });
+    } catch {
+      // Payment Request may already be completed; ignore
+    }
+  }, [paymentRequest, eventTitle, amountCents]);
+
+  // Attach PR handler once (don't depend on `agreed`)
   useEffect(() => {
     if (!paymentRequest || !stripe || !clientSecret) return;
 
     paymentRequest.on('paymentmethod', async (ev) => {
-      if (!agreed) {
+      if (!agreedRef.current) {
         ev.complete('fail');
         setErrorMsg('Please accept the Terms before paying.');
         return;
@@ -118,15 +154,62 @@ export default function CheckoutEventForm({
         window.location.href = `/event-purchase-success?event=${eventSlug}&payment_intent=${paymentIntent?.id}&redirect_status=${paymentIntent?.status}`;
       }
     });
-  }, [paymentRequest, stripe, clientSecret, agreed, eventSlug]);
+  }, [paymentRequest, stripe, clientSecret, eventSlug]);
+
+  const handleApplyPromo = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setPromoError('');
+    setErrorMsg('');
+
+    const code = promoInput.trim();
+    if (!code) {
+      setPromoError('Enter a promotion code');
+      return;
+    }
+
+    try {
+      const result = await applyPromo.mutateAsync({
+        paymentIntentId,
+        code,
+      });
+
+      setDiscountedCents(result.amount);
+      setAppliedPromo(result.promotionCode);
+
+      // Free codes leave the PaymentIntent untouched, so there is nothing to refresh
+      if (elements && !result.free) {
+        await elements.fetchUpdates();
+      }
+    } catch (err) {
+      setPromoError(err instanceof Error ? err.message : 'Could not apply promotion code');
+    }
+  };
 
   const handleSubmit = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
-    if (!stripe || !elements) return;
     if (!agreed) {
       setErrorMsg('Please accept the Terms before paying.');
       return;
     }
+
+    if (isFreeWithPromo && event && appliedPromo) {
+      setErrorMsg('');
+      setIsLoading(true);
+      try {
+        await redeemFree.mutateAsync({
+          eventId: event.id,
+          paymentIntentId,
+          code: appliedPromo,
+        });
+        window.location.href = `/event-purchase-success?event=${eventSlug}`;
+      } catch (err) {
+        setErrorMsg(err instanceof Error ? err.message : 'Could not complete registration');
+        setIsLoading(false);
+      }
+      return;
+    }
+
+    if (!stripe || !elements) return;
 
     setIsLoading(true);
     const { error } = await stripe.confirmPayment({
@@ -156,15 +239,8 @@ export default function CheckoutEventForm({
     return <p className="text-red-500">Could not load event details.</p>;
   }
 
-  const eventPrice = Math.round(
-    Number(
-      user?.role === 'Basic'
-        ? (event.nonMemberPrice ?? event.price)
-        : event.price
-    )
-  );
-
-  const priceLabel = `$${eventPrice.toFixed(2)}`;
+  const priceLabel = `$${(amountCents / 100).toFixed(2)}`;
+  const hasDiscount = amountCents < basePriceCents;
 
   return (
     <form
@@ -186,60 +262,113 @@ export default function CheckoutEventForm({
         <p className="text-sm text-neutral-700 mt-1">
           {event.pricingTier && `(${user?.role === 'Basic' ? 'Non-member Price, ' : 'Member Price, '}${event.pricingTier})`}
         </p>
-        <div className="flex items-center gap-3 mt-3">
+        <div className="flex items-center gap-3 mt-3 flex-wrap">
+          {hasDiscount && (
+            <span className="text-lg font-medium text-neutral-400 line-through">
+              ${(basePriceCents / 100).toFixed(2)}
+            </span>
+          )}
           <span className="text-xl font-semibold text-ma-red">
-            {priceLabel} CAD
+            {isFreeWithPromo ? 'Free' : `${priceLabel} CAD`}
           </span>
           <div className="flex items-center gap-1 text-xs bg-white border border-ma-red rounded-full px-2 py-0.5 shadow-sm">
             <Calendar className="w-3 h-3 text-ma-red" />
             {new Date(event.startsAt).toLocaleDateString()}
           </div>
+          {appliedPromo && (
+            <span className="text-xs rounded-full border border-green-600 bg-green-50 text-green-700 px-2 py-0.5">
+              {appliedPromo} applied
+            </span>
+          )}
         </div>
         {event.description && (
           <p className="text-sm text-neutral-700 mt-2">{event.description}</p>
         )}
       </div>
 
-      {/* Payment Methods */}
-      <div className="space-y-5">
+      {/* Promotion code */}
+      <div className="space-y-2">
         <div className="flex items-center gap-2">
-          <Zap className="w-4 h-4 text-green-600" />
-          <h4 className="text-sm font-medium text-neutral-800">Quick Pay</h4>
+          <Tag className="w-4 h-4 text-neutral-600" />
+          <h4 className="text-sm font-medium text-neutral-800">Promotion code</h4>
         </div>
-
-        {/* Only show the PR button if available AND terms accepted */}
-        {paymentRequest && agreed ? (
-          <div className="rounded-lg border border-neutral-200 p-3 bg-neutral-50 hover:bg-neutral-100 transition">
-            <PaymentRequestButtonElement options={{ paymentRequest }} />
-          </div>
-        ) : (
-          <p className="text-xs text-neutral-500">
-            {paymentRequest
-              ? 'Please accept the Terms to use Apple Pay / Google Pay.'
-              : 'Apple Pay / Google Pay not available on this device.'}
+        <div className="flex gap-2">
+          <Input
+            value={promoInput}
+            onChange={(e) => setPromoInput(e.target.value)}
+            placeholder="Enter code"
+            disabled={!!appliedPromo || applyPromo.isPending}
+            className="uppercase"
+            autoComplete="off"
+          />
+          <Button
+            type="button"
+            variant="outline"
+            disabled={!!appliedPromo || applyPromo.isPending || !promoInput.trim()}
+            onClick={handleApplyPromo}
+            className="shrink-0"
+          >
+            {applyPromo.isPending ? 'Applying…' : appliedPromo ? 'Applied' : 'Apply'}
+          </Button>
+        </div>
+        {promoError && (
+          <p className="text-sm text-red-600">{promoError}</p>
+        )}
+        {appliedPromo && hasDiscount && (
+          <p className="text-sm text-green-700">
+            Discount applied — you save ${((basePriceCents - amountCents) / 100).toFixed(2)} CAD
           </p>
         )}
       </div>
 
-      {/* Divider */}
-      <div className="flex items-center justify-center gap-2">
-        <div className="w-full border-t border-neutral-300" />
-        <span className="text-xs text-neutral-500">or</span>
-        <div className="w-full border-t border-neutral-300" />
-      </div>
+      {isFreeWithPromo ? (
+        <p className="text-sm text-neutral-700 rounded-lg border border-green-200 bg-green-50 p-3">
+          Your promotion code covers the full price — no payment required.
+        </p>
+      ) : (
+        <>
+          {/* Payment Methods */}
+          <div className="space-y-5">
+            <div className="flex items-center gap-2">
+              <Zap className="w-4 h-4 text-green-600" />
+              <h4 className="text-sm font-medium text-neutral-800">Quick Pay</h4>
+            </div>
 
-      {/* Card Payment */}
-      <div className="space-y-5">
-        <div className="flex items-center gap-2">
-          <CreditCard className="w-4 h-4 text-blue-600" />
-          <h4 className="text-sm font-medium text-neutral-800">
-            Pay with Card
-          </h4>
-        </div>
-        <div className="rounded-lg border border-neutral-200 p-4 bg-neutral-50 shadow-inner">
-          <PaymentElement />
-        </div>
-      </div>
+            {/* Only show the PR button if available AND terms accepted */}
+            {paymentRequest && agreed ? (
+              <div className="rounded-lg border border-neutral-200 p-3 bg-neutral-50 hover:bg-neutral-100 transition">
+                <PaymentRequestButtonElement options={{ paymentRequest }} />
+              </div>
+            ) : (
+              <p className="text-xs text-neutral-500">
+                {paymentRequest
+                  ? 'Please accept the Terms to use Apple Pay / Google Pay.'
+                  : 'Apple Pay / Google Pay not available on this device.'}
+              </p>
+            )}
+          </div>
+
+          {/* Divider */}
+          <div className="flex items-center justify-center gap-2">
+            <div className="w-full border-t border-neutral-300" />
+            <span className="text-xs text-neutral-500">or</span>
+            <div className="w-full border-t border-neutral-300" />
+          </div>
+
+          {/* Card Payment */}
+          <div className="space-y-5">
+            <div className="flex items-center gap-2">
+              <CreditCard className="w-4 h-4 text-blue-600" />
+              <h4 className="text-sm font-medium text-neutral-800">
+                Pay with Card
+              </h4>
+            </div>
+            <div className="rounded-lg border border-neutral-200 p-4 bg-neutral-50 shadow-inner">
+              <PaymentElement />
+            </div>
+          </div>
+        </>
+      )}
 
       {/* Error Message */}
       {errorMsg && (
@@ -254,7 +383,7 @@ export default function CheckoutEventForm({
       {/* Pay Button */}
       <Button
         type="submit"
-        disabled={!stripe || isLoading || !agreed} // disabled until terms accepted
+        disabled={(!stripe && !isFreeWithPromo) || isLoading || !agreed} // disabled until terms accepted
         className="w-full flex items-center justify-center gap-2 rounded-xl px-4 py-3 font-semibold text-white transition duration-200 shadow-md hover:shadow-lg disabled:opacity-60 disabled:cursor-not-allowed"
         variant="ma"
       >
@@ -264,7 +393,7 @@ export default function CheckoutEventForm({
             Processing...
           </>
         ) : (
-          <>Pay {priceLabel}</>
+          <>{isFreeWithPromo ? 'Register for Free' : `Pay ${priceLabel}`}</>
         )}
       </Button>
 
