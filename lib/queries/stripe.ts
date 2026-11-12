@@ -48,6 +48,7 @@ export type ApplyPromotionCodeResponse = {
   promotionCode: string;
   percentOff: number | null;
   amountOff: number | null;
+  free: boolean;
 };
 
 export function useApplyPromotionCode() {
@@ -63,6 +64,27 @@ export function useApplyPromotionCode() {
         body,
       });
       return (await res.json()) as ApplyPromotionCodeResponse;
+    },
+  });
+}
+
+export function useRedeemFreeEventRegistration() {
+  return useMutation({
+    mutationFn: async ({
+      eventId,
+      ...body
+    }: {
+      eventId: string;
+      paymentIntentId: string;
+      code: string;
+    }) => {
+      const res = await fetchFromAPI(`/api/events/${eventId}/registrations/redeem`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body,
+      });
+      return res.json();
     },
   });
 }

@@ -64,6 +64,7 @@ export default function PurchaseEventPage() {
   } = useClientSecret(body, shouldFetchClientSecret);
 
   const clientSecret = clientSecretData?.clientSecret;
+  const paymentIntentId = clientSecretData?.paymentIntentId;
 
   if (isEventLoading) {
     return (
@@ -138,7 +139,7 @@ export default function PurchaseEventPage() {
   }
 
   // Wait for Stripe + client secret
-  if (isClientSecretLoading || !stripePromise || !clientSecret) {
+  if (isClientSecretLoading || !stripePromise || !clientSecret || !paymentIntentId) {
     return (
       <div className="min-h-screen flex flex-col gap-2 items-center justify-center">
         <Spinner />
@@ -177,7 +178,10 @@ export default function PurchaseEventPage() {
             height={128}
             width={128}
           />
-          <CheckoutEventForm clientSecret={clientSecret} />
+          <CheckoutEventForm
+            clientSecret={clientSecret}
+            paymentIntentId={paymentIntentId}
+          />
         </div>
       </Elements>
     </div>
