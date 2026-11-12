@@ -2,9 +2,10 @@
 
 import { DataTable } from '@/components/ui/data-table';
 import { useGetEventRegistrationsQuery } from '@/lib/queries/registrations';
+import { useEventWorkshopsQuery } from '@/lib/queries/workshops';
 import { registrationsColumns } from '@/components/table/RegistrationColumns';
 import Spinner from './common/Spinner';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Input } from './ui/input';
 import {
   Select,
@@ -28,7 +29,21 @@ export default function EventRegistrations({
   eventId,
   eventTitle,
 }: EventRegistrationsProps) {
-  const { data, isLoading, error } = useGetEventRegistrationsQuery(eventId);
+  const { data, isLoading, error, dataUpdatedAt } =
+    useGetEventRegistrationsQuery(eventId);
+  const { data: workshopData, refetch: refetchWorkshops } =
+    useEventWorkshopsQuery(eventId);
+  const prevRegistrationsUpdatedAt = useRef<number | null>(null);
+
+  useEffect(() => {
+    if (
+      prevRegistrationsUpdatedAt.current != null &&
+      dataUpdatedAt !== prevRegistrationsUpdatedAt.current
+    ) {
+      void refetchWorkshops();
+    }
+    prevRegistrationsUpdatedAt.current = dataUpdatedAt;
+  }, [dataUpdatedAt, refetchWorkshops]);
   const [searchQuery, setSearchQuery] = useState('');
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(25);
@@ -174,11 +189,30 @@ export default function EventRegistrations({
         <h1 className="font-semibold text-2xl mb-2">
           Event Registrations: {eventTitle}
         </h1>
-        <div className="flex items-center gap-4 text-sm text-gray-600">
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-gray-600">
           <span>Total Registrations: {registrations.length}</span>
           <span>Custom Questions: {questions.length}</span>
         </div>
       </div>
+
+      {(workshopData?.workshops ?? []).length > 0 && (
+        <section>
+          <div className="flex flex-wrap gap-2">
+            {(workshopData?.workshops ?? []).map((workshop) => (
+              <div
+                key={workshop.id}
+                className="rounded-md border bg-white px-3 py-2 text-sm shadow-sm"
+              >
+                <p className="font-semibold text-gray-900">{workshop.title}</p>
+                <p className="text-xs text-muted-foreground">Slot {workshop.slot}</p>
+                <p className="mt-1 text-gray-600 tabular-nums">
+                  {workshop.registeredCount}/{workshop.capacity}
+                </p>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
       <div className="flex flex-col md:flex-row md:justify-between gap-4">
         <Input
