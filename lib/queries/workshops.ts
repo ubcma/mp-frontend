@@ -18,22 +18,31 @@ export function useEventWorkshopsQuery(eventId: number | string | undefined) {
   });
 }
 
+export type SetWorkshopSelectionPayload =
+  | number[]
+  | {
+      registrationId: number;
+      selectionsBySlot: Record<string, number | null>;
+    };
+
 export function useSetWorkshopSelectionMutation(eventId: number | string) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (workshopIds: number[]) => {
+    mutationFn: async (payload: SetWorkshopSelectionPayload) => {
+      const body = Array.isArray(payload) ? { workshopIds: payload } : payload;
       const res = await fetchFromAPI(`/api/events/${eventId}/workshops/selection`, {
         method: 'PUT',
         credentials: 'include',
-        body: { workshopIds },
+        body: body as Record<string, unknown>,
       });
-      return (await res.json()) as { mySelection: WorkshopSelection };
+      return (await res.json()) as { mySelection: WorkshopSelection | null };
     },
     onSettled: () => {
       // Refetch either way so counts and "full" states are fresh after a 409.
       queryClient.invalidateQueries({ queryKey: ['event-workshops', eventId] });
       queryClient.invalidateQueries({ queryKey: ['user-registrations'] });
+      queryClient.invalidateQueries({ queryKey: ['event-registrations', String(eventId)] });
     },
   });
 }

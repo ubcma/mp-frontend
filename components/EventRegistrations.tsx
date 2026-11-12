@@ -17,6 +17,7 @@ import { Button } from '@/components/ui/button';
 import { CSVLink } from 'react-csv';
 import { Download } from 'lucide-react';
 import { EventRegistration } from '@/lib/types/eventRegistration';
+import EditRegistrationModal from '@/components/EditRegistrationModal';
 
 interface EventRegistrationsProps {
   eventId: string;
@@ -34,6 +35,8 @@ export default function EventRegistrations({
   const [exportMode, setExportMode] = useState<'all' | 'page'>('all');
   const [isClient, setIsClient] = useState(false);
   const [csvFilename, setCsvFilename] = useState('event_registrations.csv');
+  const [editingRegistration, setEditingRegistration] =
+    useState<EventRegistration | null>(null);
 
   useEffect(() => setIsClient(true), []);
 
@@ -232,10 +235,23 @@ export default function EventRegistrations({
         </div>
       ) : (
         <DataTable
-          columns={registrationsColumns(questions, eventId, workshopSlots)}
+          columns={registrationsColumns(questions, eventId, workshopSlots, (registration) =>
+            setEditingRegistration(registration)
+          )}
           data={paginatedRegistrations}
         />
       )}
+
+      <EditRegistrationModal
+        key={editingRegistration?.id ?? 'closed'}
+        open={editingRegistration != null}
+        onOpenChange={(open) => {
+          if (!open) setEditingRegistration(null);
+        }}
+        registration={editingRegistration}
+        eventId={eventId}
+        eventTitle={eventTitle}
+      />
 
       {/* Pagination controls */}
       <div className="flex items-center justify-between">
