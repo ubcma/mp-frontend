@@ -1,6 +1,10 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { fetchFromAPI } from '../httpHandlers';
-import { EventRegistrationsResponse, WorkshopPick } from '../types/eventRegistration';
+import {
+  EventRegistration,
+  EventRegistrationsResponse,
+  WorkshopPick,
+} from '../types/eventRegistration';
 
 export type Registration = {
   id: string;
@@ -57,6 +61,7 @@ export function useUpdateRegistrationMutation() {
       eventId: string; 
       registrationId: string; 
       updateData: {
+        status?: EventRegistration['status'];
         responses?: Array<{ questionId: number; response: string }>;
         stripeTransactionId?: string;
       }

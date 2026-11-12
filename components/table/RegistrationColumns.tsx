@@ -112,7 +112,8 @@ export default function RegistrationStatusDropdown({
 export const registrationsColumns = (
   questions: EventQuestion[],
   eventId: string,
-  workshopSlots: number[] = []
+  workshopSlots: number[] = [],
+  onEditRegistration?: (registration: EventRegistration) => void
 ): ColumnDef<EventRegistration>[] => [
   // User Info Section
   {
@@ -343,7 +344,9 @@ export const registrationsColumns = (
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem>View details</DropdownMenuItem>
-            <DropdownMenuItem>Edit registration</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => onEditRegistration?.(registration)}>
+              Edit registration
+            </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem className="text-red-600">
               Remove registration
