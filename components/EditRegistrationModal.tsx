@@ -118,7 +118,7 @@ export default function EditRegistrationModal({
 
   return (
     <Dialog open={open} onOpenChange={(next) => !isSaving && onOpenChange(next)}>
-      <DialogContent className="max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-h-[90vh] w-full max-w-[calc(100%-2rem)] overflow-y-auto sm:max-w-2xl lg:max-w-3xl">
         <DialogHeader>
           <DialogTitle>Edit registration</DialogTitle>
         </DialogHeader>
@@ -181,10 +181,10 @@ export default function EditRegistrationModal({
                     }));
                   }}
                 >
-                  <SelectTrigger className="w-full">
+                  <SelectTrigger className="h-auto min-h-10 w-full py-2 text-left [&>span]:line-clamp-3 [&>span]:whitespace-normal [&>span]:text-left">
                     <SelectValue placeholder="Select workshop" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="max-w-[min(100vw-2rem,48rem)]">
                     <SelectItem value={NOT_PICKED}>Not picked</SelectItem>
                     {workshops.map((workshop) => {
                       const isCurrent = currentId === workshop.id;
@@ -194,9 +194,12 @@ export default function EditRegistrationModal({
                           key={workshop.id}
                           value={String(workshop.id)}
                           disabled={disabled}
+                          className="items-start py-2 whitespace-normal"
                         >
-                          {workshop.title}
-                          {disabled ? ' (Full)' : ''}
+                          <span className="block text-left leading-snug">
+                            {workshop.title}
+                            {disabled ? ' (Full)' : ''}
+                          </span>
                         </SelectItem>
                       );
                     })}
