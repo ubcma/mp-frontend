@@ -15,12 +15,7 @@ import {
 import { Workshop, WorkshopSelection } from '@/lib/types/workshop';
 
 const KENVUE_DISCLAIMER = [
-  "Kenvue can only be selected for one of the two workshop slots. If you choose Kenvue in Slot 1, you must select a different workshop in Slot 2 (and vice versa).",
-  "By signing up for the Kenvue case, you are committing to submitting a completed case.",
-  "If registering as a group, please ensure you have formed a group of 3-4 members before registering and that all members register for the same session (Session 1 or Session 2).",
-  "The case will be released on November 7th, with submissions due by November 12th at 12:00PM PST.",
-  "Only undergraduate students are eligible to participate in the Kenvue case.",
-  "For more details, please visit our Instagram or refer to the event description on our website.",
+  "Now open for viewing!",
 ];
 
 function isKenvueWorkshop(workshop?: Workshop | null) {
