@@ -15,6 +15,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
+import EventWorkshopCapacityTable from '@/components/EventWorkshopCapacityTable';
 import { CSVLink } from 'react-csv';
 import { Download } from 'lucide-react';
 import { EventRegistration } from '@/lib/types/eventRegistration';
@@ -195,24 +196,7 @@ export default function EventRegistrations({
         </div>
       </div>
 
-      {(workshopData?.workshops ?? []).length > 0 && (
-        <section>
-          <div className="flex flex-wrap gap-2">
-            {(workshopData?.workshops ?? []).map((workshop) => (
-              <div
-                key={workshop.id}
-                className="rounded-md border bg-white px-3 py-2 text-sm shadow-sm"
-              >
-                <p className="font-semibold text-gray-900">{workshop.title}</p>
-                <p className="text-xs text-muted-foreground">Slot {workshop.slot}</p>
-                <p className="mt-1 text-gray-600 tabular-nums">
-                  {workshop.registeredCount}/{workshop.capacity}
-                </p>
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
+      <EventWorkshopCapacityTable workshops={workshopData?.workshops ?? []} />
 
       <div className="flex flex-col md:flex-row md:justify-between gap-4">
         <Input
