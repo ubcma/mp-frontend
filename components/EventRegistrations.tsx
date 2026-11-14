@@ -80,6 +80,9 @@ export default function EventRegistrations({
   }
 
   const registrations = data?.registrations || [];
+  const checkedInCount = registrations.filter(
+    (r) => r.status === 'checkedIn'
+  ).length;
   const questions = data?.questions || [];
   const workshopSlots = [...new Set((data?.workshops || []).map((w) => w.slot))].sort(
     (a, b) => a - b
@@ -192,6 +195,7 @@ export default function EventRegistrations({
         </h1>
         <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-gray-600">
           <span>Total Registrations: {registrations.length}</span>
+          <span>Total Checked In: {checkedInCount}</span>
           <span>Custom Questions: {questions.length}</span>
         </div>
       </div>
